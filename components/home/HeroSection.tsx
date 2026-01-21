@@ -20,15 +20,15 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
     <Box 
       component="section" 
       sx={{ 
-        pt: { xs: 15, md: 18 }, 
-        pb: 10, 
+        pt: { xs: 18, md: 18 }, // Increased top padding for mobile to avoid overlap
+        pb: { xs: 6, md: 10 }, 
         position: 'relative',
         overflow: 'hidden',
         backgroundImage: `linear-gradient(${alpha(theme.palette.text.primary, 0.05)} 1px, transparent 1px), linear-gradient(90deg, ${alpha(theme.palette.text.primary, 0.05)} 1px, transparent 1px)`,
         backgroundSize: '40px 40px',
       }}
     >
-      <Container maxWidth={false} sx={{ px: { xs: 3, md: 6, lg: 8, xl: 10 } }}>
+      <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 8, xl: 10 } }}>
         <Grid container spacing={6} alignItems="center">
           {/* Visual Phone Mockup - Moved to Left */}
           <Grid size={{ xs: 12, lg: 'auto' }} sx={{ display: { xs: 'none', lg: 'flex' }, justifyContent: 'flex-start' }}>
@@ -49,11 +49,12 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                     borderRadius: 2, 
                     bgcolor: alpha(theme.palette.primary.main, 0.05),
                     border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                    mb: 4
+                    mb: { xs: 3, md: 4 },
+                    maxWidth: '100%',
                   }}
                 >
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.875rem' }}>
+                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite', flexShrink: 0 }} />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', fontSize: { xs: '0.65rem', md: '0.875rem' }, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     Lo último en tecnología a tu alcance
                   </Typography>
                 </Box>
@@ -61,10 +62,10 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                 <Typography 
                   variant="h1" 
                   sx={{ 
-                    fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5rem' }, 
+                    fontSize: { xs: '2rem', sm: '3.5rem', md: '5rem' }, 
                     fontWeight: 800, 
-                    lineHeight: 1.2,
-                    mb: 4,
+                    lineHeight: { xs: 1.1, md: 1.2 },
+                    mb: { xs: 3, md: 4 },
                     letterSpacing: '-0.03em'
                   }}
                 >
@@ -76,47 +77,66 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                   }}> que Venezuela necesitaba.</Box>
                 </Typography>
 
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 6, maxWidth: 800, fontWeight: 400, lineHeight: 1.6, fontSize: '1.25rem' }}>
+                <Typography variant="h6" color="text.secondary" sx={{ mb: { xs: 4, md: 6 }, maxWidth: 800, fontWeight: 400, lineHeight: 1.6, fontSize: { xs: '0.95rem', md: '1.25rem' } }}>
                   Precisión absoluta en tiempo real. Bolsa de Valores de Caracas, Banco Central de Venezuela, Mercado P2P y divisas en una sola interfaz diseñada para la máxima eficiencia.
                 </Typography>
 
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: { xs: 'center', lg: 'flex-start' } }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: { xs: 'center', lg: 'flex-start' } }}>
                   <Button
-                    variant="outlined"
-                    size="large"
-                    startIcon={<AndroidIcon />}
+                    variant="contained"
                     onClick={() => onDownload('android')}
                     sx={{ 
-                      borderRadius: 4, 
-                      px: { xs: 3, md: 4 }, 
-                      py: 1.5, 
-                      borderWidth: 2,
-                      '&:hover': { borderWidth: 2 },
+                      borderRadius: 2, 
+                      px: 2, 
+                      py: 1,
+                      bgcolor: 'text.primary',
+                      color: 'background.paper',
                       textTransform: 'none',
-                      fontWeight: 700,
-                      fontSize: '1rem',
-                      minHeight: 48 // Touch target
+                      minHeight: 52,
+                      '&:hover': { bgcolor: 'text.secondary' },
+                      display: 'flex',
+                      gap: 1.5,
+                      alignItems: 'center',
+                      boxShadow: '0 4px 14px 0 rgba(0,0,0,0.2)',
                     }}
                   >
-                    Play Store
+                    <AndroidIcon fontSize="large" />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+                      <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        DISPONIBLE EN
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.3px' }}>
+                        Google Play
+                      </Typography>
+                    </Box>
                   </Button>
+
                   <Button
                     disabled
-                    variant="outlined"
-                    size="large"
-                    startIcon={<AppleIcon />}
+                    variant="contained"
                     sx={{ 
-                      borderRadius: 4, 
-                      px: { xs: 3, md: 4 }, 
-                      py: 1.5, 
+                      borderRadius: 2, 
+                      px: 2, 
+                      py: 1,
+                      bgcolor: alpha(theme.palette.text.primary, 0.8), // Slightly lighter/transparent for disabled look
+                      color: 'background.paper',
                       textTransform: 'none',
-                      fontWeight: 700,
-                      opacity: 0.6, // Increased visibility even if disabled
-                      fontSize: '1rem',
-                      minHeight: 48
+                      minHeight: 52,
+                      opacity: 0.7, // Visual cue for disabled
+                      display: 'flex',
+                      gap: 1.5,
+                      alignItems: 'center',
                     }}
                   >
-                    Próximamente iOS
+                    <AppleIcon fontSize="large" />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+                      <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        PRÓXIMAMENTE
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.3px' }}>
+                        App Store
+                      </Typography>
+                    </Box>
                   </Button>
                 </Box>
               </Box>

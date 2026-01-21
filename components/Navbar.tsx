@@ -114,8 +114,8 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
         zIndex: 1100, // Ensure it stays on top
       }}
     >
-      <Container maxWidth={false} sx={{ px: { xs: 3, md: 6, lg: 8, xl: 10 } }}>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: 110, py: 2 }}>
+      <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 8, xl: 10 } }}>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: { xs: 64, md: 90 }, py: { xs: 1, md: 2 } }}>
           {/* Logo */}
           <Box 
             component={Link} 
@@ -130,8 +130,8 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
           >
             <Box sx={{ 
               position: 'relative', 
-              width: { xs: 120, md: 150 }, 
-              height: { xs: 32, md: 40 },
+              width: { xs: 110, md: 150 }, 
+              height: { xs: 28, md: 40 },
               filter: theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'none',
               transition: 'filter 0.3s ease'
             }}>

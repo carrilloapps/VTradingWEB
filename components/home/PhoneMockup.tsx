@@ -37,7 +37,16 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
     }
   };
 
-  const displayTime = formatTime(lastUpdate);
+  // Track when the data was last received (client-side timestamp)
+  const [lastFetchTime, setLastFetchTime] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (marketData) {
+      setLastFetchTime(new Date().toISOString());
+    }
+  }, [marketData]);
+
+  const displayTime = formatTime(lastFetchTime || lastUpdate);
 
   // Extract BCV Data from API
   // Using explicit typing and checks to avoid 'any'
