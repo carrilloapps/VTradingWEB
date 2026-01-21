@@ -1,6 +1,78 @@
 'use server';
 
-import { fetchMarketData } from '@/lib/vtrading-api';
+import { fetchMarketData, getRatesHistory } from '@/lib/vtrading-api';
+
+/**
+ * Server Action to fetch historical market data.
+ */
+export async function getMarketHistoryAction(page = 1, limit = 30) {
+  try {
+    const rawHistory = await getRatesHistory(page, limit);
+    console.log('DEBUG: rawHistory structure:', JSON.stringify(rawHistory).substring(0, 200));
+    
+    // API might return { data: [...] }, { history: [...] }, { rates: [...] }, or just [...]
+    let historyArray: any[] = [];
+    if (Array.isArray(rawHistory)) {
+      historyArray = rawHistory;
+    } else if (rawHistory && typeof rawHistory === 'object') {
+      // Look for any array property
+      const arrayProp = Object.values(rawHistory).find(val => Array.isArray(val));
+      if (arrayProp) {
+        historyArray = arrayProp as any[];
+      } else if (rawHistory.data && Array.isArray(rawHistory.data)) {
+        historyArray = rawHistory.data;
+      } else if (rawHistory.history && Array.isArray(rawHistory.history)) {
+        historyArray = rawHistory.history;
+      } else if (rawHistory.rates && Array.isArray(rawHistory.rates)) {
+        historyArray = rawHistory.rates;
+      }
+    }
+
+    if (historyArray.length === 0) {
+      console.log('DEBUG: No array found in rawHistory keys:', Object.keys(rawHistory || {}));
+      return [];
+    }
+
+    // Process and normalize history data
+    return historyArray.map((entry: any) => {
+      // API might return price directly or inside a rate object
+      let rawPrice = 0;
+      
+      if (typeof entry === 'number') {
+        rawPrice = entry;
+      } else if (typeof entry === 'object' && entry !== null) {
+        if (entry.rate && typeof entry.rate === 'object') {
+          rawPrice = entry.rate.average || entry.rate.buy || entry.rate.sell || 0;
+        } else if (entry.rate && (typeof entry.rate === 'number' || typeof entry.rate === 'string')) {
+          rawPrice = Number(entry.rate);
+        } else if (entry.average) {
+          rawPrice = Number(entry.average);
+        } else if (entry.price) {
+          rawPrice = Number(entry.price);
+        } else if (entry.rate_average) {
+          rawPrice = Number(entry.rate_average);
+        } else if (entry.value) {
+          rawPrice = Number(entry.value);
+        }
+      }
+      
+      const price = Number(rawPrice) || 0;
+      const buy = Number(entry.rate?.buy || entry.buy || 0) || 0;
+      const sell = Number(entry.rate?.sell || entry.sell || 0) || 0;
+      
+      return {
+        date: entry.createdAt || entry.date || entry.timestamp || new Date().toISOString(),
+        price,
+        buy,
+        sell
+      };
+    }).filter((entry: any) => entry.price > 0) // Filter out invalid entries
+    .reverse(); // Reverse to have chronological order (oldest to newest)
+  } catch (error) {
+    console.error('Error in getMarketHistoryAction:', error);
+    return [];
+  }
+}
 
 /**
  * Normalizes the raw API response into a consistent format.

@@ -74,6 +74,14 @@ export const getBVCMarket = (symbol = '', page = 1, limit = 30) =>
 
 export const getBankRates = () => fetchVTrading('/api/rates/banks');
 
+/**
+ * Fetches historical data for USD/VES rates.
+ * @param page - Page number for pagination
+ * @param limit - Number of records per page
+ */
+export const getRatesHistory = (page = 1, limit = 30) => 
+  fetchVTrading(`/api/rates/history/usd?page=${page}&limit=${limit}`, { next: { revalidate: 0 } });
+
 export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
   const [rates, crypto, bvc] = await Promise.all([
     getRates(),

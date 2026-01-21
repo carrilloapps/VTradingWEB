@@ -12,7 +12,6 @@ import {
   Fade,
   CircularProgress,
   IconButton,
-  Divider,
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import MarketTicker from '@/components/MarketTicker';
@@ -103,8 +102,62 @@ const MarketCard = ({ icon: Icon, title, subtitle, children, color, loading }: a
   );
 };
 
-const TrendChart = ({ title, subtitle, color }: any) => {
+const TrendChart = ({ title, subtitle, color, data, loading }: any) => {
   const theme = useTheme();
+  
+  const chartData = useMemo(() => {
+    if (!data || data.length < 2) return '';
+    
+    const width = 100;
+    const height = 100;
+    const padding = 10;
+    
+    const prices = data.map((d: any) => d.price).filter(p => typeof p === 'number' && !isNaN(p));
+    if (prices.length < 2) return '';
+    
+    const minVal = Math.min(...prices);
+    const maxVal = Math.max(...prices);
+    const range = maxVal - minVal || 1;
+
+    return data.map((d: any, i: number) => {
+      const x = (i / (data.length - 1)) * width;
+      const y = height - padding - ((d.price - minVal) / range) * (height - 2 * padding);
+      return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+    }).join(' ');
+  }, [data]);
+
+  const lastPointY = useMemo(() => {
+    if (!data || data.length === 0) return '50%';
+    const prices = data.map((d: any) => d.price).filter(p => typeof p === 'number' && !isNaN(p));
+    if (prices.length === 0) return '50%';
+    
+    const minVal = Math.min(...prices);
+    const maxVal = Math.max(...prices);
+    const range = maxVal - minVal || 1;
+    const lastPrice = data[data.length - 1].price;
+    const padding = 10;
+    const y = 100 - (padding + ((lastPrice - minVal) / range) * (100 - 2 * padding));
+    return `${Math.max(padding, Math.min(100 - padding, y))}%`;
+  }, [data]);
+
+  const dateLabels = useMemo(() => {
+    if (!data || data.length < 2) return null;
+    
+    const labels = [];
+    const count = 4;
+    for (let i = 0; i < count; i++) {
+      const index = Math.floor((i / (count - 1)) * (data.length - 1));
+      const dateStr = data[index]?.date;
+      if (dateStr) {
+        const date = new Date(dateStr);
+        // Format as day name or short date
+        const label = i === count - 1 ? 'AHORA' : date.toLocaleDateString('es-ES', { weekday: 'short' }).toUpperCase();
+        labels.push(label);
+      }
+    }
+    return labels;
+  }, [data]);
+
   return (
     <Box 
       sx={{ 
@@ -121,12 +174,18 @@ const TrendChart = ({ title, subtitle, color }: any) => {
         boxShadow: '0 20px 40px -15px rgba(0,0,0,0.5)'
       }}
     >
+      {loading && (
+        <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.3)', zIndex: 20 }}>
+          <CircularProgress size={20} color="inherit" />
+        </Box>
+      )}
+      
       <Box sx={{ position: 'relative', zIndex: 10 }}>
         <Typography variant="subtitle1" fontWeight="800" sx={{ color: 'white', lineHeight: 1.2 }}>{title}</Typography>
         <Typography variant="caption" sx={{ color: 'grey.500', fontWeight: 700 }}>{subtitle}</Typography>
       </Box>
       
-      <Box sx={{ height: 160, position: 'relative', mt: 4, mb: 2, display: 'flex', alignItems: 'flex-end' }}>
+      <Box sx={{ height: 160, position: 'relative', mt: 4, mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box 
           sx={{ 
             position: 'absolute', 
@@ -135,37 +194,60 @@ const TrendChart = ({ title, subtitle, color }: any) => {
             zIndex: 1
           }} 
         />
-        <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'relative', zIndex: 2 }}>
-          <path 
-            d="M0,80 Q25,75 40,60 T70,40 T100,20" 
-            fill="none" 
-            stroke={color || '#10b981'} 
-            strokeWidth="3" 
-            vectorEffect="non-scaling-stroke" 
-            strokeLinecap="round"
+        {(!data || data.length < 2) && !loading ? (
+          <Box sx={{ textAlign: 'center', zIndex: 2 }}>
+            <Typography variant="caption" sx={{ color: 'grey.700', fontWeight: 700, display: 'block' }}>
+              DATOS NO DISPONIBLES
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'grey.800', fontSize: '0.5rem' }}>
+              Items recibidos: {data?.length || 0}
+            </Typography>
+          </Box>
+        ) : (
+          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'relative', zIndex: 2 }}>
+            <path 
+              d={chartData} 
+              fill="none" 
+              stroke={color || '#10b981'} 
+              strokeWidth="3" 
+              vectorEffect="non-scaling-stroke" 
+              strokeLinecap="round"
+              style={{ transition: 'd 0.5s ease' }}
+            />
+          </svg>
+        )}
+        {!loading && data && data.length > 1 && (
+          <Box 
+            sx={{ 
+              position: 'absolute', 
+              top: lastPointY, 
+              right: 0, 
+              width: 10, 
+              height: 10, 
+              bgcolor: color || '#10b981', 
+              borderRadius: '50%', 
+              boxShadow: `0 0 20px ${color || '#10b981'}`,
+              zIndex: 3,
+              transform: 'translate(50%, -50%)',
+              transition: 'top 0.5s ease'
+            }} 
           />
-        </svg>
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            top: '20%', 
-            right: 0, 
-            width: 10, 
-            height: 10, 
-            bgcolor: color || '#10b981', 
-            borderRadius: '50%', 
-            boxShadow: `0 0 20px ${color || '#10b981'}`,
-            zIndex: 3,
-            transform: 'translate(50%, -50%)'
-          }} 
-        />
+        )}
       </Box>
 
       <Box sx={{ position: 'relative', zIndex: 10, display: 'flex', justifyContent: 'space-between', color: 'grey.600', fontSize: '0.65rem', fontWeight: 800, fontFamily: 'monospace' }}>
-        <span>00:00</span>
-        <span>08:00</span>
-        <span>16:00</span>
-        <Box component="span" sx={{ color: color || '#10b981' }}>AHORA</Box>
+        {dateLabels ? dateLabels.map((label: string, i: number) => (
+          <Box key={i} component="span" sx={{ color: label === 'AHORA' ? (color || '#10b981') : 'inherit' }}>
+            {label}
+          </Box>
+        )) : (
+          <>
+            <span>LUN</span>
+            <span>MIE</span>
+            <span>VIE</span>
+            <Box component="span" sx={{ color: color || '#10b981' }}>AHORA</Box>
+          </>
+        )}
       </Box>
     </Box>
   );
@@ -361,13 +443,15 @@ const CryptoTile = ({ label, value, change, isUp, color }: any) => {
   );
 };
 
-import { getMarketDataAction } from '@/app/actions/market';
-import { useState, useEffect } from 'react';
+import { getMarketDataAction, getMarketHistoryAction } from '@/app/actions/market';
+import { useState, useEffect, useMemo } from 'react';
 
 export default function MercadosContent({ initialData }: { initialData: any }) {
   const theme = useTheme();
   const [marketData, setMarketData] = useState<any>(initialData);
   const [loading, setLoading] = useState(!initialData);
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const [bvcPage, setBvcPage] = useState(1);
   const bvcLimit = 6; // Showing 6 items as per the grid layout
 
@@ -428,7 +512,21 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
     }
   };
 
+  const fetchHistory = async () => {
+    setLoadingHistory(true);
+    try {
+      const data = await getMarketHistoryAction(1, 30);
+      console.log('History data received:', data?.length, 'items');
+      setHistoryData(data);
+    } catch (error) {
+      console.error('Error fetching market history:', error);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
   useEffect(() => {
+    fetchHistory();
     if (!initialData || bvcPage !== 1) {
       fetchMarketData(bvcPage);
     }
@@ -645,8 +743,10 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                   <Grid size={{ xs: 12, lg: 6 }}>
                     <TrendChart 
                       title="Tendencia USD/VES" 
-                      subtitle="Últimas 24 horas" 
+                      subtitle="Última semana" 
                       color={theme.palette.primary.main} 
+                      data={historyData}
+                      loading={loadingHistory}
                     />
                   </Grid>
                 </Grid>
