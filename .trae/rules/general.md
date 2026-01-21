@@ -2,6 +2,13 @@
 
 Este documento resume la identidad técnica, arquitectura y reglas de desarrollo del proyecto `vtradingweb`. Úsalo como fuente de verdad.
 
+# Identidad Técnica
+- Dominio: `vtrading.app`
+- Nombre: VTrading
+- Emails: 
+  - soporte@vtrading.app
+  - contacto@vtrading.app
+
 ## 1. Stack Tecnológico
 *   **Core:** Next.js 16.1.4 (App Router)
 *   **Lenguaje:** TypeScript 5+ (Strict Mode)

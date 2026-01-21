@@ -6,6 +6,9 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
+import WifiIcon from '@mui/icons-material/Wifi';
+import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import RateCard from './RateCard';
 import StockListCard from './StockListCard';
 import { CurrencyRate, BVCQuote, RateValue, RateChange, RatesResponse } from '@/lib/vtrading-types';
@@ -170,26 +173,127 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   const statusColor = isMarketOpen ? mockColors.trendUp : mockColors.trendDown;
   const statusBg = isMarketOpen ? alpha(mockColors.trendUp, 0.1) : alpha(mockColors.trendDown, 0.1);
 
+  // Real-time clock for Venezuela
+  const [currentTime, setCurrentTime] = React.useState('9:41');
+
+  React.useEffect(() => {
+    // Initial update
+    const updateTime = () => {
+      const now = new Date();
+      // Format: hh:mm AM/PM in Venezuela time
+      const timeString = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'America/Caracas'
+      }).format(now);
+      setCurrentTime(timeString);
+    };
+
+    updateTime();
+    
+    // Update every second
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <Grow in timeout={1500}>
-      <Box sx={{ position: 'relative' }}>
+      <Box sx={{ position: 'relative', mx: 'auto', width: 'fit-content' }}>
+        {/* Physical Buttons (Right Side) */}
+        <Box sx={{ 
+            position: 'absolute', 
+            right: -3, 
+            top: 100, 
+            width: 4, 
+            height: 40, 
+            bgcolor: isDark ? '#4A504D' : '#C0C9C2', 
+            borderTopRightRadius: 2, 
+            borderBottomRightRadius: 2,
+            zIndex: 1,
+            boxShadow: '-1px 0 2px rgba(0,0,0,0.2)'
+        }} />
+        <Box sx={{ 
+            position: 'absolute', 
+            right: -3, 
+            top: 150, 
+            width: 4, 
+            height: 70, 
+            bgcolor: isDark ? '#4A504D' : '#C0C9C2',
+            borderTopRightRadius: 2, 
+            borderBottomRightRadius: 2,
+            zIndex: 1,
+            boxShadow: '-1px 0 2px rgba(0,0,0,0.2)'
+        }} />
+
         <Paper
           elevation={24}
           sx={{
-            width: 360,
-            height: 720,
-            mx: 0,
-            borderRadius: 12,
-            border: `12px solid ${mockColors.frame}`,
+            width: 340,
+            height: 700,
+            borderRadius: '42px',
+            border: `10px solid ${mockColors.frame}`,
             bgcolor: mockColors.bg,
             overflow: 'hidden',
             position: 'relative',
             zIndex: 2,
-            boxShadow: '0 50px 100px -20px rgba(0,0,0,0.5)'
+            boxShadow: `
+              0 50px 100px -20px rgba(0,0,0,0.5), 
+              inset 0 0 0 2px rgba(0,0,0,0.1),
+              0 0 0 1px rgba(0,0,0,0.1)
+            `,
+            transition: 'all 0.3s ease'
           }}
         >
+          {/* Status Bar / Camera Area */}
+          <Box sx={{ 
+              position: 'absolute', 
+              top: 12, 
+              left: 20, 
+              right: 20, 
+              height: 24, 
+              zIndex: 20,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              pointerEvents: 'none',
+              color: isDark ? '#fff' : '#191C1A'
+          }}>
+             {/* Time */}
+             <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.85rem', letterSpacing: '0.02em' }}>
+                {currentTime}
+             </Typography>
+
+             {/* Punch-hole Camera (Centered) */}
+             <Box sx={{ 
+                 position: 'absolute',
+                 left: '50%',
+                 transform: 'translateX(-50%)',
+                 width: 12, 
+                 height: 12, 
+                 bgcolor: '#101010', 
+                 borderRadius: '50%',
+                 boxShadow: 'inset 0 0 4px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)'
+             }} />
+
+             {/* Status Icons */}
+             <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                <SignalCellularAltIcon sx={{ fontSize: 16 }} />
+                <WifiIcon sx={{ fontSize: 16 }} />
+                <BatteryFullIcon sx={{ fontSize: 16 }} />
+             </Box>
+          </Box>
+
           {/* Mockup Content */}
-          <Box sx={{ p: 2.5, position: 'relative', height: '100%', overflowY: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
+          <Box sx={{ 
+            p: 2.5, 
+            pt: 5, // Extra padding for status bar
+            position: 'relative', 
+            height: '100%', 
+            overflowY: 'auto', 
+            '&::-webkit-scrollbar': { display: 'none' },
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)'
+          }}>
             {loading && (
               <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(mockColors.bg, 0.8), zIndex: 10 }}>
                 <CircularProgress size={24} color="primary" />
@@ -242,6 +346,21 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
             <StockListCard items={stockItems} />
             
           </Box>
+
+          {/* Home Indicator */}
+          <Box sx={{ 
+              position: 'absolute', 
+              bottom: 12, 
+              left: '50%', 
+              transform: 'translateX(-50%)', 
+              width: 108, 
+              height: 4, 
+              bgcolor: isDark ? '#ffffff' : '#191C1A', 
+              borderRadius: 4, 
+              opacity: 0.4,
+              zIndex: 20,
+              pointerEvents: 'none'
+          }} />
         </Paper>
         {/* Decorative Blobs */}
         <Box sx={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, bgcolor: alpha(mockColors.primary, 0.2), borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
