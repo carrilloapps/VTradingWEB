@@ -39,7 +39,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import md5 from 'md5';
 
 const navItems = [
-  { label: 'Mercados', href: '/mercados' },
+  { label: 'Mercados', href: '/#mercados' },
   { label: 'Características', href: '/#caracteristicas' },
   { label: 'Desarrollador', href: '/#desarrollador' },
 ];
@@ -113,7 +113,7 @@ export default function Navbar() {
         justifyContent: 'center'
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth={false} sx={{ px: { xs: 3, md: 6, lg: 8, xl: 10 } }}>
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
           {/* Logo */}
           <Box 
