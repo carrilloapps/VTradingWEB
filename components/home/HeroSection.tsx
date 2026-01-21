@@ -5,6 +5,7 @@ import { Box, Container, Grid, Typography, Button, Fade, useTheme, alpha } from 
 import AndroidIcon from '@mui/icons-material/Android';
 import AppleIcon from '@mui/icons-material/Apple';
 import PhoneMockup from './PhoneMockup';
+import HeroHeader from './HeroHeader';
 import { RatesResponse } from '@/lib/vtrading-types';
 
 interface HeroSectionProps {
@@ -20,15 +21,20 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
     <Box 
       component="section" 
       sx={{ 
-        pt: { xs: 18, md: 18 }, // Increased top padding for mobile to avoid overlap
-        pb: { xs: 6, md: 10 }, 
+        minHeight: '100vh',
+        pt: { xs: 12, md: 0 },
+        pb: { xs: 8, md: 0 },
+        display: 'flex',
+        flexDirection: 'column', // Ensure vertical stacking to prevent horizontal deformation
+        justifyContent: 'center', // Vertically center content
         position: 'relative',
         overflow: 'hidden',
-        backgroundImage: `linear-gradient(${alpha(theme.palette.text.primary, 0.05)} 1px, transparent 1px), linear-gradient(90deg, ${alpha(theme.palette.text.primary, 0.05)} 1px, transparent 1px)`,
+        // Increased opacity from 0.05 to 0.08 for better visibility
+        backgroundImage: `linear-gradient(${alpha(theme.palette.text.primary, 0.08)} 1px, transparent 1px), linear-gradient(90deg, ${alpha(theme.palette.text.primary, 0.08)} 1px, transparent 1px)`,
         backgroundSize: '40px 40px',
       }}
     >
-      <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 8, xl: 10 } }}>
+      <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 8, xl: 10 }, width: '100%' }}>
         <Grid container spacing={6} alignItems="center">
           {/* Visual Phone Mockup - Moved to Left */}
           <Grid size={{ xs: 12, lg: 'auto' }} sx={{ display: { xs: 'none', lg: 'flex' }, justifyContent: 'flex-start' }}>
@@ -36,7 +42,12 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
           </Grid>
 
           {/* Text Content - Moved to Right */}
-          <Grid size={{ xs: 12, lg: 'grow' }} sx={{ textAlign: { xs: 'center', lg: 'left' } }}>
+          <Grid size={{ xs: 12, lg: 'grow' }} sx={{ textAlign: { xs: 'center', lg: 'left' }, minWidth: 0 }}> {/* minWidth 0 for flex items to shrink properly if needed */}
+            {/* Desktop Hero Header */}
+            <Box sx={{ display: { xs: 'none', lg: 'block' }, width: '100%', mb: 4, overflowX: 'visible' }}> {/* Ensure no clipping */}
+              <HeroHeader />
+            </Box>
+
             <Fade in timeout={1000}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', lg: 'flex-start' } }}>
                 <Box 

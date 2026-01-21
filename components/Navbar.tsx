@@ -34,6 +34,7 @@ import ThemeToggle from './ThemeToggle';
 import AuthModal from './AuthModal';
 import MarketTicker from './MarketTicker';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import md5 from 'md5';
@@ -53,6 +54,7 @@ const countries = [
 export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [countryAnchorEl, setCountryAnchorEl] = useState<null | HTMLElement>(null);
@@ -60,6 +62,8 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isTickerHidden, setIsTickerHidden] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === '/';
 
   const getGravatarUrl = (email: string) => {
     const hash = md5(email.trim().toLowerCase());
@@ -106,6 +110,7 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
       position="fixed" 
       elevation={0}
       sx={{ 
+        display: (isHome && !scrolled && isLargeScreen) ? 'none' : 'flex',
         bgcolor: scrolled ? alpha(theme.palette.background.default, 0.8) : 'transparent',
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         borderBottom: scrolled ? `1px solid ${theme.palette.divider}` : 'none',
