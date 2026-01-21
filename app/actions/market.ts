@@ -108,11 +108,23 @@ export async function normalizeMarketData(data: any) {
         if (item) cryptoArr.push(item);
       });
     } else if (typeof source === 'object') {
+      // Priority 1: Summary rates (usually from rates.crypto)
       if (Array.isArray(source.crypto)) {
-        source.crypto.forEach((item: any) => cryptoArr.push(item));
-      } else if (Array.isArray(source.rates)) {
-        source.rates.forEach((item: any) => cryptoArr.push(item));
-      } else if (Array.isArray(source.data)) {
+         // This is redundant usually, but safe
+         source.crypto.forEach((item: any) => cryptoArr.push(item));
+      } 
+      // Priority 2: P2P Offers (from /api/crypto)
+      else if (Array.isArray(source.rates)) {
+         // P2P offers have a different structure. We should ideally separate them.
+         // But for now, let's include them. The frontend must handle the difference.
+         // Or better, we should prefer the 'summary' crypto rates if available.
+         source.rates.forEach((item: any) => {
+             // Tag them as P2P if not already tagged
+             cryptoArr.push({ ...item, isP2P: true });
+         });
+      } 
+      // ... rest of logic
+      else if (Array.isArray(source.data)) {
         source.data.forEach((item: any) => cryptoArr.push(item));
       } else {
         // Objeto de objetos (monedas como claves)
@@ -122,15 +134,24 @@ export async function normalizeMarketData(data: any) {
               cryptoArr.push({ ...item, currency: item.currency || key });
             });
           } else if (val && typeof val === 'object') {
-            cryptoArr.push({ ...val, currency: val.currency || key });
+            // Avoid pushing the pagination/meta objects
+            if (key !== 'pagination' && key !== 'meta') {
+                cryptoArr.push({ ...val, currency: val.currency || key });
+            }
           }
         });
       }
     }
   };
 
-  processCrypto(cryptoData);
+  // We want to prioritize the "Summary" crypto rates (from rates.crypto) over the P2P offers (from crypto.rates)
+  // because the summary rates have the average/buy/sell structure we use in the UI cards.
+  
+  // 1. First process rates.crypto (Summary)
   processCrypto(ratesCryptoData);
+  
+  // 2. Then process crypto (P2P Offers) - append them
+  processCrypto(cryptoData);
 
   // Remove duplicates by currency and source
   const seen = new Set();

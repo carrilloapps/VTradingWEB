@@ -7,9 +7,9 @@ interface RateCardProps {
   title: string;
   icon: React.ReactNode;
   data: {
-    general: { price: string; change: string; trend: 'up' | 'down' | 'neutral' };
-    buy: { price: string; change: string; trend: 'up' | 'down' | 'neutral' };
-    sell: { price: string; change: string; trend: 'up' | 'down' | 'neutral' };
+    general: { price: string; change: string; trend: 'up' | 'down' | 'stable' };
+    buy: { price: string; change: string; trend: 'up' | 'down' | 'stable' };
+    sell: { price: string; change: string; trend: 'up' | 'down' | 'stable' };
   };
   chartColor?: string;
   gradient?: string;

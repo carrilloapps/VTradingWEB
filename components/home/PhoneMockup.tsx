@@ -35,6 +35,92 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   };
 
   const displayTime = formatTime(lastUpdate);
+
+  // Extract BCV Data from API
+  const rates = Array.isArray(marketData?.rates) ? marketData.rates : (marketData?.rates?.rates || []);
+  const bcvRate = rates.find((r: any) => r.currency === 'USD' && r.source === 'BCV');
+
+  const fmt = (num: number) => num?.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0,00';
+  const fmtPct = (num: number) => `${(num || 0).toFixed(2)}%`;
+
+  const getGeneralData = (item: any) => {
+    // Safety check: ensure item and item.rate exist
+    if (!item?.rate) {
+        return { price: '0,00', change: '0.00%', trend: 'stable' as const };
+    }
+
+    const rate = item.rate;
+    const change = item.change || {};
+
+    // Calculate Average Price
+    const avgPrice = typeof rate === 'number' 
+        ? rate 
+        : (rate.average || ((rate.buy || 0) + (rate.sell || 0)) / 2);
+
+    // Calculate Average Change
+    let avgChange = 0;
+    if (typeof change === 'number') {
+        avgChange = change;
+    } else {
+        avgChange = change.average?.percent !== undefined 
+            ? change.average.percent 
+            : ((change.buy?.percent || 0) + (change.sell?.percent || 0)) / 2;
+    }
+    
+    // Determine Trend
+    let trend = typeof change === 'object' ? change.average?.direction : undefined;
+    if (!trend) {
+        if (avgChange > 0) trend = 'up';
+        else if (avgChange < 0) trend = 'down';
+        else trend = 'stable';
+    }
+    
+    return {
+        price: fmt(avgPrice),
+        change: fmtPct(avgChange),
+        trend: trend as 'up' | 'down' | 'stable'
+    };
+  };
+
+  const bcvData = bcvRate ? {
+      general: getGeneralData(bcvRate),
+      buy: { 
+          price: fmt(bcvRate.rate?.buy), 
+          change: fmtPct(bcvRate.change?.buy?.percent), 
+          trend: (bcvRate.change?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
+      },
+      sell: { 
+          price: fmt(bcvRate.rate?.sell), 
+          change: fmtPct(bcvRate.change?.sell?.percent), 
+          trend: (bcvRate.change?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
+      }
+  } : {
+      general: { price: '0', change: '0%', trend: 'up' as const },
+      buy: { price: '0', change: '0%', trend: 'stable' as const },
+      sell: { price: '0', change: '0%', trend: 'stable' as const }
+  };
+  
+  const cryptoList = Array.isArray(marketData?.crypto) ? marketData.crypto : (marketData?.rates?.crypto || []);
+  // Find first crypto with valid rate structure (summary) or fallback to first item
+  const firstCrypto = cryptoList.find((c: any) => c.rate && (c.rate.average || c.rate.buy || c.rate.sell)) || (cryptoList.length > 0 ? cryptoList[0] : null);
+
+  const cryptoData = firstCrypto ? {
+      general: getGeneralData(firstCrypto),
+      buy: { 
+          price: fmt(firstCrypto.rate?.buy), 
+          change: fmtPct(firstCrypto.change?.buy?.percent), 
+          trend: (firstCrypto.change?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
+      },
+      sell: { 
+          price: fmt(firstCrypto.rate?.sell), 
+          change: fmtPct(firstCrypto.change?.sell?.percent), 
+          trend: (firstCrypto.change?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
+      }
+  } : {
+      general: { price: '380,50', change: '-1.20%', trend: 'down' as const },
+      buy: { price: '378,00', change: '-0.50%', trend: 'down' as const },
+      sell: { price: '383,00', change: '-1.50%', trend: 'down' as const }
+  };
   
   // Debug log
   React.useEffect(() => {
@@ -104,23 +190,15 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
               <RateCard 
                 title="USD/VES • BCV"
                 icon={<AttachMoneyIcon />}
-                data={{
-                  general: { price: '347,26', change: '0.80%', trend: 'up' },
-                  buy: { price: '358,81', change: '0.00%', trend: 'neutral' },
-                  sell: { price: '356,61', change: '0.00%', trend: 'neutral' }
-                }}
+                data={bcvData}
                 // Gradient is now handled internally by RateCard to match code.txt
               />
             </Box>
             <Box sx={{ mb: 3 }}>
               <RateCard 
-                title="Tether • P2P"
+                title={firstCrypto ? `${firstCrypto.currency} • ${firstCrypto.source}` : "Tether • P2P"}
                 icon={<ShowChartIcon />}
-                data={{
-                  general: { price: '380,50', change: '-1.20%', trend: 'down' },
-                  buy: { price: '378,00', change: '-0.50%', trend: 'down' },
-                  sell: { price: '383,00', change: '-1.50%', trend: 'down' }
-                }}
+                data={cryptoData}
                 // Gradient is now handled internally by RateCard to match code.txt
               />
             </Box>
