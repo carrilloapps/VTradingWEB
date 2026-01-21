@@ -151,8 +151,21 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
     }
   }, [marketData]);
 
-  const statusColor = isMarketOpen ? '#00FF94' : '#FF8A80';
-  const statusBg = isMarketOpen ? 'rgba(0, 255, 148, 0.1)' : 'rgba(255, 138, 128, 0.1)';
+  const isDark = theme.palette.mode === 'dark';
+  
+  // Colors based on the provided palette
+  const mockColors = {
+    bg: isDark ? '#191C1A' : '#FBFDF9',
+    frame: isDark ? '#2A302D' : '#E0E6E2',
+    text: isDark ? '#E2E3DF' : '#191C1A',
+    textSecondary: isDark ? '#C0C9C2' : '#404944',
+    trendUp: isDark ? '#6DDBAC' : '#168953',
+    trendDown: isDark ? '#FFB4AB' : '#D32F2F',
+    primary: isDark ? '#6DDBAC' : '#006C4C',
+  };
+
+  const statusColor = isMarketOpen ? mockColors.trendUp : mockColors.trendDown;
+  const statusBg = isMarketOpen ? alpha(mockColors.trendUp, 0.1) : alpha(mockColors.trendDown, 0.1);
 
   return (
     <Grow in timeout={1500}>
@@ -164,8 +177,8 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
             height: 720,
             mx: 0,
             borderRadius: 12,
-            border: `12px solid ${theme.palette.mode === 'dark' ? '#1A1A1A' : '#E0E0E0'}`,
-            bgcolor: theme.palette.mode === 'dark' ? '#191C1A' : '#FBFDF9', // Force dark background as per image
+            border: `12px solid ${mockColors.frame}`,
+            bgcolor: mockColors.bg,
             overflow: 'hidden',
             position: 'relative',
             zIndex: 2,
@@ -175,7 +188,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
           {/* Mockup Content */}
           <Box sx={{ p: 2.5, position: 'relative', height: '100%', overflowY: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
             {loading && (
-              <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha('#121212', 0.8), zIndex: 10 }}>
+              <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(mockColors.bg, 0.8), zIndex: 10 }}>
                 <CircularProgress size={24} color="primary" />
               </Box>
             )}
@@ -198,10 +211,10 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
               </Box>
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem' }}>
+                <Typography variant="caption" sx={{ color: mockColors.textSecondary, fontSize: '0.65rem' }}>
                   Actualizado: {displayTime}
                 </Typography>
-                <RefreshIcon sx={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }} />
+                <RefreshIcon sx={{ color: mockColors.textSecondary, fontSize: 14 }} />
               </Box>
             </Box>
             
@@ -228,8 +241,8 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
           </Box>
         </Paper>
         {/* Decorative Blobs */}
-        <Box sx={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, bgcolor: alpha(theme.palette.primary.main, 0.2), borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
-        <Box sx={{ position: 'absolute', bottom: -40, left: -40, width: 200, height: 200, bgcolor: alpha(theme.palette.trendUp || '#00FF94', 0.1), borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
+        <Box sx={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, bgcolor: alpha(mockColors.primary, 0.2), borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
+        <Box sx={{ position: 'absolute', bottom: -40, left: -40, width: 200, height: 200, bgcolor: alpha(mockColors.trendUp, 0.1), borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
       </Box>
     </Grow>
   );

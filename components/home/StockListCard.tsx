@@ -23,6 +23,19 @@ interface StockListCardProps {
 
 const StockListCard = ({ items }: StockListCardProps) => {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  const colors = {
+    text: isDark ? '#E2E3DF' : '#191C1A',
+    textSecondary: isDark ? 'rgba(226, 227, 223, 0.6)' : 'rgba(25, 28, 26, 0.6)',
+    cardBg: isDark ? '#191C1A' : '#FFFFFF',
+    cardBorder: isDark ? '#2A302D' : '#E0E6E2',
+    trendUp: isDark ? '#6DDBAC' : '#168953',
+    trendDown: isDark ? '#FFB4AB' : '#D32F2F',
+    trendUpBg: isDark ? 'rgba(109, 219, 172, 0.1)' : 'rgba(22, 137, 83, 0.1)',
+    trendDownBg: isDark ? 'rgba(255, 180, 171, 0.1)' : 'rgba(211, 47, 47, 0.1)',
+    neutralBg: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+  };
 
   // If no items are provided, show empty state or nothing
   if (!items || items.length === 0) {
@@ -40,9 +53,9 @@ const StockListCard = ({ items }: StockListCardProps) => {
   return (
     <Box sx={{ mt: 2.5 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, px: 1 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'white', fontSize: '0.9rem', letterSpacing: '0.02em' }}>Mercado Bursátil</Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: colors.text, fontSize: '0.9rem', letterSpacing: '0.02em' }}>Mercado Bursátil</Typography>
         <Link href="/cuenta" passHref style={{ textDecoration: 'none' }}>
-            <Typography variant="caption" sx={{ color: '#00FF94', fontWeight: 700, cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.05em' }}>
+            <Typography variant="caption" sx={{ color: colors.trendUp, fontWeight: 700, cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.05em' }}>
               VER TODO
             </Typography>
         </Link>
@@ -56,10 +69,10 @@ const StockListCard = ({ items }: StockListCardProps) => {
             p: 1.5, 
             mb: 1, 
             borderRadius: 3, 
-            bgcolor: '#1A1A1A', 
+            bgcolor: colors.cardBg, 
             display: 'flex', 
             alignItems: 'center',
-            border: '1px solid rgba(255,255,255,0.05)',
+            border: `1px solid ${colors.cardBorder}`,
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}
         >
@@ -79,26 +92,26 @@ const StockListCard = ({ items }: StockListCardProps) => {
           </Avatar>
           
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 800, color: 'white', lineHeight: 1.2, fontSize: '0.85rem', letterSpacing: '0.02em' }}>{item.symbol}</Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase' }}>
+            <Typography variant="body2" sx={{ fontWeight: 800, color: colors.text, lineHeight: 1.2, fontSize: '0.85rem', letterSpacing: '0.02em' }}>{item.symbol}</Typography>
+            <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase' }}>
               {item.name}
             </Typography>
           </Box>
 
           <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: 'white', lineHeight: 1.2, fontSize: '0.8rem' }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: colors.text, lineHeight: 1.2, fontSize: '0.85rem' }}>
               {item.price}
             </Typography>
             <Box sx={{ 
               display: 'inline-flex', 
               alignItems: 'center', 
-              bgcolor: item.trend === 'down' ? 'rgba(255, 68, 68, 0.1)' : item.trend === 'up' ? 'rgba(0, 255, 148, 0.1)' : 'rgba(255,255,255,0.1)',
+              bgcolor: item.trend === 'down' ? colors.trendDownBg : item.trend === 'up' ? colors.trendUpBg : colors.neutralBg,
               px: 0.8,
               py: 0.2,
               borderRadius: 1,
-              mt: 1
+              mt: 0.3
             }}>
-              <Box sx={{ color: item.trend === 'down' ? '#FF4444' : item.trend === 'up' ? '#00FF94' : 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ color: item.trend === 'down' ? colors.trendDown : item.trend === 'up' ? colors.trendUp : colors.textSecondary, display: 'flex', alignItems: 'center' }}>
                 {getTrendIcon(item.trend)}
                 <Typography variant="caption" sx={{ 
                   color: 'inherit',

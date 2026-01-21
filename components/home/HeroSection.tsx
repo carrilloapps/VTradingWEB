@@ -53,7 +53,7 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                 >
                   <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
                   <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.65rem' }}>
-                    Sistema Operativo de Grado Profesional
+                    Lo último en tecnología a tu alcance
                   </Typography>
                 </Box>
                 
