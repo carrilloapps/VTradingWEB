@@ -717,8 +717,12 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                       <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', mt: 3, mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block' }}>
                         Referencia Bancaria (BCV)
                       </Typography>
-                      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
-                        {marketData?.banks?.slice(0, 4).map((bank: any) => (
+                      <Box sx={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', lg: 'repeat(2, 1fr)' }, 
+                        gap: 1.5 
+                      }}>
+                        {marketData?.banks?.slice(0, 6).map((bank: any) => (
                           <Box key={bank.source} sx={{ 
                             p: 2, 
                             borderRadius: 4, 
@@ -741,15 +745,80 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                     </Box>
                   </Grid>
                   <Grid size={{ xs: 12, lg: 6 }}>
-                    <TrendChart 
-                      title="Tendencia USD/VES" 
-                      subtitle="Última semana" 
-                      color={theme.palette.primary.main} 
-                      data={historyData}
-                      loading={loadingHistory}
-                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 3 }}>
+                      <Box sx={{ flexGrow: 1, minHeight: 300 }}>
+                        <TrendChart 
+                          title="Tendencia USD/VES" 
+                          subtitle="Última semana" 
+                          color={theme.palette.primary.main} 
+                          data={historyData}
+                          loading={loadingHistory}
+                        />
+                      </Box>
+                      
+                      {/* More banks to fill space under the chart if it's on desktop */}
+                      <Box sx={{ 
+                        display: { xs: 'none', lg: 'grid' }, 
+                        gridTemplateColumns: 'repeat(2, 1fr)', 
+                        gap: 1.5 
+                      }}>
+                        {marketData?.banks?.slice(6, 10).map((bank: any) => (
+                          <Box key={bank.source} sx={{ 
+                            p: 2, 
+                            borderRadius: 4, 
+                            bgcolor: alpha(theme.palette.text.primary, 0.02), 
+                            border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              bgcolor: alpha(theme.palette.text.primary, 0.04),
+                              borderColor: alpha(theme.palette.primary.main, 0.1),
+                            }
+                          }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', fontSize: '0.55rem', mb: 0.5, textTransform: 'uppercase' }}>{bank.source}</Typography>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 900, letterSpacing: '-0.02em' }}>
+                              <Box component="span" sx={{ fontSize: '0.75em', color: 'text.secondary', mr: 0.5 }}>Bs.</Box>
+                              {(bank.rate?.average || 0).toFixed(2)}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
                   </Grid>
                 </Grid>
+
+                {/* Full width bank list for the bottom space */}
+                {marketData?.banks?.length > 10 && (
+                  <Box sx={{ mt: 4, pt: 4, borderTop: `1px solid ${alpha(theme.palette.divider, 0.05)}` }}>
+                    <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', mb: 2, textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block' }}>
+                      Otras Entidades Bancarias
+                    </Typography>
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(4, 1fr)', lg: 'repeat(5, 1fr)' }, 
+                      gap: 1.5 
+                    }}>
+                      {marketData?.banks?.slice(10, 30).map((bank: any) => (
+                        <Box key={bank.source} sx={{ 
+                          p: 1.5, 
+                          borderRadius: 3, 
+                          bgcolor: alpha(theme.palette.text.primary, 0.01), 
+                          border: `1px solid ${alpha(theme.palette.divider, 0.03)}`,
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.text.primary, 0.03),
+                            borderColor: alpha(theme.palette.primary.main, 0.08),
+                          }
+                        }}>
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', fontSize: '0.5rem', mb: 0.3, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{bank.source}</Typography>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '0.85rem' }}>
+                            <Box component="span" sx={{ fontSize: '0.75em', color: 'text.secondary', mr: 0.5 }}>Bs.</Box>
+                            {(bank.rate?.average || 0).toFixed(2)}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
               </MarketCard>
             </Box>
 

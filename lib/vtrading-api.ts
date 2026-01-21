@@ -1,8 +1,20 @@
+import {
+  RatesResponse,
+  BanksResponse,
+  CryptoResponse,
+  BVCMarketData,
+  HistoryResponse,
+  NotificationRequest,
+  MarketStatus
+} from './vtrading-types';
 
 const API_URL = process.env.VTRADING_API_URL;
 const API_KEY = process.env.VTRADING_API_KEY;
 
-async function fetchVTrading(endpoint: string, options: RequestInit = {}) {
+/**
+ * Generic fetch wrapper for VTrading API
+ */
+async function fetchVTrading<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   if (!API_URL || !API_KEY) {
     throw new Error('VTRADING_API_URL or VTRADING_API_KEY is not configured');
   }
@@ -14,22 +26,26 @@ async function fetchVTrading(endpoint: string, options: RequestInit = {}) {
       'X-API-Key': API_KEY,
       'Content-Type': 'application/json',
     },
-    next: { revalidate: 60 }, // Cache for 1 minute
+    next: { revalidate: 60, ...(options.next || {}) },
   });
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
   }
 
   return response.json();
 }
 
-export const getRates = () => fetchVTrading('/api/rates');
+/**
+ * Get latest exchange rates (Fiat, Border, Crypto Summary, Status)
+ */
+export const getRates = () => fetchVTrading<RatesResponse>('/api/rates');
 
 /**
- * Fetches the current market status from the rates endpoint.
+ * Get current market status (State, Date, Last Update)
  */
-export async function getMarketStatus() {
+export async function getMarketStatus(): Promise<MarketStatus> {
   try {
     const data = await getRates();
     
@@ -39,53 +55,84 @@ export async function getMarketStatus() {
 
     const { state, date, lastUpdate } = data.status;
 
-    // Validation
     if (!state || !date || !lastUpdate) {
       throw new Error('Missing required status fields');
     }
 
-    // Basic date format validation (DD-MM-YYYY)
-    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-    if (!dateRegex.test(date)) {
-      console.warn(`Invalid date format received: ${date}`);
-    }
-
-    return {
-      state,
-      date,
-      lastUpdate
-    };
+    return { state, date, lastUpdate };
   } catch (error) {
     console.error('Error fetching market status:', error);
     throw error;
   }
 }
-export const getCrypto = (asset = '', fiat = 'VES', tradeType = 'BUY') => {
+
+/**
+ * Get Crypto P2P rates (Binance/Local)
+ */
+export const getCrypto = (asset = '', fiat = 'VES', tradeType = 'BUY', page = 1, limit = 10) => {
   const params = new URLSearchParams();
   if (asset) params.append('asset', asset);
   if (fiat) params.append('fiat', fiat);
   if (tradeType) params.append('tradeType', tradeType);
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+  
   const query = params.toString();
-  return fetchVTrading(`/api/crypto${query ? `?${query}` : ''}`);
+  return fetchVTrading<CryptoResponse>(`/api/crypto${query ? `?${query}` : ''}`);
 };
 
-export const getBVCMarket = (symbol = '', page = 1, limit = 30) => 
-  fetchVTrading(`/api/bvc/market?symbol=${symbol}&page=${page}&limit=${limit}`);
-
-export const getBankRates = () => fetchVTrading('/api/rates/banks');
+/**
+ * Get Caracas Stock Exchange (BVC) Market Data
+ */
+export const getBVCMarket = (symbol = '', page = 1, limit = 30) => {
+  const params = new URLSearchParams();
+  if (symbol) params.append('symbol', symbol);
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+  
+  return fetchVTrading<BVCMarketData>(`/api/bvc/market?${params.toString()}`);
+};
 
 /**
- * Fetches historical data for USD/VES rates.
- * @param page - Page number for pagination
- * @param limit - Number of records per page
+ * Get Bank Rates (Paginated)
  */
-export const getRatesHistory = (page = 1, limit = 30) => 
-  fetchVTrading(`/api/rates/history/usd?page=${page}&limit=${limit}`, { next: { revalidate: 0 } });
+export const getBankRates = (page = 1, limit = 30) => 
+  fetchVTrading<BanksResponse>(`/api/rates/banks?page=${page}&limit=${limit}`);
 
+/**
+ * Get Historical Data for a specific symbol (Fiat or Crypto)
+ */
+export const getAssetHistory = (symbol: string, page = 1, limit = 30) => 
+  fetchVTrading<HistoryResponse>(`/api/rates/history/${symbol}?page=${page}&limit=${limit}`, { next: { revalidate: 0 } });
+
+/**
+ * Get Historical Data for USD/VES (Legacy compatibility)
+ */
+export const getRatesHistory = (page = 1, limit = 30) => getAssetHistory('usd', page, limit);
+
+/**
+ * Get Historical Data for a specific Bank
+ */
+export const getBankHistory = (bankName: string, page = 1, limit = 30) => 
+  fetchVTrading<HistoryResponse>(`/api/rates/banks/history/${encodeURIComponent(bankName)}?page=${page}&limit=${limit}`);
+
+/**
+ * Send Firebase Cloud Messaging Notification
+ */
+export const sendNotification = (payload: NotificationRequest) => 
+  fetchVTrading<void>('/api/notifications/send', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    next: { revalidate: 0 }
+  });
+
+/**
+ * Aggregated Market Data Fetcher (Convenience function)
+ */
 export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
   const [rates, crypto, bvc] = await Promise.all([
     getRates(),
-    getCrypto(''), // Empty asset to get all cryptos
+    getCrypto('', 'VES', 'BUY', 1, 10), // Default to first page of crypto
     getBVCMarket('', bvcPage, bvcLimit)
   ]);
 
@@ -98,7 +145,13 @@ export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
 
 export const vtradingApi = {
   getRates,
+  getMarketStatus,
   getCrypto,
   getBVCMarket,
   getBankRates,
+  getRatesHistory,
+  getAssetHistory,
+  getBankHistory,
+  sendNotification,
+  fetchMarketData
 };
