@@ -39,9 +39,9 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import md5 from 'md5';
 
 const navItems = [
-  { label: 'Mercados', href: '#mercados' },
-  { label: 'Características', href: '#caracteristicas' },
-  { label: 'Desarrollador', href: '#desarrollador' },
+  { label: 'Mercados', href: '/mercados' },
+  { label: 'Características', href: '/#caracteristicas' },
+  { label: 'Desarrollador', href: '/#desarrollador' },
 ];
 
 const countries = [

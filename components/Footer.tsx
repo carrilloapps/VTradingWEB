@@ -71,15 +71,34 @@ export default function Footer() {
               Producto
             </Typography>
             <Box component="ul" sx={{ p: 0, m: 0, listStyle: 'none' }}>
-              {['Mercados', 'API Docs', 'Comunidad'].map((item) => (
-                <Box component="li" key={item} sx={{ mb: 1.5 }}>
-                  <Link href="#" style={{ textDecoration: 'none' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
-                      {item}
-                    </Typography>
-                  </Link>
-                </Box>
-              ))}
+              <Box component="li" sx={{ mb: 1.5 }}>
+                <Link href="/mercados" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                    Mercados
+                  </Typography>
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1.5 }}>
+                <Link href="#" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                    API Docs
+                  </Typography>
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1.5 }}>
+                 <Link href="/soporte" style={{ textDecoration: 'none' }}>
+                   <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                     Comunidad
+                   </Typography>
+                 </Link>
+               </Box>
+               <Box component="li" sx={{ mb: 1.5 }}>
+                 <Link href="/estado" style={{ textDecoration: 'none' }}>
+                   <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                     Estado del Sistema
+                   </Typography>
+                 </Link>
+               </Box>
             </Box>
           </Grid>
 
@@ -89,15 +108,41 @@ export default function Footer() {
               Empresa
             </Typography>
             <Box component="ul" sx={{ p: 0, m: 0, listStyle: 'none' }}>
-              {['Sobre nosotros', 'Privacidad', 'Soporte'].map((item) => (
-                <Box component="li" key={item} sx={{ mb: 1.5 }}>
-                  <Link href="#" style={{ textDecoration: 'none' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
-                      {item}
-                    </Typography>
-                  </Link>
-                </Box>
-              ))}
+              <Box component="li" sx={{ mb: 1.5 }}>
+                <Link href="/sobre-nosotros" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                    Sobre nosotros
+                  </Typography>
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1.5 }}>
+                <Link href="/privacidad" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                    Privacidad
+                  </Typography>
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1.5 }}>
+                <Link href="/soporte" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                    Soporte
+                  </Typography>
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1.5 }}>
+                <Link href="/terminos" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                    Términos
+                  </Typography>
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1.5 }}>
+                <Link href="/contacto" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                    Contacto
+                  </Typography>
+                </Link>
+              </Box>
             </Box>
           </Grid>
         </Grid>
