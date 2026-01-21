@@ -11,7 +11,7 @@ interface StockItem {
   name: string;
   price: string;
   change: string;
-  trend: 'up' | 'down' | 'neutral';
+  trend: 'up' | 'down' | 'stable';
   logo?: string;
 }
 
@@ -22,14 +22,12 @@ interface StockListCardProps {
 const StockListCard = ({ items }: StockListCardProps) => {
   const theme = useTheme();
 
-  const defaultItems: StockItem[] = [
-    { symbol: 'ABC.A', name: 'BCO. CARIBE A', price: '900,00 Bs', change: '-9.09%', trend: 'down' },
-    { symbol: 'ALZ.B', name: 'ALALZA INV. B', price: '37,00 Bs', change: '0.00%', trend: 'neutral' },
-  ];
+  // If no items are provided, show empty state or nothing
+  if (!items || items.length === 0) {
+      return null;
+  }
 
-  const displayItems = items && items.length > 0 ? items : defaultItems;
-
-  const getTrendIcon = (trend: 'up' | 'down' | 'neutral') => {
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
       case 'up': return <TrendingUpIcon sx={{ fontSize: 12, mr: 0.5 }} />;
       case 'down': return <TrendingDownIcon sx={{ fontSize: 12, mr: 0.5 }} />;
@@ -46,7 +44,7 @@ const StockListCard = ({ items }: StockListCardProps) => {
         </Typography>
       </Box>
 
-      {displayItems.map((item, index) => (
+      {items.map((item, index) => (
         <Paper 
           key={index}
           elevation={0}

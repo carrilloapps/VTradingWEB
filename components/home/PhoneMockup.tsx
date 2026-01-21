@@ -95,9 +95,9 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
           trend: (bcvRate.change?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
       }
   } : {
-      general: { price: '0', change: '0%', trend: 'up' as const },
-      buy: { price: '0', change: '0%', trend: 'stable' as const },
-      sell: { price: '0', change: '0%', trend: 'stable' as const }
+      general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      sell: { price: '0,00', change: '0.00%', trend: 'stable' as const }
   };
   
   const cryptoList = Array.isArray(marketData?.crypto) ? marketData.crypto : (marketData?.rates?.crypto || []);
@@ -117,11 +117,21 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
           trend: (firstCrypto.change?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
       }
   } : {
-      general: { price: '380,50', change: '-1.20%', trend: 'down' as const },
-      buy: { price: '378,00', change: '-0.50%', trend: 'down' as const },
-      sell: { price: '383,00', change: '-1.50%', trend: 'down' as const }
+      general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      sell: { price: '0,00', change: '0.00%', trend: 'stable' as const }
   };
   
+  const bvcQuotes = Array.isArray(marketData?.bvc) ? marketData.bvc : [];
+  // Take first 2 items for the mockup
+  const stockItems = bvcQuotes.slice(0, 2).map((quote: any) => ({
+    symbol: quote.symbol,
+    name: quote.name,
+    price: `${fmt(quote.price)} Bs`,
+    change: fmtPct(quote.change?.percent),
+    trend: (quote.change?.direction || 'stable') as 'up' | 'down' | 'stable'
+  }));
+
   // Debug log
   React.useEffect(() => {
     if (marketData?.status) {
@@ -203,7 +213,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
               />
             </Box>
             
-            <StockListCard />
+            <StockListCard items={stockItems} />
             
           </Box>
         </Paper>
