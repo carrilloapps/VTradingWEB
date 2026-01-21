@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Box, Typography, useTheme, alpha, Chip } from '@mui/material';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import RemoveIcon from '@mui/icons-material/Remove';
+import { useMarketData } from '@/context/MarketContext';
+import { RatesResponse, CurrencyRate } from '@/lib/vtrading-types';
 
 interface TickerItemProps {
   symbol: string;
-  type?: 'COMPRA' | 'VENTA';
+  type?: string;
   value: string;
-  trend?: 'up' | 'down' | 'stable';
+  trend: 'up' | 'down' | 'stable';
 }
 
 const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
@@ -91,39 +93,127 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
   );
 };
 
-export default function MarketTicker({ items }: { items?: any[] }) {
+export default function MarketTicker({ items, hide }: { items?: any[], hide?: boolean }) {
   const theme = useTheme();
+  const { marketData } = useMarketData();
   const [offset, setOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<number>(0);
   const lastXRef = useRef<number>(0);
   const speedRef = useRef<number>(0.5); // Base speed
-  
-  const displayItems = items || [];
-
-  const animate = useCallback(() => {
-    if (!isDragging && contentRef.current) {
-      setOffset(prev => {
-        const contentWidth = contentRef.current?.offsetWidth || 0;
-        const halfWidth = contentWidth / 2;
-        let newOffset = prev - speedRef.current;
-        
-        // Reset when first set moves out of view
-        if (Math.abs(newOffset) >= halfWidth) {
-          newOffset = 0;
-        }
-        return newOffset;
-      });
-    }
-    requestRef.current = requestAnimationFrame(animate);
-  }, [isDragging]);
 
   useEffect(() => {
+    isDraggingRef.current = isDragging;
+  }, [isDragging]);
+
+  // Derive ticker items if not provided
+  const getTickerItems = (data: RatesResponse | null) => {
+    if (!data) return null;
+    
+    // Support both raw (nested) and normalized (flat) structures
+    // The type definition says rates is CurrencyRate[], but runtime might be different if not careful.
+    // Assuming data follows RatesResponse interface:
+    const rates = data.rates || [];
+    const border = data.border || [];
+    const crypto = data.crypto || [];
+
+    const formatCurrency = (val: number | undefined) => {
+      return (val || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
+
+    const getTrend = (direction: string | undefined) => {
+      if (direction === 'up') return 'up';
+      if (direction === 'down') return 'down';
+      return 'stable';
+    };
+
+    const generatedItems: { symbol: string; type?: 'COMPRA' | 'VENTA'; value: string; trend: 'up' | 'down' | 'stable' }[] = [
+      ...rates.map((r) => {
+        // Handle potentially different structures if API is inconsistent, but try to stick to types
+        const rateVal = typeof r.rate === 'number' ? r.rate : r.rate?.average;
+        const changeDir = typeof r.change === 'number' ? undefined : r.change?.average?.direction;
+        
+        return {
+          symbol: `${r.currency}/VES`,
+          value: formatCurrency(rateVal),
+          trend: getTrend(changeDir)
+        };
+      }) || [],
+      ...border.map((r) => {
+        const rateBuy = typeof r.rate === 'number' ? r.rate : r.rate?.buy;
+        const changeDir = typeof r.change === 'number' ? undefined : r.change?.buy?.direction;
+
+        return {
+          symbol: `${r.currency}/VES`,
+          type: 'COMPRA' as const,
+          value: formatCurrency(rateBuy),
+          trend: getTrend(changeDir)
+        };
+      }) || [],
+      ...border.map((r) => {
+        const rateSell = typeof r.rate === 'number' ? r.rate : r.rate?.sell;
+        const changeDir = typeof r.change === 'number' ? undefined : r.change?.sell?.direction;
+
+        return {
+          symbol: `${r.currency}/VES`,
+          type: 'VENTA' as const,
+          value: formatCurrency(rateSell),
+          trend: getTrend(changeDir)
+        };
+      }) || [],
+      ...crypto.map((r) => {
+        const rateBuy = typeof r.rate === 'number' ? r.rate : r.rate?.buy;
+        const changeDir = typeof r.change === 'number' ? undefined : r.change?.buy?.direction;
+
+        return {
+          symbol: `${r.currency}/VES`,
+          type: 'COMPRA' as const,
+          value: formatCurrency(rateBuy),  
+          trend: getTrend(changeDir)
+        };
+      }) || [],
+      ...crypto.map((r) => {
+        const rateSell = typeof r.rate === 'number' ? r.rate : r.rate?.sell;
+        const changeDir = typeof r.change === 'number' ? undefined : r.change?.sell?.direction;
+
+        return {
+          symbol: `${r.currency}/VES`,
+          type: 'VENTA' as const,
+          value: formatCurrency(rateSell),  
+          trend: getTrend(changeDir)
+        };
+      }) || []
+    ];
+    
+    return generatedItems.length > 0 ? generatedItems : null;
+  };
+  
+  const displayItems = items || getTickerItems(marketData) || [];
+
+  useEffect(() => {
+    const animate = () => {
+      if (!isDraggingRef.current && contentRef.current) {
+        setOffset(prev => {
+          const contentWidth = contentRef.current?.offsetWidth || 0;
+          const halfWidth = contentWidth / 2;
+          let newOffset = prev - speedRef.current;
+          
+          // Reset when first set moves out of view
+          if (Math.abs(newOffset) >= halfWidth) {
+            newOffset = 0;
+          }
+          return newOffset;
+        });
+      }
+      requestRef.current = requestAnimationFrame(animate);
+    };
+
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
-  }, [animate]);
+  }, []); // Empty dependency array, using refs for mutable state
 
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     setIsDragging(true);
@@ -155,7 +245,7 @@ export default function MarketTicker({ items }: { items?: any[] }) {
     setIsDragging(false);
   };
 
-  if (displayItems.length === 0) return null;
+  if (hide || displayItems.length === 0) return null;
 
   return (
     <Box 
@@ -169,13 +259,13 @@ export default function MarketTicker({ items }: { items?: any[] }) {
       onTouchEnd={handleMouseUp}
       sx={{ 
         width: '100%', 
-        bgcolor: alpha(theme.palette.background.default, 0.8),
+        bgcolor: alpha(theme.palette.background.default, 0.9),
         backdropFilter: 'blur(12px)',
         borderBottom: `1px solid ${theme.palette.divider}`,
-        py: 1.5,
+        borderTop: `1px solid ${theme.palette.divider}`,
+        py: 0.8,
         overflow: 'hidden',
-        position: 'fixed',
-        top: 80, // Navbar height
+        position: 'relative',
         zIndex: 90,
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none'
@@ -197,7 +287,7 @@ export default function MarketTicker({ items }: { items?: any[] }) {
               symbol={item.symbol || item.label} 
               type={item.type} 
               value={item.value} 
-              trend={item.trend as any} 
+              trend={item.trend as 'up' | 'down' | 'stable'} 
             />
           </Box>
         ))}

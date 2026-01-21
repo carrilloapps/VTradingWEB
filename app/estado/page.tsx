@@ -20,7 +20,6 @@ import {
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import MarketTicker from '@/components/MarketTicker';
 
 // Componente para el Gauge de Integridad
 const IntegrityGauge = ({ value }: { value: number }) => {
@@ -164,7 +163,6 @@ export default function StatusPage() {
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
-      <MarketTicker />
 
       <Container maxWidth="lg" sx={{ pt: { xs: 20, md: 25 }, pb: 15, flex: 1 }}>
         <Fade in timeout={1000}>

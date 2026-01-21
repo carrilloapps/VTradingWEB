@@ -87,6 +87,7 @@ export interface RatesResponse {
   border: CurrencyRate[];
   crypto: CurrencyRate[]; // Summary crypto rates
   banks?: CurrencyRate[]; // Sometimes included or separate
+  bvc?: BVCQuote[];
 }
 
 export interface BanksResponse {

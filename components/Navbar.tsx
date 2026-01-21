@@ -7,7 +7,6 @@ import {
   Box, 
   Button, 
   Container, 
-  Typography,
   useTheme, 
   alpha, 
   IconButton, 
@@ -33,6 +32,7 @@ import flagCo from '../app/assets/flags/co.svg';
 import flagPe from '../app/assets/flags/pe.svg';
 import ThemeToggle from './ThemeToggle';
 import AuthModal from './AuthModal';
+import MarketTicker from './MarketTicker';
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -50,7 +50,7 @@ const countries = [
   { id: 'pe', label: 'Perú', flag: flagPe, available: false },
 ];
 
-export default function Navbar() {
+export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -109,12 +109,12 @@ export default function Navbar() {
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         borderBottom: scrolled ? `1px solid ${theme.palette.divider}` : 'none',
         transition: 'all 0.3s ease-in-out',
-        height: 80,
-        justifyContent: 'center'
+        width: '100%',
+        zIndex: 1100, // Ensure it stays on top
       }}
     >
       <Container maxWidth={false} sx={{ px: { xs: 3, md: 6, lg: 8, xl: 10 } }}>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: 110, py: 2 }}>
           {/* Logo */}
           <Box 
             component={Link} 
@@ -396,6 +396,8 @@ export default function Navbar() {
           )}
         </Toolbar>
       </Container>
+
+      {!hideTicker && <MarketTicker />}
 
       <AuthModal 
         open={authModalOpen} 

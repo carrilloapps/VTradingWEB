@@ -207,9 +207,12 @@ export const ColorModeProvider = ({ children }: { children: React.ReactNode }) =
 
   useEffect(() => {
     // Detectar preferencia inicial del navegador
-    setMode(prefersDarkMode ? 'dark' : 'light');
+    const newMode = prefersDarkMode ? 'dark' : 'light';
+    if (mode !== newMode) {
+      setMode(newMode);
+    }
     setMounted(true);
-  }, [prefersDarkMode]);
+  }, [prefersDarkMode, mode]);
 
   const colorMode = useMemo(
     () => ({

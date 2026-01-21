@@ -27,7 +27,7 @@ const ManifestoSection = () => {
                 El Manifiesto
               </Typography>
               <Typography variant="h2" fontWeight="800" sx={{ mb: 6, lineHeight: 1.1, fontSize: { xs: '2rem', sm: '3rem', md: '4rem' }, letterSpacing: '-0.02em' }}>
-                "Cuando algo no te gusta, lo construyes mejor."
+                &quot;Cuando algo no te gusta, lo construyes mejor.&quot;
               </Typography>
               <Typography variant="h6" color="text.secondary" sx={{ mb: 8, fontWeight: 400, lineHeight: 1.7, fontSize: { xs: '1rem', md: '1.25rem' } }}>
                 VTrading no es solo una app; es una respuesta. Cansado de herramientas lentas y datos fragmentados, construí la plataforma que yo mismo, como trader, necesitaba. Velocidad sin concesiones, precisión sin dudas.

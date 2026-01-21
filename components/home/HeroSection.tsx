@@ -5,9 +5,10 @@ import { Box, Container, Grid, Typography, Button, Fade, useTheme, alpha } from 
 import AndroidIcon from '@mui/icons-material/Android';
 import AppleIcon from '@mui/icons-material/Apple';
 import PhoneMockup from './PhoneMockup';
+import { RatesResponse } from '@/lib/vtrading-types';
 
 interface HeroSectionProps {
-  marketData: any;
+  marketData: RatesResponse | null;
   loading: boolean;
   onDownload: (platform: string) => void;
 }

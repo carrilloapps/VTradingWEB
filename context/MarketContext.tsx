@@ -5,7 +5,7 @@ import { getMarketDataAction } from '@/app/actions/market';
 import { RatesResponse } from '@/lib/vtrading-types';
 
 interface MarketContextType {
-  marketData: any;
+  marketData: RatesResponse | null;
   loading: boolean;
   refreshData: () => Promise<void>;
 }
@@ -14,11 +14,11 @@ const MarketContext = createContext<MarketContextType | undefined>(undefined);
 
 interface MarketProviderProps {
   children: ReactNode;
-  initialData: any;
+  initialData: RatesResponse | null;
 }
 
 export const MarketProvider: React.FC<MarketProviderProps> = ({ children, initialData }) => {
-  const [marketData, setMarketData] = useState<any>(initialData);
+  const [marketData, setMarketData] = useState<RatesResponse | null>(initialData);
   const [loading, setLoading] = useState(!initialData);
 
   const refreshData = async () => {
