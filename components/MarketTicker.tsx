@@ -47,16 +47,41 @@ const TickerItem = ({ label, value, trend }: TickerItemProps) => {
   );
 };
 
-export default function MarketTicker() {
+interface MarketTickerProps {
+  initialItems?: any[];
+}
+
+import { getMarketDataAction } from '@/app/actions/market';
+
+export default function MarketTicker({ initialItems }: MarketTickerProps) {
   const theme = useTheme();
-  
-  const items = [
-    { label: 'USD/VES BCV', value: '36.42', trend: 'up' },
-    { label: 'BTC/VES', value: '2,415,920.00', trend: 'up' },
-    { label: 'USDT P2P', value: '42.15', trend: 'up' },
-    { label: 'IBVC Index', value: '92,450.21', trend: 'down' },
-    { label: 'USD/VES Parallel', value: '41.98', trend: 'up' },
-  ];
+  const [items, setItems] = useState(initialItems || [
+    { label: 'USD/VES BCV', value: '...', trend: 'up' },
+    { label: 'BTC/VES', value: '...', trend: 'up' },
+    { label: 'USDT P2P', value: '...', trend: 'up' },
+    { label: 'IBVC Index', value: '...', trend: 'down' },
+    { label: 'USD/VES Parallel', value: '...', trend: 'up' },
+  ]);
+
+  useEffect(() => {
+    const fetchTickerData = async () => {
+      try {
+        const data = await getMarketDataAction('ticker');
+        if (data && Array.isArray(data)) {
+          setItems(data);
+        }
+      } catch (error) {
+        console.error('Error fetching ticker data:', error);
+      }
+    };
+
+    if (!initialItems) {
+      fetchTickerData();
+    }
+    
+    const interval = setInterval(fetchTickerData, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, [initialItems]);
 
   return (
     <Box 

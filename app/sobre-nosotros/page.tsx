@@ -89,7 +89,7 @@ export default function SobreNosotrosPage() {
                 color: "#9C27B0" 
               }
             ].map((feature, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Grid size={{ xs: 12, md: 4 }} key={index}>
                 <Paper
                   elevation={0}
                   sx={{
@@ -125,7 +125,7 @@ export default function SobreNosotrosPage() {
       <Box sx={{ py: 15, bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
         <Container maxWidth="lg">
           <Grid container spacing={8} alignItems="center">
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', mb: 2, display: 'block' }}>
                 La Historia
               </Typography>
@@ -151,7 +151,7 @@ export default function SobreNosotrosPage() {
                 </Box>
               </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Box sx={{ 
                 p: 0.5, 
                 borderRadius: 10, 
