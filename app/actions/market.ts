@@ -167,7 +167,8 @@ export async function normalizeMarketData(data: any) {
     crypto: cryptoArr,
     bvc: bvcNormalized,
     bvcMeta: bvcMeta,
-    status: data.rates?.status || data.status || null
+    // Prefer the top-level status which contains the request timestamp from fetchMarketData
+    status: data.status || data.rates?.status || null
   };
 }
 
@@ -183,6 +184,11 @@ export async function getMarketDataAction(bvcPage = 1, bvcLimit = 30) {
     if (rawData.crypto && !Array.isArray(rawData.crypto)) {
       console.log('Crypto keys:', Object.keys(rawData.crypto));
     }
+    
+    // Check if status exists in rawData (from fetchMarketData modification) or in rates
+    const statusFound = rawData.status || rawData.rates?.status;
+    console.log('DEBUG: Status found in action:', statusFound ? 'YES' : 'NO', statusFound);
+
     const data = await normalizeMarketData(rawData);
     
     if (!data) throw new Error('No data received from API');

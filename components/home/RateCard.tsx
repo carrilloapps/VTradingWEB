@@ -143,7 +143,7 @@ const RateCard = ({ title, icon, data, chartColor = '#00FF94', gradient }: RateC
             </Typography>
 
             {/* Values Container (3 Columns) */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: -0.8 }}>
                 
                 {/* General - Column 1 */}
                 <Box sx={{ pr: 1.5, borderRight: '1px solid rgba(255,255,255,0.2)', mr: 1.5 }}>

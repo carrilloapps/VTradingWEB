@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { getMarketDataAction } from '@/app/actions/market';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import MarketTicker from '@/components/MarketTicker';
@@ -11,11 +10,10 @@ import { analytics } from '@/lib/firebase';
 import HeroSection from '@/components/home/HeroSection';
 import FeaturesSection from '@/components/home/FeaturesSection';
 import ManifestoSection from '@/components/home/ManifestoSection';
-import { CurrencyRate } from '@/lib/vtrading-types';
+import { useMarketData } from '@/context/MarketContext';
 
-export default function HomeContent({ initialData }: { initialData: any }) {
-  const [marketData, setMarketData] = useState<any>(initialData);
-  const [loading, setLoading] = useState(!initialData);
+export default function HomeContent() {
+  const { marketData, loading } = useMarketData();
 
   // Derive ticker items from marketData
   const getTickerItems = (data: any) => {
@@ -33,34 +31,44 @@ export default function HomeContent({ initialData }: { initialData: any }) {
       return (val || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
-    const items: { label: string; value: string; trend: 'up' | 'down' | 'neutral' }[] = [
+    const getTrend = (direction: string) => {
+      if (direction === 'up') return 'up';
+      if (direction === 'down') return 'down';
+      return 'stable';
+    };
+
+    const items: { symbol: string; type?: 'COMPRA' | 'VENTA'; value: string; trend: 'up' | 'down' | 'stable' }[] = [
       // Rates
       ...rates.map((r: any) => ({
-        label: `${r.currency}/VES`,
-        value: formatCurrency(r.rate.average),
-        trend: r.change.average?.direction === 'up' ? 'up' : 'down'
+        symbol: `${r?.currency}/VES`,
+        value: formatCurrency(r?.rate?.average),
+        trend: getTrend(r?.change?.average?.direction)
       })) || [],
       // Border
       ...border.map((r: any) => ({
-        label: `${r.currency}/VES • COMPRA`,
-        value: formatCurrency(r.rate.buy),
-        trend: r.change.buy?.direction === 'up' ? 'up' : 'down'
+        symbol: `${r?.currency}/VES`,
+        type: 'COMPRA',
+        value: formatCurrency(r?.rate?.buy),
+        trend: getTrend(r?.change?.buy?.direction)
       })) || [],
       ...border.map((r: any) => ({
-        label: `${r.currency}/VES • VENTA`,
-        value: formatCurrency(r.rate.sell),
-        trend: r.change.sell?.direction === 'up' ? 'up' : 'down'
+        symbol: `${r?.currency}/VES`,
+        type: 'VENTA',
+        value: formatCurrency(r?.rate?.sell),
+        trend: getTrend(r?.change?.sell?.direction)
       })) || [],
       // Cripto
       ...crypto.map((r: any) => ({
-        label: `${r.currency}/VES • COMPRA`,
-        value: formatCurrency(r.rate.buy),  
-        trend: r.change.buy?.direction === 'up' ? 'up' : 'down'
+        symbol: `${r?.currency}/VES`,
+        type: 'COMPRA',
+        value: formatCurrency(r?.rate?.buy),  
+        trend: getTrend(r?.change?.buy?.direction)
       })) || [],
       ...crypto.map((r: any) => ({
-        label: `${r.currency}/VES • VENTA`,
-        value: formatCurrency(r.rate.sell),  
-        trend: r.change.sell?.direction === 'up' ? 'up' : 'down'
+        symbol: `${r?.currency}/VES`,
+        type: 'VENTA',
+        value: formatCurrency(r?.rate?.sell),  
+        trend: getTrend(r?.change?.sell?.direction)
       })) || []
     ];
     
@@ -73,32 +81,7 @@ export default function HomeContent({ initialData }: { initialData: any }) {
     if (analytics) {
       logEvent(analytics, 'page_view', { page_title: 'Home' });
     }
-
-    if (!initialData) {
-      const fetchMarketData = async () => {
-        try {
-          const data = await getMarketDataAction();
-          setMarketData(data);
-        } catch (error) {
-          console.error('Error fetching market data:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchMarketData();
-    }
-
-    const interval = setInterval(async () => {
-      try {
-        const data = await getMarketDataAction();
-        setMarketData(data);
-      } catch (error) {
-        console.error('Error refreshing market data:', error);
-      }
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [initialData]);
+  }, []);
 
   const handleDownloadClick = (platform: string) => {
     if (analytics) {
@@ -109,7 +92,7 @@ export default function HomeContent({ initialData }: { initialData: any }) {
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
       <Navbar />
-      <MarketTicker initialItems={tickerItems || undefined} />
+      <MarketTicker items={tickerItems || undefined} />
 
       <HeroSection 
         marketData={marketData} 

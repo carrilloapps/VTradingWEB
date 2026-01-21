@@ -130,6 +130,9 @@ export const sendNotification = (payload: NotificationRequest) =>
  * Aggregated Market Data Fetcher (Convenience function)
  */
 export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
+  // Capture the timestamp of the request
+  const requestTimestamp = new Date().toISOString();
+
   const [rates, crypto, bvc] = await Promise.all([
     getRates(),
     getCrypto('', 'VES', 'BUY', 1, 10), // Default to first page of crypto
@@ -139,7 +142,12 @@ export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
   return {
     rates,
     crypto,
-    bvc
+    bvc,
+    // Use the request timestamp as the lastUpdate time
+    status: rates?.status ? {
+      ...rates.status,
+      lastUpdate: requestTimestamp
+    } : null
   };
 }
 

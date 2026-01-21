@@ -18,21 +18,32 @@ interface PhoneMockupProps {
 const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   const theme = useTheme();
 
-  const { state, lastUpdate } = marketData?.status || { state: 'CERRADO', lastUpdate: '...' };
+  const { state, lastUpdate } = marketData?.status || { state: 'CERRADO', lastUpdate: null };
   const isMarketOpen = state === 'ABIERTO';
   
-  // Format date if needed, assuming ISO or similar. If already formatted, keep it.
-  const formatTime = (dateStr: string) => {
+  // Format date if needed, assuming ISO or similar.
+  const formatTime = (dateStr: string | null | undefined) => {
     if (!dateStr || dateStr === '...') return '...';
     try {
-        // Try parsing as date
         const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr; // Return original if not a valid date
+        if (isNaN(date.getTime())) return dateStr;
         return new Intl.DateTimeFormat('es-VE', { hour: 'numeric', minute: 'numeric', hour12: true }).format(date);
     } catch (e) {
-        return dateStr;
+        console.error('Date formatting error:', e);
+        return dateStr || '...';
     }
   };
+
+  const displayTime = formatTime(lastUpdate);
+  
+  // Debug log
+  React.useEffect(() => {
+    if (marketData?.status) {
+      console.log('PhoneMockup marketData.status:', marketData.status);
+    } else {
+      console.log('PhoneMockup marketData.status is missing', marketData);
+    }
+  }, [marketData]);
 
   const statusColor = isMarketOpen ? '#00FF94' : '#FF8A80';
   const statusBg = isMarketOpen ? 'rgba(0, 255, 148, 0.1)' : 'rgba(255, 138, 128, 0.1)';
@@ -82,7 +93,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem' }}>
-                  Actualizado: {formatTime(lastUpdate)}
+                  Actualizado: {displayTime}
                 </Typography>
                 <RefreshIcon sx={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }} />
               </Box>
