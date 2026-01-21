@@ -17,16 +17,24 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
   const theme = useTheme();
   
   const getIcon = () => {
-    if (trend === 'down') return <ArrowDropDownIcon fontSize="small" sx={{ color: '#FF4444' }} />;
-    if (trend === 'up') return <ArrowDropUpIcon fontSize="small" sx={{ color: '#00FF94' }} />;
+    if (trend === 'down') return <ArrowDropDownIcon fontSize="small" sx={{ color: theme.palette.trendDown }} />;
+    if (trend === 'up') return <ArrowDropUpIcon fontSize="small" sx={{ color: theme.palette.trendUp }} />;
     return <RemoveIcon fontSize="small" sx={{ color: 'text.secondary', transform: 'scale(0.7)' }} />;
   };
 
   const getBadgeColor = () => {
-    // Blue for BUY (Bid side) - Distinct from Up Trend (Green)
-    if (type === 'COMPRA') return { bg: alpha('#2979FF', 0.15), color: '#448AFF', border: '#2979FF' };
-    // Orange for SELL (Ask side) - Distinct from Down Trend (Red)
-    if (type === 'VENTA') return { bg: alpha('#FF9100', 0.15), color: '#FFB74D', border: '#FF9100' };
+    // Accessible Blue for BUY
+    if (type === 'COMPRA') return { 
+      bg: alpha('#1976D2', 0.1), 
+      color: theme.palette.mode === 'dark' ? '#64B5F6' : '#1565C0', 
+      border: theme.palette.mode === 'dark' ? '#64B5F6' : '#1565C0' 
+    };
+    // Accessible Orange for SELL
+    if (type === 'VENTA') return { 
+      bg: alpha('#ED6C02', 0.1), 
+      color: theme.palette.mode === 'dark' ? '#FFB74D' : '#E65100', 
+      border: theme.palette.mode === 'dark' ? '#FFB74D' : '#E65100' 
+    };
     return { bg: 'transparent', color: 'text.secondary', border: 'transparent' };
   };
 
@@ -38,9 +46,9 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
         variant="caption" 
         sx={{ 
           fontFamily: 'monospace', 
-          color: 'text.secondary',
+          color: 'text.primary', // Improved contrast
           fontWeight: 'bold',
-          fontSize: '0.85rem',
+          fontSize: '0.9rem', // Increased size
           textTransform: 'uppercase'
         }}
       >
@@ -52,8 +60,8 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
           label={type}
           size="small"
           sx={{ 
-            height: 20, 
-            fontSize: '0.7rem', 
+            height: 22, // Slightly taller
+            fontSize: '0.75rem', // Increased size
             fontWeight: 'bold',
             fontFamily: 'monospace',
             bgcolor: badgeStyle.bg,
@@ -69,10 +77,9 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
           variant="caption" 
           sx={{ 
             fontFamily: 'monospace', 
-            color: trend === 'down' ? '#FF4444' : (trend === 'up' ? '#00FF94' : 'text.primary'),
+            color: trend === 'down' ? theme.palette.trendDown : (trend === 'up' ? theme.palette.trendUp : 'text.primary'),
             fontWeight: 'bold',
-            fontSize: '0.85rem',
-            textShadow: trend === 'up' ? `0 0 10px ${alpha('#00FF94', 0.4)}` : 'none',
+            fontSize: '0.9rem', // Increased size
             mr: 0.5
           }}
         >

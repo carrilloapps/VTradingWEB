@@ -44,15 +44,15 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                     alignItems: 'center', 
                     gap: 1.5, 
                     px: 2, 
-                    py: 0.8, 
+                    py: 1, 
                     borderRadius: 2, 
                     bgcolor: alpha(theme.palette.primary.main, 0.05),
                     border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
                     mb: 4
                   }}
                 >
-                  <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.65rem' }}>
+                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.875rem' }}>
                     Lo último en tecnología a tu alcance
                   </Typography>
                 </Box>
@@ -62,7 +62,7 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                   sx={{ 
                     fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5rem' }, 
                     fontWeight: 800, 
-                    lineHeight: 1.1,
+                    lineHeight: 1.2,
                     mb: 4,
                     letterSpacing: '-0.03em'
                   }}
@@ -71,10 +71,11 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.trendUp} 100%)`,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
+                    display: 'inline-block', // Prevent clipping
                   }}> que Venezuela necesitaba.</Box>
                 </Typography>
 
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 6, maxWidth: 800, fontWeight: 400, lineHeight: 1.6 }}>
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 6, maxWidth: 800, fontWeight: 400, lineHeight: 1.6, fontSize: '1.25rem' }}>
                   Precisión absoluta en tiempo real. Bolsa de Valores de Caracas, Banco Central de Venezuela, Mercado P2P y divisas en una sola interfaz diseñada para la máxima eficiencia.
                 </Typography>
 
@@ -87,12 +88,13 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                     sx={{ 
                       borderRadius: 4, 
                       px: { xs: 3, md: 4 }, 
-                      py: 2, 
+                      py: 1.5, 
                       borderWidth: 2,
                       '&:hover': { borderWidth: 2 },
                       textTransform: 'none',
                       fontWeight: 700,
-                      fontSize: { xs: '0.9rem', md: '1rem' }
+                      fontSize: '1rem',
+                      minHeight: 48 // Touch target
                     }}
                   >
                     Play Store
@@ -105,11 +107,12 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                     sx={{ 
                       borderRadius: 4, 
                       px: { xs: 3, md: 4 }, 
-                      py: 2, 
+                      py: 1.5, 
                       textTransform: 'none',
                       fontWeight: 700,
-                      opacity: 0.4,
-                      fontSize: { xs: '0.9rem', md: '1rem' }
+                      opacity: 0.6, // Increased visibility even if disabled
+                      fontSize: '1rem',
+                      minHeight: 48
                     }}
                   >
                     Próximamente iOS

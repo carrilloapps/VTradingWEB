@@ -334,10 +334,12 @@ export default function Navbar() {
                   sx={{ 
                     borderRadius: 10, 
                     px: 3, 
-                    fontSize: '0.7rem', 
+                    py: 1,
+                    fontSize: '0.85rem', 
                     fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
+                    textTransform: 'none', // Improved readability
+                    letterSpacing: '0.02em',
+                    minHeight: 40
                   }}
                 >
                   Descargar App

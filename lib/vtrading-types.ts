@@ -40,9 +40,7 @@ export interface CurrencyRate {
   change?: RateChange | number;
 }
 
-export interface BankRate extends CurrencyRate {
-  // Specific fields for banks if any
-}
+export type BankRate = CurrencyRate;
 
 export interface CryptoP2POffer {
   currency: string;

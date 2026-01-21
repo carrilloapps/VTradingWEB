@@ -108,7 +108,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
       sell: { price: '0,00', change: '0.00%', trend: 'stable' as const }
   };
   
-  const cryptoList = (Array.isArray(marketData?.crypto) ? marketData.crypto : ((marketData as any)?.rates?.crypto || [])) as CurrencyRate[];
+  const cryptoList = (Array.isArray(marketData?.crypto) ? marketData.crypto : (!Array.isArray(ratesData) && ratesData && 'crypto' in ratesData ? (ratesData as { crypto: CurrencyRate[] }).crypto : [])) || [];
   // Find first crypto with valid rate structure (summary) or fallback to first item
   const firstCrypto = cryptoList.find((c: CurrencyRate) => c.rate && ((c.rate as RateValue).average || (c.rate as RateValue).buy || (c.rate as RateValue).sell)) || (cryptoList.length > 0 ? cryptoList[0] : null);
 

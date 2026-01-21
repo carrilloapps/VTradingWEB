@@ -255,7 +255,7 @@ export const ColorModeProvider = ({ children }: { children: React.ReactNode }) =
                 },
                 // Custom & Semantic
                 ...semanticColors,
-                trendUp: '#00C853',
+                trendUp: '#168953', // Darker green for accessibility (WCAG AA)
                 trendDown: '#D32F2F',
                 warning: { main: '#F57C00' },
                 skeleton: '#E1E9EE',
