@@ -5,6 +5,8 @@ import { Box, Paper, Typography, CircularProgress, useTheme, alpha, Grow } from 
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import RateCard from './RateCard';
 import StockListCard from './StockListCard';
 
@@ -15,6 +17,25 @@ interface PhoneMockupProps {
 
 const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   const theme = useTheme();
+
+  const { state, lastUpdate } = marketData?.status || { state: 'CERRADO', lastUpdate: '...' };
+  const isMarketOpen = state === 'ABIERTO';
+  
+  // Format date if needed, assuming ISO or similar. If already formatted, keep it.
+  const formatTime = (dateStr: string) => {
+    if (!dateStr || dateStr === '...') return '...';
+    try {
+        // Try parsing as date
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr; // Return original if not a valid date
+        return new Intl.DateTimeFormat('es-VE', { hour: 'numeric', minute: 'numeric', hour12: true }).format(date);
+    } catch (e) {
+        return dateStr;
+    }
+  };
+
+  const statusColor = isMarketOpen ? '#00FF94' : '#FF8A80';
+  const statusBg = isMarketOpen ? 'rgba(0, 255, 148, 0.1)' : 'rgba(255, 138, 128, 0.1)';
 
   return (
     <Grow in timeout={1500}>
@@ -43,54 +64,55 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
             )}
             
             {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pt: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, pt: 1 }}>
               <Box sx={{ 
-                border: '1px solid #FF8A80', 
+                border: `1px solid ${statusColor}`, 
                 borderRadius: 5, 
-                px: 1.5, 
-                py: 0.5,
-                bgcolor: 'rgba(255, 138, 128, 0.1)'
+                px: 1, 
+                py: 0.3,
+                bgcolor: statusBg
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                  <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#FF8A80' }} />
-                  <Typography variant="caption" sx={{ color: '#FF8A80', fontWeight: 700, fontSize: '0.6rem', letterSpacing: '0.05em' }}>
-                    MERCADO CERRADO
+                  <FiberManualRecordIcon sx={{ fontSize: 8, color: statusColor }} />
+                  <Typography variant="caption" sx={{ color: statusColor, fontWeight: 700, fontSize: '0.6rem', letterSpacing: '0.05em' }}>
+                    MERCADO {state}
                   </Typography>
                 </Box>
               </Box>
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem' }}>
-                  Actualizado: 3:35 p. m.
+                  Actualizado: {formatTime(lastUpdate)}
                 </Typography>
                 <RefreshIcon sx={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }} />
               </Box>
             </Box>
             
-            {/* Rate Cards */}
-            <RateCard 
-              title="USD/VES • BCV"
-              icon={<AttachMoneyIcon />}
-              data={{
-                general: { price: '347,26', change: '0.80%', trend: 'up' },
-                buy: { price: '358,81', change: '0.00%', trend: 'neutral' },
-                sell: { price: '356,61', change: '0.00%', trend: 'neutral' }
-              }}
-              gradient="linear-gradient(180deg, #003366 0%, #001a33 100%)"
-              chartColor="#00FF94"
-            />
-
-            <RateCard 
-              title="TETHER • P2P"
-              icon={<CurrencyExchangeIcon />}
-              data={{
-                general: { price: '464,09', change: '0.01%', trend: 'up' },
-                buy: { price: '463,45', change: '+0.04%', trend: 'up' },
-                sell: { price: '464,72', change: '-0.02%', trend: 'down' }
-              }}
-              gradient="linear-gradient(180deg, #003366 0%, #001a33 100%)"
-              chartColor="#FF4444"
-            />
+            {/* Rate Cards - Now matching RN ExchangeCard style */}
+            <Box sx={{ mb: 2 }}>
+              <RateCard 
+                title="USD/VES • BCV"
+                icon={<AttachMoneyIcon />}
+                data={{
+                  general: { price: '347,26', change: '0.80%', trend: 'up' },
+                  buy: { price: '358,81', change: '0.00%', trend: 'neutral' },
+                  sell: { price: '356,61', change: '0.00%', trend: 'neutral' }
+                }}
+                // Gradient is now handled internally by RateCard to match code.txt
+              />
+            </Box>
+            <Box sx={{ mb: 3 }}>
+              <RateCard 
+                title="Tether • P2P"
+                icon={<ShowChartIcon />}
+                data={{
+                  general: { price: '380,50', change: '-1.20%', trend: 'down' },
+                  buy: { price: '378,00', change: '-0.50%', trend: 'down' },
+                  sell: { price: '383,00', change: '-1.50%', trend: 'down' }
+                }}
+                // Gradient is now handled internally by RateCard to match code.txt
+              />
+            </Box>
             
             <StockListCard />
             

@@ -10,10 +10,16 @@ Este directorio contiene los bloques de construcción visual reutilizables de la
 ## Catálogo de Componentes Clave
 
 ### Estructurales
-*   **`Navbar.tsx`**: Barra de navegación superior. Responsive (Drawer en móvil).
+*   **`Navbar.tsx`**: Barra de navegación superior. Responsive (Drawer en móvil). Soporta ancho completo (`maxWidth={false}`).
 *   **`Footer.tsx`**: Pie de página con enlaces y copyright.
 *   **`AuthModal.tsx`**: Modal de autenticación (Login/Registro) integrado con Firebase.
 *   **`MarketTicker.tsx`**: Cinta de cotizaciones en tiempo real (Marquee).
+
+### Home (Landing Page)
+*   **`HeroSection.tsx`**: Sección principal con grid asimétrico (Texto expansivo vs Mockup). Optimizado para Mobile-First con fondo dinámico.
+*   **`PhoneMockup.tsx`**: Emulador de dispositivo móvil de alta fidelidad (360x720px). Estilo "Dark Mode" forzado.
+    *   **`RateCard.tsx`**: Tarjetas de tasas de cambio con diseño compacto de 3 columnas (General, Compra, Venta) y alta densidad de información.
+    *   **`StockListCard.tsx`**: Lista bursátil con avatares, indicadores de tendencia y diseño optimizado para espacios reducidos.
 
 ### Proveedores
 *   **`MUIProvider.tsx`**: Wrapper necesario para que funcione Material UI con el App Router de Next.js. Maneja la caché de estilos Emotion.
@@ -32,7 +38,9 @@ Este directorio contiene los bloques de construcción visual reutilizables de la
       isActive?: boolean;
     }
     ```
-*   **Iconos:** Usar `@mui/icons-material`.
+*   **Iconos:** OBLIGATORIO usar `@mui/icons-material`. PROHIBIDO usar emojis, caracteres unicode (flechas, etc.) o imágenes para iconos estándar.
+    *   Ejemplo correcto: `<TrendingUpIcon />`
+    *   Ejemplo incorrecto: `change: '↘ -9.09%'` o `<span>📈</span>`
 
 ## Validación
 Al modificar componentes aquí, verificar que no rompan el layout en `app/layout.tsx` o `app/page.tsx`.

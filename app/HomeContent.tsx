@@ -20,39 +20,46 @@ export default function HomeContent({ initialData }: { initialData: any }) {
   // Derive ticker items from marketData
   const getTickerItems = (data: any) => {
     if (!data) return null;
-    const marketcap = data.rates;
+    
+    // Support both raw (nested) and normalized (flat) structures
+    // Raw: data.rates.rates array
+    // Normalized: data.rates array
+    const rates = Array.isArray(data.rates) ? data.rates : (data.rates?.rates || []);
+    const border = Array.isArray(data.border) ? data.border : (data.rates?.border || []);
+    const crypto = Array.isArray(data.crypto) ? data.crypto : (data.rates?.crypto || []);
+
+    // Helper to format currency: 1.000,00
+    const formatCurrency = (val: number) => {
+      return (val || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
+
     const items: { label: string; value: string; trend: 'up' | 'down' | 'neutral' }[] = [
       // Rates
-      ...marketcap.rates.map((r: any) => ({
+      ...rates.map((r: any) => ({
         label: `${r.currency}/VES`,
-        value: (r.rate.average || 0).toFixed(2),
+        value: formatCurrency(r.rate.average),
         trend: r.change.average?.direction === 'up' ? 'up' : 'down'
       })) || [],
       // Border
-      ...marketcap.border.map((r: any) => ({
-        label: `${r.currency}/VES (COMPRA)`,
-        value: (r.rate.buy || 0).toFixed(2),
+      ...border.map((r: any) => ({
+        label: `${r.currency}/VES • COMPRA`,
+        value: formatCurrency(r.rate.buy),
         trend: r.change.buy?.direction === 'up' ? 'up' : 'down'
       })) || [],
-      ...marketcap.border.map((r: any) => ({
-        label: `${r.currency}/VES (VENTA)`,
-        value: (r.rate.sell || 0).toFixed(2),
+      ...border.map((r: any) => ({
+        label: `${r.currency}/VES • VENTA`,
+        value: formatCurrency(r.rate.sell),
         trend: r.change.sell?.direction === 'up' ? 'up' : 'down'
       })) || [],
       // Cripto
-      ...marketcap.crypto.map((r: any) => ({
-        label: `${r.currency}/VES (COMPRA)`,
-        value: (r.rate.buy || 0).toFixed(2),  
+      ...crypto.map((r: any) => ({
+        label: `${r.currency}/VES • COMPRA`,
+        value: formatCurrency(r.rate.buy),  
         trend: r.change.buy?.direction === 'up' ? 'up' : 'down'
       })) || [],
-      ...marketcap.crypto.map((r: any) => ({
-        label: `${r.currency}/VES (COMPRA)`,
-        value: (r.rate.buy || 0).toFixed(2),  
-        trend: r.change.buy?.direction === 'up' ? 'up' : 'down'
-      })) || [],
-      ...marketcap.crypto.map((r: any) => ({
-        label: `${r.currency}/VES (VENTA)`,
-        value: (r.rate.sell || 0).toFixed(2),  
+      ...crypto.map((r: any) => ({
+        label: `${r.currency}/VES • VENTA`,
+        value: formatCurrency(r.rate.sell),  
         trend: r.change.sell?.direction === 'up' ? 'up' : 'down'
       })) || []
     ];

@@ -18,99 +18,171 @@ interface RateCardProps {
 const RateCard = ({ title, icon, data, chartColor = '#00FF94', gradient }: RateCardProps) => {
   const theme = useTheme();
 
+  // Helper for trend color matching the RN code logic
+  const getTrendColor = (percent: string) => {
+    if (!percent || percent.includes('0.00') || percent === '0%') return 'rgba(255, 255, 255, 0.5)';
+    return percent.includes('-') ? '#FF4444' : '#00FF94';
+  };
+
   const formatPrice = (price: string) => {
     const parts = price.split(',');
     return (
       <>
-        {parts[0]}<Typography component="span" sx={{ fontSize: '0.75em' }}>,{parts[1]}</Typography>
+        {parts[0]}<Typography component="span" sx={{ fontSize: '0.7em' }}>,{parts[1]}</Typography>
       </>
     );
+  };
+
+  // Helper to parse percentage string to number
+  const parsePercentage = (percentStr: string): number => {
+    if (!percentStr) return 0;
+    // Remove % and replace comma with dot if needed, though usually format is 0.80% or -1.20%
+    // Assuming format like "0.80%" or "-1.20%" or "0,80%"
+    const cleanStr = percentStr.replace('%', '').replace(',', '.');
+    const val = parseFloat(cleanStr);
+    return isNaN(val) ? 0 : val;
+  };
+
+  // Dynamic path generation logic adapted from mobile version
+  const getChartPath = (percentStr: string) => {
+    const percent = parsePercentage(percentStr);
+
+    // If practically zero, flat line
+    if (Math.abs(percent) < 0.001) return 'M0 25 L 300 25';
+    
+    // Dynamic curve intensity based on percentage
+    // We amplify small percentages to make them visible
+    // 0.5% is treated as "high intensity" (1.0) for visual purposes
+    const scaleFactor = 200; // Multiplier: 0.005 * 200 = 1.0
+    const intensity = Math.min(Math.abs(percent / 100) * scaleFactor, 1.0); // divide by 100 because input is like 0.80 not 0.0080
+    
+    // Base amplitude (how far from center Y=25)
+    // Min deviation 4 (flat-ish), Max 22 (steep, keeping within 50px height padding)
+    const minAmp = 4;
+    const maxAmp = 22;
+    const amplitude = minAmp + ((maxAmp - minAmp) * intensity);
+    const center = 25;
+    
+    if (percent > 0) {
+        // Up Trend: Start Low (Y > 25), End High (Y < 25)
+        const startY = center + amplitude;
+        const endY = center - amplitude;
+        // Bezier control points for smooth S-curve, scaled for width 300
+        // Original: M0 startY C 40 startY, 60 endY, 100 endY
+        // Scaled x3: M0 startY C 120 startY, 180 endY, 300 endY
+        return `M0 ${startY} C 120 ${startY}, 180 ${endY}, 300 ${endY}`; 
+    } else {
+        // Down Trend: Start High (Y < 25), End Low (Y > 25)
+        const startY = center - amplitude;
+        const endY = center + amplitude;
+        return `M0 ${startY} C 120 ${startY}, 180 ${endY}, 300 ${endY}`;
+    }
   };
 
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 2.5,
-        borderRadius: 5,
+        p: 2,
+        borderRadius: 4, // Approx theme.roundness * 6
         mb: 2,
-        background: gradient || `linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)`,
+        background: gradient || `linear-gradient(135deg, #0e4981 0%, #0b3a67 50%, #082f54 100%)`, // Matches RN colors
         color: 'white',
         position: 'relative',
         overflow: 'hidden',
-        border: '1px solid rgba(255,255,255,0.1)'
+        border: '1px solid rgba(255,255,255,0.1)', // theme.colors.exchangeCardBorder approx
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-        {/* Left Icon - Large */}
+      {/* Background Blur Effect Circle */}
+      <Box sx={{
+        position: 'absolute',
+        top: -50,
+        right: -50,
+        width: 150,
+        height: 150,
+        borderRadius: '50%',
+        bgcolor: 'rgba(255,255,255,0.05)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+
+      {/* Main Layout: Icon Left, Content Right */}
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
+        
+        {/* Icon Container */}
         <Box sx={{ 
-          width: 52, 
-          height: 52, 
-          borderRadius: '50%', 
-          bgcolor: '#00FF94', 
-          color: '#003366', 
+          width: 40, 
+          height: 40, 
+          borderRadius: 2.5, // rounded-xl approx
+          bgcolor: 'rgba(255,255,255,0.1)', 
+          border: '1px solid rgba(255,255,255,0.2)',
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          mr: 2,
+          mr: 1.5,
           flexShrink: 0,
-          mt: 0.5,
-          boxShadow: '0 4px 12px rgba(0,255,148,0.3)'
         }}>
-           {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { sx: { fontSize: 32, color: '#003366' } }) : icon}
+           {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { sx: { fontSize: 24, color: '#FFFFFF' } }) : icon}
         </Box>
 
-        {/* Right Content */}
-        <Box sx={{ flexGrow: 1, zIndex: 1 }}>
-            {/* Header Title */}
+        {/* Right Content Column */}
+        <Box sx={{ flexGrow: 1 }}>
+            
+            {/* Title */}
             <Typography variant="caption" sx={{ 
                 display: 'block', 
-                fontWeight: 800, 
+                fontWeight: 700, 
                 textTransform: 'uppercase', 
-                letterSpacing: '0.05em', 
+                letterSpacing: '0.5px', 
                 fontSize: '0.75rem',
-                mb: 1.5,
-                opacity: 0.9,
-                color: 'white'
+                mb: 0.5,
+                color: 'rgba(255, 255, 255, 0.7)'
             }}>
                 {title}
             </Typography>
 
-            {/* 3 Columns Grid */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+            {/* Values Container (3 Columns) */}
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: 1 }}>
                 
                 {/* General - Column 1 */}
-                <Box sx={{ pr: 1.5, borderRight: '1px solid rgba(255,255,255,0.15)', mr: 1.5, minWidth: 80 }}>
-                    <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', opacity: 0.8, mb: 0.5, letterSpacing: '0.05em' }}>GENERAL</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em', mb: 0.5, fontSize: '1.1rem' }}>
-                        {formatPrice(data.general.price)}
-                        <Typography component="span" variant="caption" sx={{ opacity: 0.7, fontSize: '0.6rem', ml: 0.3, verticalAlign: 'top', position: 'relative', top: 3 }}>Bs</Typography>
-                    </Typography>
-                     <Typography variant="caption" sx={{ color: '#00FF94', fontWeight: 700, fontSize: '0.7rem' }}>
+                <Box sx={{ pr: 1.5, borderRight: '1px solid rgba(255,255,255,0.2)', mr: 1.5 }}>
+                    <Typography variant="caption" sx={{ display: 'block', fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.7)', mb: 0.2 }}>GENERAL</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1, fontSize: '1rem', color: '#FFFFFF' }}>
+                          {formatPrice(data.general.price)}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', ml: 0.5, fontSize: '0.65rem' }}>Bs</Typography>
+                    </Box>
+                     <Typography variant="caption" sx={{ color: getTrendColor(data.general.change), fontWeight: 700, fontSize: '0.7rem' }}>
                         {data.general.change}
                     </Typography>
                 </Box>
 
                  {/* Compra - Column 2 */}
-                <Box sx={{ pr: 1.5, borderRight: '1px solid rgba(255,255,255,0.15)', mr: 1.5, minWidth: 80 }}>
-                    <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', opacity: 0.8, mb: 0.5, letterSpacing: '0.05em' }}>COMPRA</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em', mb: 0.5, fontSize: '1.1rem' }}>
-                        {formatPrice(data.buy.price)}
-                        <Typography component="span" variant="caption" sx={{ opacity: 0.7, fontSize: '0.6rem', ml: 0.3, verticalAlign: 'top', position: 'relative', top: 3 }}>Bs</Typography>
-                    </Typography>
-                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 700, fontSize: '0.7rem' }}>
+                <Box sx={{ pr: 1.5, borderRight: '1px solid rgba(255,255,255,0.2)', mr: 1.5 }}>
+                    <Typography variant="caption" sx={{ display: 'block', fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.7)', mb: 0.2 }}>COMPRA</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1, fontSize: '1rem', color: '#FFFFFF' }}>
+                          {formatPrice(data.buy.price)}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', ml: 0.5, fontSize: '0.65rem' }}>Bs</Typography>
+                    </Box>
+                     <Typography variant="caption" sx={{ color: getTrendColor(data.buy.change), fontWeight: 700, fontSize: '0.7rem' }}>
                         {data.buy.change}
                     </Typography>
                 </Box>
 
                  {/* Venta - Column 3 */}
-                <Box sx={{ minWidth: 80 }}>
-                    <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', opacity: 0.8, mb: 0.5, letterSpacing: '0.05em' }}>VENTA</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em', mb: 0.5, fontSize: '1.1rem' }}>
-                         {formatPrice(data.sell.price)}
-                        <Typography component="span" variant="caption" sx={{ opacity: 0.7, fontSize: '0.6rem', ml: 0.3, verticalAlign: 'top', position: 'relative', top: 3 }}>Bs</Typography>
-                    </Typography>
-                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 700, fontSize: '0.7rem' }}>
+                <Box>
+                    <Typography variant="caption" sx={{ display: 'block', fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.7)', mb: 0.2 }}>VENTA</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1, fontSize: '1rem', color: '#FFFFFF' }}>
+                          {formatPrice(data.sell.price)}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', ml: 0.5, fontSize: '0.65rem' }}>Bs</Typography>
+                    </Box>
+                     <Typography variant="caption" sx={{ color: getTrendColor(data.sell.change), fontWeight: 700, fontSize: '0.7rem' }}>
                         {data.sell.change}
                     </Typography>
                 </Box>
@@ -119,14 +191,35 @@ const RateCard = ({ title, icon, data, chartColor = '#00FF94', gradient }: RateC
         </Box>
       </Box>
 
-      {/* Chart Decoration */}
-      <Box sx={{ position: 'absolute', bottom: 15, left: 0, right: 0, height: 40, opacity: 0.9, zIndex: 0, pointerEvents: 'none' }}>
-        <svg width="100%" height="100%" viewBox="0 0 320 40" preserveAspectRatio="none">
-           {/* Solid horizontal line */}
-           <line x1="20" y1="28" x2="300" y2="28" stroke="rgba(255,255,255,0.8)" strokeWidth="2" strokeLinecap="round" />
-           {/* Dashed wave line */}
-           <path d="M20,35 Q90,35 160,20 T300,5" fill="none" stroke={chartColor} strokeWidth="3" strokeDasharray="8,5" strokeLinecap="round" />
-        </svg>
+      {/* Chart Decoration (Bottom) */}
+      <Box sx={{ height: 50, mt: 1, position: 'relative', zIndex: 0, opacity: 0.9 }}>
+        <svg width="100%" height="100%" viewBox="0 0 300 50" preserveAspectRatio="none">
+             {/* General/Average Line (Dashed) */}
+             <path 
+               d={getChartPath(data.general.change)} 
+               fill="none" 
+               stroke={getTrendColor(data.general.change)}
+               strokeWidth="3" 
+               strokeDasharray="10,8" 
+               strokeLinecap="round" 
+             />
+             {/* Buy Line */}
+             <path 
+               d={getChartPath(data.buy.change)} 
+               fill="none" 
+               stroke={getTrendColor(data.buy.change)} 
+               strokeWidth="2" 
+               strokeLinecap="round" 
+             />
+             {/* Sell Line */}
+             <path 
+               d={getChartPath(data.sell.change)} 
+               fill="none" 
+               stroke={getTrendColor(data.sell.change)} 
+               strokeWidth="2" 
+               strokeLinecap="round" 
+             />
+          </svg>
       </Box>
     </Paper>
   );

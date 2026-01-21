@@ -39,7 +39,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import md5 from 'md5';
 
 const navItems = [
-  { label: 'Mercados', href: '/#mercados' },
+  { label: 'Aplicación', href: '/' },
   { label: 'Características', href: '/#caracteristicas' },
   { label: 'Desarrollador', href: '/#desarrollador' },
 ];
