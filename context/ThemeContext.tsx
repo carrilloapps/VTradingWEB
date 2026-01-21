@@ -206,13 +206,16 @@ export const ColorModeProvider = ({ children }: { children: React.ReactNode }) =
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Detectar preferencia inicial del navegador
-    const newMode = prefersDarkMode ? 'dark' : 'light';
-    if (mode !== newMode) {
-      setMode(newMode);
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-  }, [prefersDarkMode, mode]);
+  }, []);
+
+  useEffect(() => {
+    // Detectar preferencia inicial del navegador y cambios
+    const newMode = prefersDarkMode ? 'dark' : 'light';
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMode(newMode);
+  }, [prefersDarkMode]);
 
   const colorMode = useMemo(
     () => ({

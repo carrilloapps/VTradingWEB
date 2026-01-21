@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Paper, Typography, useTheme } from '@mui/material';
+import { Box, Paper, Typography, SxProps, Theme } from '@mui/material';
 
 interface RateCardProps {
   title: string;
@@ -11,13 +11,10 @@ interface RateCardProps {
     buy: { price: string; change: string; trend: 'up' | 'down' | 'stable' };
     sell: { price: string; change: string; trend: 'up' | 'down' | 'stable' };
   };
-  chartColor?: string;
   gradient?: string;
 }
 
-const RateCard = ({ title, icon, data, chartColor = '#00FF94', gradient }: RateCardProps) => {
-  const theme = useTheme();
-
+const RateCard = ({ title, icon, data, gradient }: RateCardProps) => {
   // Helper for trend color matching the RN code logic
   const getTrendColor = (percent: string) => {
     if (!percent || percent.includes('0.00') || percent === '0%') return 'rgba(255, 255, 255, 0.5)';
@@ -123,7 +120,7 @@ const RateCard = ({ title, icon, data, chartColor = '#00FF94', gradient }: RateC
           mr: 1.5,
           flexShrink: 0,
         }}>
-           {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement, { sx: { fontSize: 24, color: '#FFFFFF' } }) : icon}
+           {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<{ sx?: SxProps<Theme> }>, { sx: { fontSize: 24, color: '#FFFFFF' } }) : icon}
         </Box>
 
         {/* Right Content Column */}

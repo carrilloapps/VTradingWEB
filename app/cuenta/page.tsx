@@ -44,7 +44,6 @@ import {
   DialogActions,
   Fade,
   InputAdornment,
-  Tooltip,
   Tab,
   Tabs,
   alpha,
@@ -59,7 +58,6 @@ import {
   Lock as LockIcon,
   Visibility,
   VisibilityOff,
-  InfoOutlined as InfoIcon,
   Person as PersonIcon,
   Settings as SettingsIcon,
   Security as SecurityIcon,
@@ -121,8 +119,12 @@ export default function CuentaPage() {
       }
       
       showMessage('Sesión iniciada correctamente', 'success');
-    } catch (err: any) {
-      showMessage('Error: ' + err.message, 'error');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        showMessage('Error: ' + err.message, 'error');
+      } else {
+        showMessage('Error desconocido', 'error');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -153,8 +155,12 @@ export default function CuentaPage() {
         
         showMessage('Cuenta creada correctamente', 'success');
       }
-    } catch (err: any) {
-      showMessage('Error: ' + err.message, 'error');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        showMessage('Error: ' + err.message, 'error');
+      } else {
+        showMessage('Error desconocido', 'error');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -164,7 +170,8 @@ export default function CuentaPage() {
     try {
       await auth.signOut();
       showMessage('Sesión cerrada', 'info');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      console.error('Error signing out:', err);
       showMessage('Error al cerrar sesión', 'error');
     }
   };
@@ -178,8 +185,12 @@ export default function CuentaPage() {
     try {
       await sendPasswordResetEmail(auth, email);
       showMessage('Correo de recuperación enviado', 'success');
-    } catch (err: any) {
-      showMessage('Error: ' + err.message, 'error');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        showMessage('Error: ' + err.message, 'error');
+      } else {
+        showMessage('Error desconocido', 'error');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -193,12 +204,17 @@ export default function CuentaPage() {
       await deleteDoc(doc(db, 'users', user.uid));
       await deleteUser(user);
       showMessage('Cuenta eliminada permanentemente', 'success');
-    } catch (err: any) {
-      if (err.code === 'auth/requires-recent-login') {
+    } catch (err: unknown) {
+      const error = err as { code?: string; message?: string };
+      if (error.code === 'auth/requires-recent-login') {
         showMessage('Re-autentícate para realizar esta acción', 'info');
         setTimeout(() => auth.signOut(), 2000);
       } else {
-        showMessage('Error: ' + err.message, 'error');
+        if (err instanceof Error) {
+          showMessage('Error: ' + err.message, 'error');
+        } else {
+          showMessage('Error desconocido', 'error');
+        }
       }
     } finally {
       setIsProcessing(false);

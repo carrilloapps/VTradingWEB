@@ -10,9 +10,7 @@ import {
   alpha,
   Paper,
   Button,
-  TextField,
-  Fade,
-  Stack
+  Fade
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';

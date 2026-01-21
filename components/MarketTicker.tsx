@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Typography, useTheme, alpha, Chip } from '@mui/material';
+import { Box, Typography, useTheme, alpha, Chip, IconButton } from '@mui/material';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import RemoveIcon from '@mui/icons-material/Remove';
+import CloseIcon from '@mui/icons-material/Close';
 import { useMarketData } from '@/context/MarketContext';
-import { RatesResponse, CurrencyRate } from '@/lib/vtrading-types';
+import { RatesResponse } from '@/lib/vtrading-types';
 
 interface TickerItemProps {
   symbol: string;
@@ -93,7 +94,7 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
   );
 };
 
-export default function MarketTicker({ items, hide }: { items?: any[], hide?: boolean }) {
+export default function MarketTicker({ items, hide, onClose }: { items?: TickerItemProps[], hide?: boolean, onClose?: () => void }) {
   const theme = useTheme();
   const { marketData } = useMarketData();
   const [offset, setOffset] = useState(0);
@@ -139,7 +140,7 @@ export default function MarketTicker({ items, hide }: { items?: any[], hide?: bo
         return {
           symbol: `${r.currency}/VES`,
           value: formatCurrency(rateVal),
-          trend: getTrend(changeDir)
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
         };
       }) || [],
       ...border.map((r) => {
@@ -150,7 +151,7 @@ export default function MarketTicker({ items, hide }: { items?: any[], hide?: bo
           symbol: `${r.currency}/VES`,
           type: 'COMPRA' as const,
           value: formatCurrency(rateBuy),
-          trend: getTrend(changeDir)
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
         };
       }) || [],
       ...border.map((r) => {
@@ -161,7 +162,7 @@ export default function MarketTicker({ items, hide }: { items?: any[], hide?: bo
           symbol: `${r.currency}/VES`,
           type: 'VENTA' as const,
           value: formatCurrency(rateSell),
-          trend: getTrend(changeDir)
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
         };
       }) || [],
       ...crypto.map((r) => {
@@ -172,7 +173,7 @@ export default function MarketTicker({ items, hide }: { items?: any[], hide?: bo
           symbol: `${r.currency}/VES`,
           type: 'COMPRA' as const,
           value: formatCurrency(rateBuy),  
-          trend: getTrend(changeDir)
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
         };
       }) || [],
       ...crypto.map((r) => {
@@ -183,7 +184,7 @@ export default function MarketTicker({ items, hide }: { items?: any[], hide?: bo
           symbol: `${r.currency}/VES`,
           type: 'VENTA' as const,
           value: formatCurrency(rateSell),  
-          trend: getTrend(changeDir)
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
         };
       }) || []
     ];
@@ -284,7 +285,7 @@ export default function MarketTicker({ items, hide }: { items?: any[], hide?: bo
         {[...displayItems, ...displayItems].map((item, index) => (
           <Box key={index} sx={{ px: 4, display: 'inline-block' }}>
             <TickerItem 
-              symbol={item.symbol || item.label} 
+              symbol={item.symbol} 
               type={item.type} 
               value={item.value} 
               trend={item.trend as 'up' | 'down' | 'stable'} 
@@ -292,6 +293,38 @@ export default function MarketTicker({ items, hide }: { items?: any[], hide?: bo
           </Box>
         ))}
       </Box>
+
+      {onClose && (
+        <Box 
+          onMouseDown={(e) => e.stopPropagation()}
+          sx={{ 
+            position: 'absolute', 
+            right: 0, 
+            top: 0, 
+            bottom: 0, 
+            display: 'flex', 
+            alignItems: 'center', 
+            pr: 1, 
+            pl: 4, 
+            background: `linear-gradient(to right, transparent, ${theme.palette.background.default} 30%)`, 
+            zIndex: 100 
+          }}
+        >
+          <IconButton 
+            size="small" 
+            onClick={(e) => { e.stopPropagation(); onClose(); }} 
+            sx={{ 
+              color: 'text.secondary', 
+              '&:hover': { 
+                color: 'text.primary', 
+                bgcolor: alpha(theme.palette.text.primary, 0.05) 
+              } 
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      )}
     </Box>
   );
 }

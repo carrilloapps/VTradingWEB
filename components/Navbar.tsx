@@ -59,6 +59,7 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [isTickerHidden, setIsTickerHidden] = useState(false);
 
   const getGravatarUrl = (email: string) => {
     const hash = md5(email.trim().toLowerCase());
@@ -397,7 +398,12 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
         </Toolbar>
       </Container>
 
-      {!hideTicker && <MarketTicker />}
+      {!hideTicker && (
+        <MarketTicker 
+          hide={isTickerHidden} 
+          onClose={() => setIsTickerHidden(true)} 
+        />
+      )}
 
       <AuthModal 
         open={authModalOpen} 

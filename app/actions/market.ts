@@ -1,6 +1,9 @@
 'use server';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { fetchMarketData, getRatesHistory } from '@/lib/vtrading-api';
+import { RatesResponse, CurrencyRate, BVCQuote } from '@/lib/vtrading-types';
 
 /**
  * Server Action to fetch historical market data.
@@ -15,16 +18,19 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
     if (Array.isArray(rawHistory)) {
       historyArray = rawHistory;
     } else if (rawHistory && typeof rawHistory === 'object') {
+      // Cast to any to access dynamic properties
+      const rawObj = rawHistory as any;
+      
       // Look for any array property
-      const arrayProp = Object.values(rawHistory).find(val => Array.isArray(val));
+      const arrayProp = Object.values(rawObj).find(val => Array.isArray(val));
       if (arrayProp) {
         historyArray = arrayProp as any[];
-      } else if (rawHistory.data && Array.isArray(rawHistory.data)) {
-        historyArray = rawHistory.data;
-      } else if (rawHistory.history && Array.isArray(rawHistory.history)) {
-        historyArray = rawHistory.history;
-      } else if (rawHistory.rates && Array.isArray(rawHistory.rates)) {
-        historyArray = rawHistory.rates;
+      } else if (rawObj.data && Array.isArray(rawObj.data)) {
+        historyArray = rawObj.data;
+      } else if (rawObj.history && Array.isArray(rawObj.history)) {
+        historyArray = rawObj.history;
+      } else if (rawObj.rates && Array.isArray(rawObj.rates)) {
+        historyArray = rawObj.rates;
       }
     }
 
@@ -78,19 +84,19 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
  * Normalizes the raw API response into a consistent format.
  * The API sometimes returns nested 'rates' or 'crypto' objects.
  */
-export async function normalizeMarketData(data: any) {
+export async function normalizeMarketData(data: any): Promise<RatesResponse | null> {
   if (!data) return null;
 
   // Extract arrays safely
-  const ratesArr = Array.isArray(data.rates) 
+  const ratesArr: CurrencyRate[] = Array.isArray(data.rates) 
     ? data.rates 
     : (Array.isArray(data.rates?.rates) ? data.rates.rates : (Array.isArray(data.rates?.data) ? data.rates.data : []));
     
-  const banksArr = Array.isArray(data.rates?.banks) 
+  const banksArr: CurrencyRate[] = Array.isArray(data.rates?.banks) 
     ? data.rates.banks 
     : (Array.isArray(data.banks) ? data.banks : []);
     
-  const borderArr = Array.isArray(data.rates?.border) 
+  const borderArr: CurrencyRate[] = Array.isArray(data.rates?.border) 
     ? data.rates.border 
     : (Array.isArray(data.border) ? data.border : []);
     
@@ -98,13 +104,13 @@ export async function normalizeMarketData(data: any) {
   const cryptoData = data.crypto;
   const ratesCryptoData = data.rates?.crypto;
   
-  let cryptoArr: any = [];
+  let cryptoArr: CurrencyRate[] = [];
   
   const processCrypto = (source: any) => {
     if (!source) return;
     
     if (Array.isArray(source)) {
-      source.forEach(item => {
+      source.forEach((item: any) => {
         if (item) cryptoArr.push(item);
       });
     } else if (typeof source === 'object') {
@@ -136,7 +142,7 @@ export async function normalizeMarketData(data: any) {
           } else if (val && typeof val === 'object') {
             // Avoid pushing the pagination/meta objects
             if (key !== 'pagination' && key !== 'meta') {
-                cryptoArr.push({ ...val, currency: val.currency || key });
+                cryptoArr.push({ ...val, currency: val.currency || key } as CurrencyRate);
             }
           }
         });
@@ -155,7 +161,7 @@ export async function normalizeMarketData(data: any) {
 
   // Remove duplicates by currency and source
   const seen = new Set();
-  cryptoArr = cryptoArr.filter((item: any) => {
+  cryptoArr = cryptoArr.filter((item: CurrencyRate) => {
     if (!item || !item.currency) return false;
     const key = `${item.currency}-${item.source || ''}`;
     if (seen.has(key)) return false;
@@ -164,20 +170,23 @@ export async function normalizeMarketData(data: any) {
   });
 
   const bvcData = data.bvc;
-  let bvcNormalized: any = [];
-  let bvcMeta: any = null;
+  let bvcNormalized: BVCQuote[] = [];
+  // unused
+  // let bvcMeta: any = null;
 
   if (Array.isArray(bvcData)) {
     bvcNormalized = bvcData;
   } else if (bvcData && typeof bvcData === 'object') {
     if (Array.isArray(bvcData.data)) {
       bvcNormalized = bvcData.data;
-      bvcMeta = bvcData.meta || bvcData.pagination || null;
+      // bvcMeta = bvcData.meta || bvcData.pagination || null;
     } else if (Array.isArray(bvcData.quotes)) {
       bvcNormalized = bvcData.quotes;
-      bvcMeta = bvcData.meta || bvcData.pagination || null;
+      // bvcMeta = bvcData.meta || bvcData.pagination || null;
     } else {
-      bvcNormalized = bvcData;
+      // Cast to BVCQuote[] if it looks like one, otherwise []
+      bvcNormalized = []; 
+      // If bvcData is just a single object or unknown structure, we skip for safety unless we know
     }
   }
 
@@ -187,7 +196,7 @@ export async function normalizeMarketData(data: any) {
     border: borderArr,
     crypto: cryptoArr,
     bvc: bvcNormalized,
-    bvcMeta: bvcMeta,
+    // bvcMeta: bvcMeta,
     // Prefer the top-level status which contains the request timestamp from fetchMarketData
     status: data.status || data.rates?.status || null
   };

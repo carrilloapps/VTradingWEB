@@ -78,7 +78,7 @@ const IntegrityGauge = ({ value }: { value: number }) => {
 
 // Componente para los logs de actividad
 const ActivityLogs = () => {
-  const [logs, setLogs] = useState([
+  const [logs] = useState([
     { time: '14:02:11', type: 'INFO', message: 'Connected to BCV Gateway.', color: '#3B82F6' },
     { time: '14:02:12', type: 'SUCCESS', message: 'Fetched USD/VES from BCV...', status: 'OK', color: '#00FF94' },
     { time: '14:02:15', type: 'INFO', message: 'Polling IBVC Index session start.', color: '#3B82F6' },
@@ -129,21 +129,19 @@ const ActivityLogs = () => {
 };
 
 import { getMarketDataAction } from '@/app/actions/market';
+import { RatesResponse } from '@/lib/vtrading-types';
 
 export default function StatusPage() {
   const theme = useTheme();
-  const [marketData, setMarketData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [marketData, setMarketData] = useState<RatesResponse | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getMarketDataAction();
-        setMarketData(data);
+        setMarketData(data as RatesResponse);
       } catch (error) {
         console.error('Error fetching market status:', error);
-      } finally {
-        setLoading(false);
       }
     };
 

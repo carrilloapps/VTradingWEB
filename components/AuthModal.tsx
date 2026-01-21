@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   signInWithEmailAndPassword, 
   signInWithPopup, 
@@ -59,6 +59,21 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
+  const handleReset = React.useCallback(() => {
+    setAuthMode('login');
+    setEmail('');
+    setPassword('');
+    setName('');
+    setError(null);
+    setIsProcessing(false);
+  }, []);
+
+  const handleClose = React.useCallback(() => {
+    onClose();
+    // Delay reset to avoid layout shift during closing animation
+    setTimeout(handleReset, 300);
+  }, [onClose, handleReset]);
+
   // Safety net: Close modal if user is detected
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -68,22 +83,7 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
       }
     });
     return () => unsubscribe();
-  }, [open]);
-
-  const handleReset = () => {
-    setAuthMode('login');
-    setEmail('');
-    setPassword('');
-    setName('');
-    setError(null);
-    setIsProcessing(false);
-  };
-
-  const handleClose = () => {
-    onClose();
-    // Delay reset to avoid layout shift during closing animation
-    setTimeout(handleReset, 300);
-  };
+  }, [open, handleClose]);
 
   const handleGoogleAuth = async () => {
     if (isProcessing) return;
@@ -107,9 +107,13 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
       setIsProcessing(false);
       onSuccess?.();
       handleClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Auth Error:", err);
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Ocurrió un error desconocido');
+      }
       setIsProcessing(false);
     }
   };
@@ -142,9 +146,13 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
       setIsProcessing(false);
       onSuccess?.();
       handleClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Auth Error:", err);
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Error desconocido');
+      }
       setIsProcessing(false);
     }
   };

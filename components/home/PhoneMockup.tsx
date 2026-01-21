@@ -8,17 +8,10 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import RateCard from './RateCard';
 import StockListCard from './StockListCard';
-import { MarketStatus, CurrencyRate, BVCQuote, RateValue, RateChange } from '@/lib/vtrading-types';
-
-interface PhoneMockupData {
-  status: MarketStatus;
-  rates: CurrencyRate[];
-  crypto: CurrencyRate[];
-  bvc: BVCQuote[];
-}
+import { CurrencyRate, BVCQuote, RateValue, RateChange, RatesResponse } from '@/lib/vtrading-types';
 
 interface PhoneMockupProps {
-  marketData: PhoneMockupData;
+  marketData: RatesResponse | null;
   loading: boolean;
 }
 
@@ -44,8 +37,9 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   const displayTime = formatTime(lastUpdate);
 
   // Extract BCV Data from API
-  const rates = (Array.isArray(marketData?.rates) ? marketData.rates : ((marketData as any)?.rates?.rates || [])) as CurrencyRate[];
-  const bcvRate = rates.find((r: CurrencyRate) => r.currency === 'USD' && r.source === 'BCV');
+  // Using explicit typing and checks to avoid 'any'
+  const rates = (marketData && Array.isArray(marketData.rates)) ? marketData.rates : [];
+  const bcvRate = rates.find((r) => r.currency === 'USD' && r.source === 'BCV');
 
   const fmt = (num: number) => num?.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0,00';
   const fmtPct = (num: number) => `${(num || 0).toFixed(2)}%`;
@@ -94,12 +88,12 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
       general: getGeneralData(bcvRate),
       buy: { 
           price: fmt((bcvRate.rate as RateValue)?.buy), 
-          change: fmtPct((bcvRate.change as RateChange)?.buy?.percent), 
+          change: fmtPct((bcvRate.change as RateChange)?.buy?.percent ?? 0), 
           trend: ((bcvRate.change as RateChange)?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
       },
       sell: { 
           price: fmt((bcvRate.rate as RateValue)?.sell), 
-          change: fmtPct((bcvRate.change as RateChange)?.sell?.percent), 
+          change: fmtPct((bcvRate.change as RateChange)?.sell?.percent ?? 0), 
           trend: ((bcvRate.change as RateChange)?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
       }
   } : {
@@ -108,7 +102,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
       sell: { price: '0,00', change: '0.00%', trend: 'stable' as const }
   };
   
-  const cryptoList = (Array.isArray(marketData?.crypto) ? marketData.crypto : (!Array.isArray(ratesData) && ratesData && 'crypto' in ratesData ? (ratesData as { crypto: CurrencyRate[] }).crypto : [])) || [];
+  const cryptoList = (Array.isArray(marketData?.crypto) ? marketData.crypto : []) || [];
   // Find first crypto with valid rate structure (summary) or fallback to first item
   const firstCrypto = cryptoList.find((c: CurrencyRate) => c.rate && ((c.rate as RateValue).average || (c.rate as RateValue).buy || (c.rate as RateValue).sell)) || (cryptoList.length > 0 ? cryptoList[0] : null);
 
@@ -116,12 +110,12 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
       general: getGeneralData(firstCrypto),
       buy: { 
           price: fmt((firstCrypto.rate as RateValue)?.buy), 
-          change: fmtPct((firstCrypto.change as RateChange)?.buy?.percent), 
+          change: fmtPct((firstCrypto.change as RateChange)?.buy?.percent ?? 0), 
           trend: ((firstCrypto.change as RateChange)?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
       },
       sell: { 
           price: fmt((firstCrypto.rate as RateValue)?.sell), 
-          change: fmtPct((firstCrypto.change as RateChange)?.sell?.percent), 
+          change: fmtPct((firstCrypto.change as RateChange)?.sell?.percent ?? 0), 
           trend: ((firstCrypto.change as RateChange)?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
       }
   } : {
