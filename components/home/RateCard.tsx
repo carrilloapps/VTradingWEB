@@ -123,7 +123,7 @@ const RateCard = ({ title, icon, data, chartColor = '#00FF94', gradient }: RateC
           mr: 1.5,
           flexShrink: 0,
         }}>
-           {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { sx: { fontSize: 24, color: '#FFFFFF' } }) : icon}
+           {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement, { sx: { fontSize: 24, color: '#FFFFFF' } }) : icon}
         </Box>
 
         {/* Right Content Column */}
@@ -137,7 +137,7 @@ const RateCard = ({ title, icon, data, chartColor = '#00FF94', gradient }: RateC
                 letterSpacing: '0.5px', 
                 fontSize: '0.75rem',
                 mb: 0.5,
-                color: 'rgba(255, 255, 255, 0.7)'
+                color: 'rgba(255, 255, 255, 1)'
             }}>
                 {title}
             </Typography>

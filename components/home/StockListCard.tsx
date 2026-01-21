@@ -26,7 +26,7 @@ const StockListCard = ({ items }: StockListCardProps) => {
   const isDark = theme.palette.mode === 'dark';
 
   const colors = {
-    text: isDark ? '#E2E3DF' : '#191C1A',
+    text: isDark ? '#FFFFFF' : '#191C1A',
     textSecondary: isDark ? 'rgba(226, 227, 223, 0.6)' : 'rgba(25, 28, 26, 0.6)',
     cardBg: isDark ? '#191C1A' : '#FFFFFF',
     cardBorder: isDark ? '#2A302D' : '#E0E6E2',

@@ -71,6 +71,10 @@ export interface BVCQuote {
     amount: number;
   };
   lastUpdate?: string;
+  image?: string;
+  meta?: {
+    iconUrl?: string;
+  };
 }
 
 export interface BVCMarketData {

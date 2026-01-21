@@ -8,9 +8,17 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import RateCard from './RateCard';
 import StockListCard from './StockListCard';
+import { MarketStatus, CurrencyRate, BVCQuote, RateValue, RateChange } from '@/lib/vtrading-types';
+
+interface PhoneMockupData {
+  status: MarketStatus;
+  rates: CurrencyRate[];
+  crypto: CurrencyRate[];
+  bvc: BVCQuote[];
+}
 
 interface PhoneMockupProps {
-  marketData: any;
+  marketData: PhoneMockupData;
   loading: boolean;
 }
 
@@ -36,20 +44,20 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   const displayTime = formatTime(lastUpdate);
 
   // Extract BCV Data from API
-  const rates = Array.isArray(marketData?.rates) ? marketData.rates : (marketData?.rates?.rates || []);
-  const bcvRate = rates.find((r: any) => r.currency === 'USD' && r.source === 'BCV');
+  const rates = (Array.isArray(marketData?.rates) ? marketData.rates : ((marketData as any)?.rates?.rates || [])) as CurrencyRate[];
+  const bcvRate = rates.find((r: CurrencyRate) => r.currency === 'USD' && r.source === 'BCV');
 
   const fmt = (num: number) => num?.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0,00';
   const fmtPct = (num: number) => `${(num || 0).toFixed(2)}%`;
 
-  const getGeneralData = (item: any) => {
+  const getGeneralData = (item: CurrencyRate) => {
     // Safety check: ensure item and item.rate exist
     if (!item?.rate) {
         return { price: '0,00', change: '0.00%', trend: 'stable' as const };
     }
 
     const rate = item.rate;
-    const change = item.change || {};
+    const change = item.change;
 
     // Calculate Average Price
     const avgPrice = typeof rate === 'number' 
@@ -60,14 +68,15 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
     let avgChange = 0;
     if (typeof change === 'number') {
         avgChange = change;
-    } else {
-        avgChange = change.average?.percent !== undefined 
-            ? change.average.percent 
-            : ((change.buy?.percent || 0) + (change.sell?.percent || 0)) / 2;
+    } else if (change) {
+        const changeObj = change as RateChange;
+        avgChange = changeObj.average?.percent !== undefined 
+            ? changeObj.average.percent 
+            : ((changeObj.buy?.percent || 0) + (changeObj.sell?.percent || 0)) / 2;
     }
     
     // Determine Trend
-    let trend = typeof change === 'object' ? change.average?.direction : undefined;
+    let trend = (typeof change === 'object' && change) ? (change as RateChange).average?.direction : undefined;
     if (!trend) {
         if (avgChange > 0) trend = 'up';
         else if (avgChange < 0) trend = 'down';
@@ -84,14 +93,14 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   const bcvData = bcvRate ? {
       general: getGeneralData(bcvRate),
       buy: { 
-          price: fmt(bcvRate.rate?.buy), 
-          change: fmtPct(bcvRate.change?.buy?.percent), 
-          trend: (bcvRate.change?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
+          price: fmt((bcvRate.rate as RateValue)?.buy), 
+          change: fmtPct((bcvRate.change as RateChange)?.buy?.percent), 
+          trend: ((bcvRate.change as RateChange)?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
       },
       sell: { 
-          price: fmt(bcvRate.rate?.sell), 
-          change: fmtPct(bcvRate.change?.sell?.percent), 
-          trend: (bcvRate.change?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
+          price: fmt((bcvRate.rate as RateValue)?.sell), 
+          change: fmtPct((bcvRate.change as RateChange)?.sell?.percent), 
+          trend: ((bcvRate.change as RateChange)?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
       }
   } : {
       general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
@@ -99,21 +108,21 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
       sell: { price: '0,00', change: '0.00%', trend: 'stable' as const }
   };
   
-  const cryptoList = Array.isArray(marketData?.crypto) ? marketData.crypto : (marketData?.rates?.crypto || []);
+  const cryptoList = (Array.isArray(marketData?.crypto) ? marketData.crypto : ((marketData as any)?.rates?.crypto || [])) as CurrencyRate[];
   // Find first crypto with valid rate structure (summary) or fallback to first item
-  const firstCrypto = cryptoList.find((c: any) => c.rate && (c.rate.average || c.rate.buy || c.rate.sell)) || (cryptoList.length > 0 ? cryptoList[0] : null);
+  const firstCrypto = cryptoList.find((c: CurrencyRate) => c.rate && ((c.rate as RateValue).average || (c.rate as RateValue).buy || (c.rate as RateValue).sell)) || (cryptoList.length > 0 ? cryptoList[0] : null);
 
   const cryptoData = firstCrypto ? {
       general: getGeneralData(firstCrypto),
       buy: { 
-          price: fmt(firstCrypto.rate?.buy), 
-          change: fmtPct(firstCrypto.change?.buy?.percent), 
-          trend: (firstCrypto.change?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
+          price: fmt((firstCrypto.rate as RateValue)?.buy), 
+          change: fmtPct((firstCrypto.change as RateChange)?.buy?.percent), 
+          trend: ((firstCrypto.change as RateChange)?.buy?.direction || 'stable') as 'up' | 'down' | 'stable'
       },
       sell: { 
-          price: fmt(firstCrypto.rate?.sell), 
-          change: fmtPct(firstCrypto.change?.sell?.percent), 
-          trend: (firstCrypto.change?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
+          price: fmt((firstCrypto.rate as RateValue)?.sell), 
+          change: fmtPct((firstCrypto.change as RateChange)?.sell?.percent), 
+          trend: ((firstCrypto.change as RateChange)?.sell?.direction || 'stable') as 'up' | 'down' | 'stable'
       }
   } : {
       general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
@@ -122,8 +131,8 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   };
   
   const bvcQuotes = Array.isArray(marketData?.bvc) ? marketData.bvc : [];
-  // Take first 2 items for the mockup
-  const stockItems = bvcQuotes.slice(0, 2).map((quote: any) => {
+  // Take first 3 items for the mockup
+  const stockItems = bvcQuotes.slice(0, 3).map((quote: BVCQuote) => {
     const percent = quote.change?.percent || 0;
     let trend = quote.change?.direction;
     
@@ -157,7 +166,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   const mockColors = {
     bg: isDark ? '#191C1A' : '#FBFDF9',
     frame: isDark ? '#2A302D' : '#E0E6E2',
-    text: isDark ? '#E2E3DF' : '#191C1A',
+    text: isDark ? '#FFFFFF' : '#191C1A',
     textSecondary: isDark ? '#C0C9C2' : '#404944',
     trendUp: isDark ? '#6DDBAC' : '#168953',
     trendDown: isDark ? '#FFB4AB' : '#D32F2F',
