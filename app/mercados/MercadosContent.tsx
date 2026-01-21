@@ -12,6 +12,7 @@ import {
   Fade,
   CircularProgress,
   IconButton,
+  Divider,
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import MarketTicker from '@/components/MarketTicker';
@@ -30,87 +31,143 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 const MarketCard = ({ icon: Icon, title, subtitle, children, color, loading }: any) => {
   const theme = useTheme();
   return (
-    <Grid size={{ xs: 12, lg: 6 }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 2.5, md: 3 },
-          height: '100%',
-          borderRadius: 6,
-          bgcolor: 'background.paper',
-          border: `1px solid ${theme.palette.divider}`,
-          display: 'flex',
-          flexDirection: 'column',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          position: 'relative',
-          overflow: 'hidden',
-          '&:hover': {
-            borderColor: alpha(color, 0.5),
-            transform: 'translateY(-4px)',
-            boxShadow: `0 15px 30px ${alpha(color, 0.08)}`,
-            '& .market-icon': {
-              transform: 'scale(1.1)',
-              color: color
-            }
-          }
-        }}
-      >
-        {loading && (
-          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(theme.palette.background.paper, 0.7), zIndex: 1, borderRadius: 6 }}>
-            <CircularProgress size={30} color="inherit" />
-          </Box>
-        )}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box 
-              className="market-icon"
-              sx={{ 
-                p: 1.2, 
-                borderRadius: 2.5, 
-                bgcolor: alpha(color, 0.1), 
-                color: color,
-                display: 'flex',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              <Icon sx={{ fontSize: 24 }} />
-            </Box>
-            <Box>
-              <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.2, letterSpacing: '-0.01em' }}>
-                {title}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 800, fontSize: '0.6rem' }}>
-                {subtitle}
-              </Typography>
-            </Box>
-          </Box>
-          <Button 
-            size="small" 
-            variant="outlined"
+    <Paper
+      elevation={0}
+      sx={{
+        p: { xs: 2.5, md: 3 },
+        height: '100%',
+        borderRadius: 8,
+        bgcolor: 'background.paper',
+        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        position: 'relative',
+        overflow: 'hidden',
+        '&:hover': {
+          borderColor: alpha(color || theme.palette.primary.main, 0.3),
+          transform: 'translateY(-2px)',
+          boxShadow: `0 10px 30px -10px ${alpha('#000', 0.5)}`,
+        }
+      }}
+    >
+      {loading && (
+        <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(theme.palette.background.paper, 0.7), zIndex: 1, borderRadius: 8 }}>
+          <CircularProgress size={30} color="inherit" />
+        </Box>
+      )}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box 
             sx={{ 
-              fontSize: '0.6rem', 
-              fontWeight: 800, 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.1em',
-              borderRadius: 2,
-              px: 1.5,
-              borderColor: alpha(theme.palette.divider, 0.1),
-              color: 'text.secondary',
-              '&:hover': { 
-                borderColor: color,
-                bgcolor: alpha(color, 0.05),
-                color: 'text.primary'
-              }
+              p: 1.2, 
+              borderRadius: 3, 
+              bgcolor: alpha(color || theme.palette.primary.main, 0.1), 
+              color: color || theme.palette.primary.main,
+              display: 'flex',
+              transition: 'all 0.3s ease'
             }}
           >
-            Ver Todo
-          </Button>
+            <Icon sx={{ fontSize: 24 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.2, letterSpacing: '-0.01em', fontSize: '1.1rem' }}>
+              {title}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 800, fontSize: '0.6rem' }}>
+              {subtitle}
+            </Typography>
+          </Box>
         </Box>
-        <Box sx={{ flexGrow: 1 }}>
-          {children}
-        </Box>
-      </Paper>
-    </Grid>
+        <Button 
+          size="small" 
+          sx={{ 
+            fontSize: '0.65rem', 
+            fontWeight: 800, 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.1em',
+            color: color || theme.palette.primary.main,
+            '&:hover': { 
+              textDecoration: 'underline',
+              bgcolor: 'transparent'
+            }
+          }}
+        >
+          Ver Todo
+        </Button>
+      </Box>
+      <Box sx={{ flexGrow: 1 }}>
+        {children}
+      </Box>
+    </Paper>
+  );
+};
+
+const TrendChart = ({ title, subtitle, color }: any) => {
+  const theme = useTheme();
+  return (
+    <Box 
+      sx={{ 
+        bgcolor: '#0a0a0a', 
+        borderRadius: 6, 
+        p: 3, 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'space-between',
+        border: '1px solid rgba(255, 255, 255, 0.05)',
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: '0 20px 40px -15px rgba(0,0,0,0.5)'
+      }}
+    >
+      <Box sx={{ position: 'relative', zIndex: 10 }}>
+        <Typography variant="subtitle1" fontWeight="800" sx={{ color: 'white', lineHeight: 1.2 }}>{title}</Typography>
+        <Typography variant="caption" sx={{ color: 'grey.500', fontWeight: 700 }}>{subtitle}</Typography>
+      </Box>
+      
+      <Box sx={{ height: 160, position: 'relative', mt: 4, mb: 2, display: 'flex', alignItems: 'flex-end' }}>
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            inset: 0, 
+            background: `linear-gradient(to top, ${alpha(color || '#10b981', 0.15)}, transparent)`,
+            zIndex: 1
+          }} 
+        />
+        <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'relative', zIndex: 2 }}>
+          <path 
+            d="M0,80 Q25,75 40,60 T70,40 T100,20" 
+            fill="none" 
+            stroke={color || '#10b981'} 
+            strokeWidth="3" 
+            vectorEffect="non-scaling-stroke" 
+            strokeLinecap="round"
+          />
+        </svg>
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: '20%', 
+            right: 0, 
+            width: 10, 
+            height: 10, 
+            bgcolor: color || '#10b981', 
+            borderRadius: '50%', 
+            boxShadow: `0 0 20px ${color || '#10b981'}`,
+            zIndex: 3,
+            transform: 'translate(50%, -50%)'
+          }} 
+        />
+      </Box>
+
+      <Box sx={{ position: 'relative', zIndex: 10, display: 'flex', justifyContent: 'space-between', color: 'grey.600', fontSize: '0.65rem', fontWeight: 800, fontFamily: 'monospace' }}>
+        <span>00:00</span>
+        <span>08:00</span>
+        <span>16:00</span>
+        <Box component="span" sx={{ color: color || '#10b981' }}>AHORA</Box>
+      </Box>
+    </Box>
   );
 };
 
@@ -128,61 +185,65 @@ const MarketCard = ({ icon: Icon, title, subtitle, children, color, loading }: a
     return val.startsWith('+') ? (theme.palette.trendUp || '#00FF94') : val.startsWith('-') ? (theme.palette.trendDown || '#FF3B3B') : 'text.secondary';
   };
 
-const MarketRow = ({ label, value, buy, sell, buyChange, sellChange, change, isUp, sublabel }: any) => {
+const MarketRow = ({ label, value, buy, sell, buyChange, sellChange, change, isUp, sublabel, compact }: any) => {
   const theme = useTheme();
   const trendColor = isUp ? (theme.palette.trendUp || '#00FF94') : (theme.palette.trendDown || '#FF3B3B');
   
-  const hasTradingData = buy && sell && buy !== '0.00' && sell !== '0.00' && buy !== '0.0000' && sell !== '0.0000';
+  const hasTradingData = !compact && buy && sell && buy !== '0.00' && sell !== '0.00' && buy !== '0.0000' && sell !== '0.0000';
 
   return (
     <Box sx={{ 
       display: 'flex', 
       flexDirection: 'column',
-      gap: 1,
-      p: 2, 
-      mb: 1.5,
-      borderRadius: 4, 
+      gap: compact ? 0.5 : 1,
+      p: compact ? 1.5 : 2, 
+      mb: compact ? 1 : 1.5,
+      borderRadius: compact ? 3 : 4, 
       bgcolor: alpha(theme.palette.text.primary, 0.02),
       border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
       transition: 'all 0.2s ease',
+      cursor: 'pointer',
       '&:hover': {
         bgcolor: alpha(theme.palette.text.primary, 0.04),
         borderColor: alpha(theme.palette.divider, 0.1),
       }
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box sx={{ 
-            width: 36, 
-            height: 36, 
-            borderRadius: '50%', 
-            bgcolor: alpha(theme.palette.text.primary, 0.05),
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            fontWeight: 900, 
-            fontSize: '0.7rem', 
-            color: 'text.secondary',
-            border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
-          }}>
-            {label.split('/')[0].substring(0, 3).toUpperCase()}
-          </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: compact ? 1.5 : 2 }}>
+          {(!compact || label.includes('/')) && (
+            <Box sx={{ 
+              width: compact ? 28 : 36, 
+              height: compact ? 28 : 36, 
+              borderRadius: '50%', 
+              bgcolor: alpha(theme.palette.text.primary, 0.05),
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              fontWeight: 900, 
+              fontSize: compact ? '0.6rem' : '0.7rem', 
+              color: 'text.secondary',
+              border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
+            }}>
+              {label.split('/')[0].substring(0, 3).toUpperCase()}
+            </Box>
+          )}
           <Box>
-            <Typography variant="body2" fontWeight="800" sx={{ letterSpacing: '-0.01em', fontSize: '0.85rem' }}>{label}</Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.7rem' }}>{sublabel}</Typography>
+            <Typography variant="body2" fontWeight="800" sx={{ letterSpacing: '-0.01em', fontSize: compact ? '0.75rem' : '0.85rem', lineHeight: 1.2 }}>{label}</Typography>
+            {sublabel && (
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: compact ? '0.6rem' : '0.7rem', textTransform: 'uppercase', fontWeight: 700, opacity: 0.7 }}>{sublabel}</Typography>
+            )}
           </Box>
         </Box>
-        <Box sx={{ textAlign: 'right' }}>
-          <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 900, lineHeight: 1 }}>
-            <Box component="span" sx={{ fontSize: '0.7em', color: 'text.secondary', mr: 0.5 }}>Bs.</Box>
+        <Box sx={{ textAlign: 'right', display: compact ? 'flex' : 'block', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 900, lineHeight: 1, fontSize: compact ? '0.85rem' : '1rem' }}>
             {value}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, mt: 0.2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, mt: compact ? 0 : 0.2 }}>
             {(() => {
               const changeNum = parseFloat(change);
               const isNeutral = isNaN(changeNum) || Math.abs(changeNum) < 0.0001;
               return (
-                <Typography variant="caption" sx={{ color: isNeutral ? 'text.secondary' : trendColor, fontWeight: 900, display: 'flex', alignItems: 'center', fontSize: '0.7rem' }}>
+                <Typography variant="caption" sx={{ color: isNeutral ? 'text.secondary' : trendColor, fontWeight: 900, display: 'flex', alignItems: 'center', fontSize: compact ? '0.65rem' : '0.7rem', minWidth: compact ? 45 : 'auto', justifyContent: 'flex-end' }}>
                   {isNeutral ? '●' : (isUp ? '▲' : '▼')} {isNeutral ? '0.00' : Math.abs(changeNum).toFixed(2)}%
                 </Typography>
               );
@@ -194,13 +255,14 @@ const MarketRow = ({ label, value, buy, sell, buyChange, sellChange, change, isU
       {hasTradingData && (
         <Box sx={{ 
           display: 'flex', 
-          gap: 2, 
+          flexDirection: 'column',
+          gap: 1.5, 
           mt: 0.2, 
           pt: 1, 
           borderTop: `1px solid ${alpha(theme.palette.divider, 0.05)}` 
         }}>
-          <Box sx={{ flex: 1 }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.55rem', display: 'block', mb: 0.1 }}>Compra</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.55rem' }}>Compra</Typography>
               <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
                 <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '0.75rem' }}>
                   <Box component="span" sx={{ fontSize: '0.8em', color: 'text.secondary', mr: 0.2 }}>Bs.</Box>
@@ -217,8 +279,8 @@ const MarketRow = ({ label, value, buy, sell, buyChange, sellChange, change, isU
                 })()}
               </Box>
             </Box>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.55rem', display: 'block', mb: 0.1 }}>Venta</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.55rem' }}>Venta</Typography>
               <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
                 <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '0.75rem' }}>
                   <Box component="span" sx={{ fontSize: '0.8em', color: 'text.secondary', mr: 0.2 }}>Bs.</Box>
@@ -237,6 +299,64 @@ const MarketRow = ({ label, value, buy, sell, buyChange, sellChange, change, isU
             </Box>
         </Box>
       )}
+    </Box>
+  );
+};
+
+const CryptoTile = ({ label, value, change, isUp, color }: any) => {
+  const theme = useTheme();
+  const trendColor = isUp ? (theme.palette.trendUp || '#00FF94') : (theme.palette.trendDown || '#FF3B3B');
+
+  return (
+    <Box 
+      sx={{ 
+        p: 3, 
+        borderRadius: 5, 
+        bgcolor: alpha(theme.palette.text.primary, 0.02),
+        border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        transition: 'all 0.3s ease',
+        cursor: 'pointer',
+        '&:hover': {
+          bgcolor: alpha(theme.palette.text.primary, 0.04),
+          borderColor: alpha(color || theme.palette.primary.main, 0.2),
+          transform: 'translateY(-2px)'
+        }
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+        <Typography variant="caption" fontWeight="800" sx={{ color: 'text.secondary', letterSpacing: '0.05em' }}>{label} / VES</Typography>
+        <Box 
+          sx={{ 
+            px: 1.5, 
+            py: 0.4, 
+            borderRadius: 10, 
+            bgcolor: alpha(trendColor, 0.1), 
+            color: trendColor,
+            fontSize: '0.65rem',
+            fontWeight: 900
+          }}
+        >
+          {isUp ? '+' : ''}{change}%
+        </Box>
+      </Box>
+      <Box>
+        <Typography variant="h5" fontWeight="900" sx={{ fontFamily: 'monospace', letterSpacing: '-0.04em', mb: 1, fontSize: '1.4rem' }}>
+          {value}
+        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.05)}` }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            {label === 'USDT' ? 'P2P MARKET' : 'GLOBAL PRICE'}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+             <Typography variant="caption" sx={{ color: trendColor, fontSize: '0.6rem', fontWeight: 900 }}>LIVE</Typography>
+             <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: trendColor, animation: 'pulse 2s infinite' }} />
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };
@@ -345,379 +465,364 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                 sx={{ 
                   display: 'inline-flex', 
                   alignItems: 'center', 
-                  gap: 1.5, 
-                  px: 2, 
-                  py: 0.8, 
-                  borderRadius: 2, 
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                  mb: 3
+                  gap: 1, 
+                  px: 1.5, 
+                  py: 0.5, 
+                  borderRadius: '20px', 
+                  bgcolor: alpha('#10b981', 0.1),
+                  border: `1px solid ${alpha('#10b981', 0.2)}`,
+                  mb: 4
                 }}
               >
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00FF94', animation: 'pulse 2s infinite' }} />
-                <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.65rem' }}>
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#10b981', animation: 'pulse 2s infinite' }} />
+                <Typography variant="caption" sx={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#10b981', fontSize: '0.6rem' }}>
                   Live Market Intelligence
                 </Typography>
               </Box>
               
               <Typography 
-                variant="h2" 
-                fontWeight="800" 
+                variant="h1" 
+                fontWeight="900" 
                 sx={{ 
-                  fontSize: { xs: '2.5rem', md: '4rem' },
-                  letterSpacing: '-0.03em',
+                  fontSize: { xs: '3rem', md: '4.5rem' },
+                  letterSpacing: '-0.05em',
                   mb: 2,
-                  lineHeight: 1.1
+                  lineHeight: 1,
+                  color: 'text.primary'
                 }}
               >
                 Monitor de Mercado
               </Typography>
-              <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 650, fontWeight: 400, lineHeight: 1.6, fontSize: '1rem' }}>
-                Seguimiento en tiempo real de los principales indicadores económicos de Venezuela con infraestructura de grado profesional.
-              </Typography>
+              
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'flex-end' }, gap: 4 }}>
+                <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, fontWeight: 500, lineHeight: 1.5, fontSize: '1.1rem', opacity: 0.8 }}>
+                  Seguimiento en tiempo real de los principales indicadores económicos de Venezuela con infraestructura de grado profesional.
+                </Typography>
+                
+                {/* Status Bar - Bento Style */}
+                <Box sx={{ 
+                  p: 1, 
+                  borderRadius: 5, 
+                  bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.background.paper, 0.4) : '#fff',
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  display: 'grid',
+                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+                  gap: { xs: 2, lg: 0 },
+                  alignItems: 'center',
+                  width: { xs: '100%', md: 'auto' },
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? `0 10px 40px -10px ${alpha('#000', 0.5)}`
+                    : `0 10px 40px -10px ${alpha(theme.palette.primary.main, 0.1)}`
+                }}>
+                  <Box sx={{ px: 3, borderRight: { xs: 'none', lg: `1px solid ${alpha(theme.palette.divider, 0.1)}` } }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.55rem', display: 'block', mb: 0.5, letterSpacing: '0.05em' }}>BOLSA DE VALORES</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ 
+                        width: 8, 
+                        height: 8, 
+                        borderRadius: '50%', 
+                        bgcolor: marketData?.status?.state === 'ABIERTO' ? '#00FF94' : '#FF3B3B',
+                        boxShadow: `0 0 10px ${marketData?.status?.state === 'ABIERTO' ? '#00FF94' : '#FF3B3B'}`,
+                        animation: 'pulse 2s infinite' 
+                      }} />
+                      <Typography variant="body2" sx={{ fontWeight: 900, fontSize: '0.9rem', letterSpacing: '0.02em', color: 'text.primary' }}>
+                        {marketData?.status?.state || 'CERRADA'}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ px: 3, borderRight: { xs: 'none', lg: `1px solid ${alpha(theme.palette.divider, 0.1)}` } }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.55rem', display: 'block', mb: 0.5, letterSpacing: '0.05em' }}>FECHA</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.9rem', color: 'text.primary' }}>
+                      {marketData?.status?.date || new Date().toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ px: 3 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.55rem', display: 'block', mb: 0.5, letterSpacing: '0.05em' }}>ACTUALIZACIÓN</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.9rem', color: 'text.primary', whiteSpace: 'nowrap' }}>
+                      {(() => {
+                        try {
+                          const dateObj = marketData?.status?.lastUpdate ? new Date(marketData.status.lastUpdate) : new Date();
+                          return new Intl.DateTimeFormat('es-VE', {
+                             day: '2-digit',
+                             month: '2-digit',
+                             year: '2-digit',
+                             hour: '2-digit',
+                             minute: '2-digit',
+                             hour12: true,
+                             timeZone: 'America/Caracas'
+                           }).format(dateObj).replace(',', '').replace(/\./g, '').toUpperCase();
+                        } catch (e) {
+                          return marketData?.status?.lastUpdate || '---';
+                        }
+                      })()}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
           </Fade>
 
-          <Grid container spacing={3}>
-            {/* 1. Estado del Mercado */}
-            <Grid size={{ xs: 12 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 3,
-                  borderRadius: 6,
-                  bgcolor: alpha(theme.palette.background.paper, 0.5),
-                  border: `1px solid ${theme.palette.divider}`,
-                  backdropFilter: 'blur(10px)',
-                  display: 'flex',
-                  flexDirection: { xs: 'column', md: 'row' },
-                  alignItems: 'center',
-                  gap: 4,
-                  mb: 2
-                }}
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(12, 1fr)' }, 
+            gap: 3,
+            gridAutoRows: 'minmax(180px, auto)'
+          }}>
+            {/* 1. Mercado Cambiario (span 8, row 2) */}
+            <Box sx={{ gridColumn: { xs: 'span 1', md: 'span 8' }, gridRow: { md: 'span 2' } }}>
+              <MarketCard 
+                icon={PaymentsIcon} 
+                title="Mercado Cambiario" 
+                subtitle="Tasas Oficiales BCV"
+                color={theme.palette.primary.main}
+                loading={loading}
               >
-                <Box sx={{ flexShrink: 0 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    Bolsa de Valores
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
-                    <Box sx={{ 
-                      width: 10, 
-                      height: 10, 
-                      borderRadius: '50%', 
-                      bgcolor: marketData?.status?.state === 'ABIERTO' || marketData?.status?.state === 'operational' || !marketData?.status ? '#00FF94' : 
-                               marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#F59E0B',
-                      boxShadow: `0 0 10px ${marketData?.status?.state === 'ABIERTO' || marketData?.status?.state === 'operational' || !marketData?.status ? alpha('#00FF94', 0.5) : 
-                                  marketData?.status?.state === 'CERRADO' ? alpha('#FF3B3B', 0.5) : alpha('#F59E0B', 0.5)}`,
-                      animation: 'pulse 2s infinite'
-                    }} />
-                    <Typography variant="h6" fontWeight="900" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {marketData?.status?.state === 'ABIERTO' ? 'ABIERTA' : 'CERRADA'}
-                    </Typography>
-                  </Box>
-                </Box>
+                <Grid container spacing={4}>
+                  <Grid size={{ xs: 12, lg: 6 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {marketData?.rates?.map((rate: any, idx: number) => {
+                        const isRateObject = typeof rate.rate === 'object' && rate.rate !== null;
+                        const currentAverage = isRateObject 
+                          ? (rate.rate.average || rate.rate.buy || rate.rate.sell || 0) 
+                          : (rate.rate || 0);
+                        
+                        const isChangeObject = typeof rate.change === 'object' && rate.change !== null;
+                        const avgPercent = isChangeObject 
+                          ? (rate.change.average?.percent || rate.change.buy?.percent || rate.change.sell?.percent || 0)
+                          : (typeof rate.change === 'number' ? rate.change : 0);
+                        
+                        const direction = isChangeObject 
+                          ? (rate.change.average?.direction || rate.change.buy?.direction || rate.change.sell?.direction || 'stable')
+                          : (avgPercent > 0 ? 'up' : avgPercent < 0 ? 'down' : 'stable');
 
-                <Box sx={{ height: { xs: '1px', md: '40px' }, width: { xs: '100%', md: '1px' }, bgcolor: theme.palette.divider }} />
+                        return (
+                          <MarketRow
+                            key={idx}
+                            label={`${rate.currency}/VES`}
+                            sublabel={rate.source === 'BCV' ? 'Banco Central de Venezuela' : rate.source}
+                            value={currentAverage.toFixed(2)}
+                            change={`${avgPercent >= 0 ? '+' : ''}${avgPercent.toFixed(2)}`}
+                            isUp={direction === 'up'}
+                            buy={isRateObject ? rate.rate.buy?.toFixed(2) : undefined}
+                            sell={isRateObject ? rate.rate.sell?.toFixed(2) : undefined}
+                            buyChange={isChangeObject ? `${rate.change.buy?.percent >= 0 ? '+' : ''}${rate.change.buy?.percent?.toFixed(2)}` : undefined}
+                            sellChange={isChangeObject ? `${rate.change.sell?.percent >= 0 ? '+' : ''}${Number(rate.change.sell?.percent || 0).toFixed(2)}` : undefined}
+                            compact={idx > 0}
+                          />
+                        );
+                      })}
 
-                <Box sx={{ flexGrow: 1, display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3 }}>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Mercado fronterizo</Typography>
-                    <Typography 
-                      variant="h6" 
-                      fontWeight="900" 
-                      sx={{ 
-                        color: '#00FF94',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.02em',
-                        mt: -0.5
-                      }}
-                    >
-                      ABIERTO
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Mercado P2P</Typography>
-                    <Typography 
-                      variant="h6" 
-                      fontWeight="900" 
-                      sx={{ 
-                        color: '#00FF94',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.02em',
-                        mt: -0.5
-                      }}
-                    >
-                      ABIERTO
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Fecha de Referencia</Typography>
-                    <Typography variant="body1" fontWeight="900" sx={{ fontFamily: 'monospace' }}>
-                      {marketData?.status?.date || '---'}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Última Actualización</Typography>
-                    <Typography variant="body1" fontWeight="900" sx={{ fontSize: '0.85rem' }}>
-                      {marketData?.status?.lastUpdate ? new Date(marketData.status.lastUpdate).toLocaleTimeString() : new Date().toLocaleTimeString()}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Paper>
-            </Grid>
-
-            {/* 2. Mercado Cambiario */}
-            <MarketCard 
-              icon={PaymentsIcon} 
-              title="Mercado Cambiario" 
-              subtitle="Divisas & Tasas Oficiales"
-              color={theme.palette.primary.main}
-              loading={loading}
-            >
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                {marketData?.rates?.map((rate: any, idx: number) => {
-                  const isRateObject = typeof rate.rate === 'object' && rate.rate !== null;
-                  const currentBuy = isRateObject ? (rate.rate.buy || 0) : 0;
-                  const currentSell = isRateObject ? (rate.rate.sell || 0) : 0;
-                  const currentAverage = isRateObject 
-                    ? (rate.rate.average || rate.rate.buy || rate.rate.sell || 0) 
-                    : (rate.rate || 0);
-                  
-                  const isChangeObject = typeof rate.change === 'object' && rate.change !== null;
-                  const avgPercent = isChangeObject 
-                    ? (rate.change.average?.percent || rate.change.buy?.percent || rate.change.sell?.percent || 0)
-                    : (typeof rate.change === 'number' ? rate.change : 0);
-                  
-                  const buyPercent = isChangeObject ? (rate.change.buy?.percent || 0) : 0;
-                  const sellPercent = isChangeObject ? (rate.change.sell?.percent || 0) : 0;
-                  
-                  const direction = isChangeObject 
-                    ? (rate.change.average?.direction || rate.change.buy?.direction || rate.change.sell?.direction || 'stable')
-                    : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
-                  
-                  const showTrading = rate.currency === 'USD' && (currentBuy > 0 || currentSell > 0);
-                  
-                  return (
-                    <MarketRow 
-                      key={`${rate.currency}-${rate.source || idx}-${idx}`}
-                      label={`${rate.currency}/VES`}
-                      value={Number(currentAverage).toFixed(2)}
-                      buy={showTrading ? Number(currentBuy).toFixed(2) : undefined}
-                      sell={showTrading ? Number(currentSell).toFixed(2) : undefined}
-                      buyChange={showTrading ? `${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}` : undefined}
-                      sellChange={showTrading ? `${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}` : undefined}
-                      change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
-                      isUp={direction === 'up'}
-                      sublabel={rate.source === 'BCV' ? 'Banco Central de Venezuela' : rate.source}
+                      {/* Bancos de la Tasa BCV - Versión compacta para Bento */}
+                      <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', mt: 3, mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block' }}>
+                        Referencia Bancaria (BCV)
+                      </Typography>
+                      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
+                        {marketData?.banks?.slice(0, 4).map((bank: any) => (
+                          <Box key={bank.source} sx={{ 
+                            p: 2, 
+                            borderRadius: 4, 
+                            bgcolor: alpha(theme.palette.text.primary, 0.02), 
+                            border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              bgcolor: alpha(theme.palette.text.primary, 0.04),
+                              borderColor: alpha(theme.palette.primary.main, 0.1),
+                            }
+                          }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', fontSize: '0.55rem', mb: 0.5, textTransform: 'uppercase' }}>{bank.source}</Typography>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 900, letterSpacing: '-0.02em' }}>
+                              <Box component="span" sx={{ fontSize: '0.75em', color: 'text.secondary', mr: 0.5 }}>Bs.</Box>
+                              {(bank.rate?.average || 0).toFixed(2)}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  </Grid>
+                  <Grid size={{ xs: 12, lg: 6 }}>
+                    <TrendChart 
+                      title="Tendencia USD/VES" 
+                      subtitle="Últimas 24 horas" 
+                      color={theme.palette.primary.main} 
                     />
-                  );
-                })}
-              </Box>
-              {!marketData && !loading && <Typography variant="caption" color="error">Error al cargar datos oficiales</Typography>}
-              
-                {/* Bancos de la Tasa BCV */}
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                  {marketData?.banks
-                    ?.slice(0, 4)
-                    .map((bank: any) => (
-                      <Grid key={bank.source} size={{ xs: 6, sm: 3 }}>
-                        <Box sx={{ 
-                          p: 2, 
-                          borderRadius: 3, 
-                          bgcolor: alpha(theme.palette.text.primary, 0.02), 
-                          border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-                          transition: 'all 0.2s ease',
-                          '&:hover': {
-                            bgcolor: alpha(theme.palette.text.primary, 0.04),
-                            borderColor: alpha(theme.palette.divider, 0.1),
-                          }
-                        }}>
-                          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 0.5, fontSize: '0.55rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {bank.source}
-                          </Typography>
-                          <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 900, lineHeight: 1, fontSize: '0.9rem' }}>
-                            <Box component="span" sx={{ fontSize: '0.7em', color: 'text.secondary', mr: 0.5 }}>Bs.</Box>
-                            {(bank.rate?.average || 0).toFixed(2)}
-                          </Typography>
-                          {bank.change?.average && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                              <Typography 
-                                variant="caption" 
-                                sx={{ 
-                                  color: getTrendColor(bank.change.average.direction === 'up' ? '+' : (bank.change.average.direction === 'down' ? '-' : '0'), theme), 
-                                  fontWeight: 900,
-                                  fontSize: '0.6rem'
-                                }}
-                              >
-                                {bank.change.average.direction === 'up' ? '▲' : (bank.change.average.direction === 'down' ? '▼' : '●')} {Math.abs(bank.change.average.percent || 0).toFixed(2)}%
-                              </Typography>
-                            </Box>
-                          )}
-                        </Box>
-                      </Grid>
-                    ))}
+                  </Grid>
                 </Grid>
-            </MarketCard>
+              </MarketCard>
+            </Box>
 
-            {/* 3. Divisas Fronterizas */}
-            <MarketCard 
-              icon={LanguageIcon} 
-              title="Divisas Fronterizas" 
-              subtitle="Tasas Regionales P2P"
-              color="#9C27B0"
-              loading={loading}
-            >
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                {marketData?.border?.map((fiat: any, idx: number) => {
-                   const isRateObject = typeof fiat.rate === 'object' && fiat.rate !== null;
-                   const currentBuy = isRateObject ? (fiat.rate.buy || 0) : 0;
-                   const currentSell = isRateObject ? (fiat.rate.sell || 0) : 0;
-                   const currentAverage = isRateObject 
-                     ? (fiat.rate.average || (currentBuy + currentSell) / 2) 
-                     : (fiat.rate || 0);
-                   
-                   const isChangeObject = typeof fiat.change === 'object' && fiat.change !== null;
-                   const buyPercent = isChangeObject ? (fiat.change.buy?.percent || 0) : 0;
-                   const sellPercent = isChangeObject ? (fiat.change.sell?.percent || 0) : 0;
-                   const avgPercent = isChangeObject 
-                     ? (fiat.change.average?.percent || (buyPercent + sellPercent) / 2)
-                     : (typeof fiat.change === 'number' ? fiat.change : 0);
-                   
-                   const direction = isChangeObject 
-                     ? (fiat.change.average?.direction || fiat.change.buy?.direction || 'stable')
-                     : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
-                   
-                   return (
-                     <MarketRow 
-                       key={`${fiat.currency}-${idx}`}
-                       label={`${fiat.currency}/VES`}
-                       value={Number(currentAverage).toFixed(4)}
-                       buy={Number(currentBuy).toFixed(4)}
-                       sell={Number(currentSell).toFixed(4)}
-                       buyChange={`${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}`}
-                       sellChange={`${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}`}
-                       change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
-                       isUp={direction === 'up'}
-                       sublabel={fiat.source}
-                     />
-                   );
-                 })}
-              </Box>
-            </MarketCard>
-
-            {/* 4. Bolsa de Valores */}
-            <MarketCard 
-              icon={ShowChartIcon} 
-              title="Bolsa de Valores" 
-              subtitle="Top Acciones BVC"
-              color="#00FF94"
-              loading={loading}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, mb: 1 }}>
-                <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.6rem' }}>Instrumento</Typography>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', mr: 1, fontSize: '0.6rem' }}>
-                    PÁGINA {bvcPage} {marketData?.bvcMeta?.pages ? `DE ${marketData.bvcMeta.pages}` : ''}
-                  </Typography>
-                  <IconButton 
-                    size="small" 
-                    onClick={() => handleBvcPageChange(bvcPage - 1)}
-                    disabled={bvcPage <= 1 || loading}
-                    sx={{ p: 0.2, color: 'text.secondary', '&:disabled': { opacity: 0.3 } }}
-                  >
-                    <NavigateBeforeIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton 
-                    size="small" 
-                    onClick={() => handleBvcPageChange(bvcPage + 1)}
-                    disabled={(marketData?.bvcMeta?.pages && bvcPage >= marketData.bvcMeta.pages) || loading || !marketData?.bvc?.length}
-                    sx={{ p: 0.2, color: 'text.secondary', '&:disabled': { opacity: 0.3 } }}
-                  >
-                    <NavigateNextIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-
-                <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.6rem' }}>Precio</Typography>
-              </Box>
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                  {Array.isArray(marketData?.bvc) && marketData.bvc.length > 0 ? marketData.bvc.map((quote: any, idx: number) => {
-                    const price = quote.price || quote.rate?.average || quote.rate || 0;
-                    const changePercent = quote.change?.percent || quote.change?.average?.percent || (typeof quote.change === 'number' ? quote.change : 0);
-                    const direction = quote.change?.direction || quote.change?.average?.direction || (changePercent >= 0 ? 'up' : 'down');
+            {/* 2. Divisas Fronterizas (span 4) */}
+            <Box sx={{ gridColumn: { xs: 'span 1', md: 'span 4' } }}>
+              <MarketCard 
+                icon={LanguageIcon} 
+                title="Divisas Fronterizas" 
+                subtitle="Tasas Regionales P2P"
+                color="#9C27B0"
+                loading={loading}
+              >
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
+                  {marketData?.border?.map((fiat: any, idx: number) => {
+                    const isRateObject = typeof fiat.rate === 'object' && fiat.rate !== null;
+                    const currentAverage = isRateObject 
+                      ? (fiat.rate.average || (fiat.rate.buy + fiat.rate.sell) / 2) 
+                      : (fiat.rate || 0);
+                    
+                    const isChangeObject = typeof fiat.change === 'object' && fiat.change !== null;
+                    const avgPercent = isChangeObject 
+                      ? (fiat.change.average?.percent || 0)
+                      : (typeof fiat.change === 'number' ? fiat.change : 0);
+                    
+                    const direction = isChangeObject 
+                      ? (fiat.change.average?.direction || 'stable')
+                      : (avgPercent > 0 ? 'up' : 'down');
                     
                     return (
                       <MarketRow 
-                        key={`${quote.symbol || idx}-${idx}`}
-                        label={quote.symbol || 'S/S'}
-                        value={Number(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        change={`${changePercent >= 0 ? '+' : ''}${Number(changePercent).toFixed(2)}%`}
+                        key={`${fiat.currency}-${idx}`}
+                        label={`${fiat.currency}/VES`}
+                        value={Number(currentAverage).toFixed(4)}
+                        change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
                         isUp={direction === 'up'}
-                        sublabel={quote.name || quote.symbol || 'Stock'}
+                        sublabel={fiat.source}
+                        compact
                       />
                     );
-                  }) : !loading && (
-                    <Box sx={{ gridColumn: '1 / -1', py: 4, textAlign: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">No hay datos disponibles en esta página</Typography>
-                    </Box>
-                  )}
-               </Box>
-              {!marketData?.bvc && !loading && <Typography variant="caption" color="error">Error al cargar datos BVC</Typography>}
-            </MarketCard>
+                  })}
+                </Box>
+              </MarketCard>
+            </Box>
 
-            {/* 5. Ecosistema Cripto */}
-            <MarketCard 
-              icon={CurrencyBitcoinIcon} 
-              title="Ecosistema Cripto" 
-              subtitle="P2P & Market Caps"
-              color="#F7931A"
-              loading={loading}
-            >
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 8 }}>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-                    {marketData?.crypto?.map((coin: any, index: number) => {
-                       const isRateObject = typeof coin.rate === 'object' && coin.rate !== null;
-                       const currentBuy = isRateObject ? (coin.rate.buy || 0) : 0;
-                       const currentSell = isRateObject ? (coin.rate.sell || 0) : 0;
-                       const currentPrice = isRateObject 
-                         ? (coin.rate.average || coin.rate.buy || coin.rate.sell || 0) 
-                         : (coin.rate || 0);
-                       
-                       const isChangeObject = typeof coin.change === 'object' && coin.change !== null;
-                       const avgPercent = isChangeObject 
-                         ? (coin.change.average?.percent || coin.change.buy?.percent || coin.change.sell?.percent || 0)
-                         : (typeof coin.change === 'number' ? coin.change : 0);
-                         
-                       const buyPercent = isChangeObject ? (coin.change.buy?.percent || 0) : 0;
-                       const sellPercent = isChangeObject ? (coin.change.sell?.percent || 0) : 0;
-                       
-                       const direction = isChangeObject 
-                         ? (coin.change.average?.direction || coin.change.buy?.direction || coin.change.sell?.direction || 'stable')
-                         : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
-                       
-                       const hasBuySell = (currentBuy > 0 && currentSell > 0);
-                       
-                       return (
-                          <MarketRow 
-                            key={`${coin.currency}-${coin.source || index}-${index}`}
-                            label={`${coin.currency}/VES`}
-                            value={Number(currentPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            buy={hasBuySell ? Number(currentBuy).toFixed(2) : undefined}
-                            sell={hasBuySell ? Number(currentSell).toFixed(2) : undefined}
-                            buyChange={hasBuySell ? `${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}` : undefined}
-                            sellChange={hasBuySell ? `${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}` : undefined}
-                            change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
-                            isUp={direction === 'up'}
-                            sublabel={`${coin.source || 'P2P'} - ${coin.currency}`}
-                          />
-                        );
-                     })}
+            {/* 3. Bolsa de Valores (span 4) */}
+            <Box sx={{ gridColumn: { xs: 'span 1', md: 'span 4' } }}>
+              <MarketCard 
+                icon={ShowChartIcon} 
+                title="Bolsa de Valores" 
+                subtitle="Top Acciones BVC"
+                color="#00FF94"
+                loading={loading}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.6rem' }}>Instrumento</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <IconButton size="small" onClick={() => handleBvcPageChange(bvcPage - 1)} disabled={bvcPage <= 1 || loading} sx={{ p: 0.2 }}>
+                      <NavigateBeforeIcon fontSize="small" />
+                    </IconButton>
+                    <Typography variant="caption" sx={{ fontWeight: 900, fontSize: '0.6rem' }}>{bvcPage}</Typography>
+                    <IconButton size="small" onClick={() => handleBvcPageChange(bvcPage + 1)} disabled={(marketData?.bvcMeta?.pages && bvcPage >= marketData.bvcMeta.pages) || loading} sx={{ p: 0.2 }}>
+                      <NavigateNextIcon fontSize="small" />
+                    </IconButton>
                   </Box>
-                </Grid>
-              </Grid>
-            </MarketCard>
-          </Grid>
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
+                  {marketData?.bvc?.map((quote: any, idx: number) => (
+                    <MarketRow 
+                      key={idx}
+                      label={quote.symbol}
+                      value={Number(quote.price || 0).toFixed(2)}
+                      change={`${quote.change?.percent >= 0 ? '+' : ''}${Number(quote.change?.percent || 0).toFixed(2)}%`}
+                      isUp={quote.change?.direction === 'up'}
+                      sublabel={quote.name}
+                      compact
+                    />
+                  ))}
+                </Box>
+              </MarketCard>
+            </Box>
+
+            {/* 4. Ecosistema Cripto (span 12) */}
+            <Box sx={{ gridColumn: { xs: 'span 1', md: 'span 12' }, mt: 2 }}>
+              <MarketCard 
+                icon={CurrencyBitcoinIcon} 
+                title="Ecosistema Cripto" 
+                subtitle="Indicadores Globales & P2P"
+                color="#F7931A"
+                loading={loading}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6, mt: -2 }}>
+                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                     P2P & Market Caps • Real-time Feeds
+                   </Typography>
+                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Box sx={{ display: 'flex', ml: 2 }}>
+                        {['BTC', 'ETH', 'USDT'].map((coin, i) => (
+                          <Box key={coin} sx={{ 
+                            width: 32, 
+                            height: 32, 
+                            borderRadius: '50%', 
+                            border: `2px solid ${theme.palette.background.paper}`,
+                            bgcolor: coin === 'BTC' ? '#F7931A' : coin === 'ETH' ? '#627EEA' : '#26A17B',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.6rem',
+                            fontWeight: 900,
+                            color: 'white',
+                            ml: i === 0 ? 0 : -1.5,
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
+                          }}>
+                            {coin[0]}
+                          </Box>
+                        ))}
+                        <Box sx={{ 
+                          width: 32, 
+                          height: 32, 
+                          borderRadius: '50%', 
+                          border: `2px solid ${theme.palette.background.paper}`,
+                          bgcolor: 'grey.800',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.6rem',
+                          fontWeight: 900,
+                          color: 'white',
+                          ml: -1.5,
+                          boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
+                        }}>
+                          +8
+                        </Box>
+                      </Box>
+                      <Button variant="outlined" size="small" sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 700, fontSize: '0.75rem', px: 2 }}>
+                        Explorar Pares
+                      </Button>
+                   </Box>
+                </Box>
+                <Box sx={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, 
+                  gap: 3 
+                }}>
+                  {marketData?.crypto?.slice(0, 4).map((coin: any, index: number) => {
+                    const isRateObject = typeof coin.rate === 'object' && coin.rate !== null;
+                    const currentPrice = isRateObject 
+                      ? (coin.rate.average || coin.rate.buy || coin.rate.sell || 0) 
+                      : (coin.rate || 0);
+                    
+                    const isChangeObject = typeof coin.change === 'object' && coin.change !== null;
+                    const avgPercent = isChangeObject 
+                      ? (coin.change.average?.percent || 0)
+                      : (typeof coin.change === 'number' ? coin.change : 0);
+                      
+                    const direction = isChangeObject 
+                      ? (coin.change.average?.direction || 'stable')
+                      : (avgPercent > 0 ? 'up' : 'down');
+
+                    return (
+                      <CryptoTile
+                        key={index}
+                        label={coin.currency}
+                        value={coin.currency === 'BTC' ? `$${Number(currentPrice).toLocaleString()}` : Number(currentPrice).toFixed(2)}
+                        change={Number(avgPercent).toFixed(2)}
+                        isUp={direction === 'up'}
+                        color="#F7931A"
+                      />
+                    );
+                  })}
+                </Box>
+              </MarketCard>
+            </Box>
+          </Box>
         </Container>
       </Box>
 
