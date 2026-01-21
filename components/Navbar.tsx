@@ -19,18 +19,24 @@ import {
   useMediaQuery,
   Menu,
   MenuItem,
-  ListItemIcon
+  ListItemIcon,
+  Avatar
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CheckIcon from '@mui/icons-material/Check';
+import PersonIcon from '@mui/icons-material/Person';
 import Image from 'next/image';
 import logo from '../app/assets/logotipo.png';
 import flagVe from '../app/assets/flags/ve.svg';
 import flagCo from '../app/assets/flags/co.svg';
 import flagPe from '../app/assets/flags/pe.svg';
 import ThemeToggle from './ThemeToggle';
+import AuthModal from './AuthModal';
 import Link from 'next/link';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import md5 from 'md5';
 
 const navItems = [
   { label: 'Mercados', href: '#mercados' },
@@ -51,6 +57,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [countryAnchorEl, setCountryAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+  const [user, setUser] = useState<User | null>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  const getGravatarUrl = (email: string) => {
+    const hash = md5(email.trim().toLowerCase());
+    return `https://www.gravatar.com/avatar/${hash}?d=mp&s=100`;
+  };
 
   const handleCountryOpen = (event: React.MouseEvent<HTMLElement>) => {
     setCountryAnchorEl(event.currentTarget);
@@ -72,7 +85,15 @@ export default function Navbar() {
       setScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      unsubscribe();
+    };
   }, []);
 
   const handleDrawerToggle = () => {
@@ -142,6 +163,57 @@ export default function Navbar() {
                 </Button>
               ))}
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
+                {/* Login Button / Profile */}
+                {user ? (
+                  <Button
+                    component={Link}
+                    href="/cuenta"
+                    sx={{
+                      p: 0.5,
+                      borderRadius: '50px',
+                      minWidth: 'auto',
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      '&:hover': {
+                        borderColor: theme.palette.primary.main,
+                        bgcolor: alpha(theme.palette.primary.main, 0.05)
+                      }
+                    }}
+                  >
+                    <Avatar 
+                      src={user.photoURL || (user.email ? getGravatarUrl(user.email) : '')}
+                      sx={{ 
+                        width: 32, 
+                        height: 32,
+                        bgcolor: 'primary.main',
+                        fontSize: '0.9rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      {user.displayName?.charAt(0) || user.email?.charAt(0)}
+                    </Avatar>
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setAuthModalOpen(true)}
+                    variant="outlined"
+                    size="small"
+                    startIcon={<PersonIcon />}
+                    sx={{
+                      borderRadius: '50px',
+                      px: 3,
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      borderColor: alpha(theme.palette.divider, 0.1),
+                      color: 'text.primary',
+                      '&:hover': {
+                        borderColor: theme.palette.primary.main,
+                        bgcolor: alpha(theme.palette.primary.main, 0.05)
+                      }
+                    }}
+                  >
+                    Ingresar
+                  </Button>
+                )}
                 <ThemeToggle />
                 
                 {/* Selector de Países */}
@@ -322,6 +394,11 @@ export default function Navbar() {
           )}
         </Toolbar>
       </Container>
+
+      <AuthModal 
+        open={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+      />
 
       {/* Mobile Drawer */}
       <Drawer
