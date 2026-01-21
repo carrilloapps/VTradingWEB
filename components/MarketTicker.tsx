@@ -1,15 +1,10 @@
 'use client';
 
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Box, Typography, useTheme, alpha, Chip } from '@mui/material';
-import { keyframes } from '@mui/system';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import RemoveIcon from '@mui/icons-material/Remove';
-
-const tickerAnimation = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-`;
 
 interface TickerItemProps {
   symbol: string;
@@ -22,10 +17,20 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
   const theme = useTheme();
   
   const getIcon = () => {
-    if (trend === 'down') return <ArrowDropDownIcon fontSize="small" color="error" />;
-    if (trend === 'up') return <ArrowDropUpIcon fontSize="small" sx={{ color: 'trendUp' }} />;
+    if (trend === 'down') return <ArrowDropDownIcon fontSize="small" sx={{ color: '#FF4444' }} />;
+    if (trend === 'up') return <ArrowDropUpIcon fontSize="small" sx={{ color: '#00FF94' }} />;
     return <RemoveIcon fontSize="small" sx={{ color: 'text.secondary', transform: 'scale(0.7)' }} />;
   };
+
+  const getBadgeColor = () => {
+    // Blue for BUY (Bid side) - Distinct from Up Trend (Green)
+    if (type === 'COMPRA') return { bg: alpha('#2979FF', 0.15), color: '#448AFF', border: '#2979FF' };
+    // Orange for SELL (Ask side) - Distinct from Down Trend (Red)
+    if (type === 'VENTA') return { bg: alpha('#FF9100', 0.15), color: '#FFB74D', border: '#FF9100' };
+    return { bg: 'transparent', color: 'text.secondary', border: 'transparent' };
+  };
+
+  const badgeStyle = getBadgeColor();
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, whiteSpace: 'nowrap' }}>
@@ -46,13 +51,14 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
         <Chip
           label={type}
           size="small"
-          variant="filled"
-          color={type === 'COMPRA' ? 'info' : 'warning'}
           sx={{ 
             height: 20, 
             fontSize: '0.7rem', 
             fontWeight: 'bold',
             fontFamily: 'monospace',
+            bgcolor: badgeStyle.bg,
+            color: badgeStyle.color,
+            border: `1px solid ${alpha(badgeStyle.border, 0.3)}`,
             '& .MuiChip-label': { px: 1 }
           }}
         />
@@ -63,10 +69,10 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
           variant="caption" 
           sx={{ 
             fontFamily: 'monospace', 
-            color: trend === 'down' ? 'error.main' : (trend === 'up' ? 'trendUp' : 'text.primary'),
+            color: trend === 'down' ? '#FF4444' : (trend === 'up' ? '#00FF94' : 'text.primary'),
             fontWeight: 'bold',
             fontSize: '0.85rem',
-            textShadow: trend === 'up' ? `0 0 10px ${alpha(theme.palette.trendUp || '#00FF94', 0.4)}` : 'none',
+            textShadow: trend === 'up' ? `0 0 10px ${alpha('#00FF94', 0.4)}` : 'none',
             mr: 0.5
           }}
         >
@@ -80,17 +86,80 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
 
 export default function MarketTicker({ items }: { items?: any[] }) {
   const theme = useTheme();
+  const [offset, setOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const requestRef = useRef<number>(0);
+  const lastXRef = useRef<number>(0);
+  const speedRef = useRef<number>(0.5); // Base speed
   
   const displayItems = items || [];
 
-  if (displayItems.length === 0) return null;
+  const animate = useCallback(() => {
+    if (!isDragging && contentRef.current) {
+      setOffset(prev => {
+        const contentWidth = contentRef.current?.offsetWidth || 0;
+        const halfWidth = contentWidth / 2;
+        let newOffset = prev - speedRef.current;
+        
+        // Reset when first set moves out of view
+        if (Math.abs(newOffset) >= halfWidth) {
+          newOffset = 0;
+        }
+        return newOffset;
+      });
+    }
+    requestRef.current = requestAnimationFrame(animate);
+  }, [isDragging]);
 
-  // Adjust duration based on item count to maintain readable speed
-  // Base duration 60s, add 8s per item
-  const duration = Math.max(60, displayItems.length * 8);
+  useEffect(() => {
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [animate]);
+
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDragging(true);
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+    lastXRef.current = clientX;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+    const delta = clientX - lastXRef.current;
+    lastXRef.current = clientX;
+
+    setOffset(prev => {
+      const contentWidth = contentRef.current?.offsetWidth || 0;
+      const halfWidth = contentWidth / 2;
+      let newOffset = prev + delta;
+      
+      // Allow dragging back and forth seamlessly
+      if (newOffset > 0) newOffset = -halfWidth;
+      if (Math.abs(newOffset) >= halfWidth) newOffset = 0;
+      
+      return newOffset;
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  if (displayItems.length === 0) return null;
 
   return (
     <Box 
+      ref={containerRef}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchStart={handleMouseDown}
+      onTouchMove={handleMouseMove}
+      onTouchEnd={handleMouseUp}
       sx={{ 
         width: '100%', 
         bgcolor: alpha(theme.palette.background.default, 0.8),
@@ -101,21 +170,22 @@ export default function MarketTicker({ items }: { items?: any[] }) {
         position: 'fixed',
         top: 80, // Navbar height
         zIndex: 90,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        userSelect: 'none'
       }}
     >
       <Box 
+        ref={contentRef}
         sx={{ 
           display: 'flex', 
           width: 'fit-content',
-          animation: `${tickerAnimation} ${duration}s linear infinite`,
-          '&:hover': {
-            animationPlayState: 'paused',
-          }
+          transform: `translateX(${offset}px)`,
+          willChange: 'transform',
         }}
       >
         {/* Render twice for seamless loop */}
         {[...displayItems, ...displayItems].map((item, index) => (
-          <Box key={index} sx={{ px: 8 }}>
+          <Box key={index} sx={{ px: 4, display: 'inline-block' }}>
             <TickerItem 
               symbol={item.symbol || item.label} 
               type={item.type} 
