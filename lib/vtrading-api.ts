@@ -25,17 +25,25 @@ async function fetchVTrading(endpoint: string, options: RequestInit = {}) {
 }
 
 export const getRates = () => fetchVTrading('/api/rates');
-export const getCrypto = (asset = 'USDT', fiat = 'VES', tradeType = 'BUY') => 
-  fetchVTrading(`/api/crypto?asset=${asset}&fiat=${fiat}&tradeType=${tradeType}`);
+export const getCrypto = (asset = '', fiat = 'VES', tradeType = 'BUY') => {
+  const params = new URLSearchParams();
+  if (asset) params.append('asset', asset);
+  if (fiat) params.append('fiat', fiat);
+  if (tradeType) params.append('tradeType', tradeType);
+  const query = params.toString();
+  return fetchVTrading(`/api/crypto${query ? `?${query}` : ''}`);
+};
+
 export const getBVCMarket = (symbol = '', page = 1, limit = 30) => 
   fetchVTrading(`/api/bvc/market?symbol=${symbol}&page=${page}&limit=${limit}`);
+
 export const getBankRates = () => fetchVTrading('/api/rates/banks');
 
-export async function fetchMarketData() {
+export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
   const [rates, crypto, bvc] = await Promise.all([
     getRates(),
-    getCrypto('USDT', 'VES'),
-    getBVCMarket()
+    getCrypto(''), // Empty asset to get all cryptos
+    getBVCMarket('', bvcPage, bvcLimit)
   ]);
 
   return {

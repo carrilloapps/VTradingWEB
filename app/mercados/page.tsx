@@ -5,7 +5,8 @@ import MercadosContent from './MercadosContent';
 
 export default async function MercadosPage() {
   // Fetch initial data on the server
-  const rawData = await fetchMarketData();
+  const initialBvcLimit = 6;
+  const rawData = await fetchMarketData(1, initialBvcLimit);
   const initialData = await normalizeMarketData(rawData);
 
   return <MercadosContent initialData={initialData} />;

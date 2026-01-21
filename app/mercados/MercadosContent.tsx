@@ -11,7 +11,9 @@ import {
   Paper,
   Button,
   Fade,
-  CircularProgress
+  CircularProgress,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import MarketTicker from '@/components/MarketTicker';
@@ -24,6 +26,8 @@ import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import LanguageIcon from '@mui/icons-material/Language';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 const MarketCard = ({ icon: Icon, title, subtitle, children, color, loading }: any) => {
   const theme = useTheme();
@@ -246,6 +250,8 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
   const theme = useTheme();
   const [marketData, setMarketData] = useState<any>(initialData);
   const [loading, setLoading] = useState(!initialData);
+  const [bvcPage, setBvcPage] = useState(1);
+  const bvcLimit = 6; // Showing 6 items as per the grid layout
 
   // Derive ticker items from marketData
   const getTickerItems = (data: any) => {
@@ -292,24 +298,26 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
 
   const tickerItems = getTickerItems(marketData);
 
+  const fetchMarketData = async (page = bvcPage) => {
+    setLoading(true);
+    try {
+      const data = await getMarketDataAction(page, bvcLimit);
+      setMarketData(data);
+    } catch (error) {
+      console.error('Error fetching market data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!initialData) {
-      const fetchMarketData = async () => {
-        try {
-          const data = await getMarketDataAction();
-          setMarketData(data);
-        } catch (error) {
-          console.error('Error fetching market data:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchMarketData();
+    if (!initialData || bvcPage !== 1) {
+      fetchMarketData(bvcPage);
     }
 
     const interval = setInterval(async () => {
       try {
-        const data = await getMarketDataAction();
+        const data = await getMarketDataAction(bvcPage, bvcLimit);
         setMarketData(data);
       } catch (error) {
         console.error('Error refreshing market data:', error);
@@ -317,7 +325,13 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [initialData]);
+  }, [initialData, bvcPage]);
+
+  const handleBvcPageChange = (newPage: number) => {
+    if (newPage < 1) return;
+    if (marketData?.bvcMeta?.pages && newPage > marketData.bvcMeta.pages) return;
+    setBvcPage(newPage);
+  };
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
@@ -376,28 +390,38 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
               loading={loading}
             >
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                {marketData?.rates?.map((rate: any) => {
-                  const currentBuy = rate.rate?.buy || 0;
-                  const currentSell = rate.rate?.sell || 0;
-                  const currentAverage = rate.rate?.average || currentBuy;
+                {marketData?.rates?.map((rate: any, idx: number) => {
+                  const isRateObject = typeof rate.rate === 'object' && rate.rate !== null;
+                  const currentBuy = isRateObject ? (rate.rate.buy || 0) : 0;
+                  const currentSell = isRateObject ? (rate.rate.sell || 0) : 0;
+                  const currentAverage = isRateObject 
+                    ? (rate.rate.average || rate.rate.buy || rate.rate.sell || 0) 
+                    : (rate.rate || 0);
                   
-                  const avgPercent = rate.change?.average?.percent || 0;
-                  const buyPercent = rate.change?.buy?.percent || 0;
-                  const sellPercent = rate.change?.sell?.percent || 0;
+                  const isChangeObject = typeof rate.change === 'object' && rate.change !== null;
+                  const avgPercent = isChangeObject 
+                    ? (rate.change.average?.percent || rate.change.buy?.percent || rate.change.sell?.percent || 0)
+                    : (typeof rate.change === 'number' ? rate.change : 0);
                   
-                  const direction = rate.change?.average?.direction || 'stable';
+                  const buyPercent = isChangeObject ? (rate.change.buy?.percent || 0) : 0;
+                  const sellPercent = isChangeObject ? (rate.change.sell?.percent || 0) : 0;
+                  
+                  const direction = isChangeObject 
+                    ? (rate.change.average?.direction || rate.change.buy?.direction || rate.change.sell?.direction || 'stable')
+                    : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
+                  
                   const showTrading = rate.currency === 'USD' && (currentBuy > 0 || currentSell > 0);
                   
                   return (
                     <MarketRow 
-                      key={rate.currency + rate.source}
+                      key={`${rate.currency}-${rate.source || idx}-${idx}`}
                       label={`${rate.currency}/VES`}
-                      value={currentAverage.toFixed(2)}
-                      buy={showTrading ? currentBuy.toFixed(2) : undefined}
-                      sell={showTrading ? currentSell.toFixed(2) : undefined}
-                      buyChange={showTrading ? `${buyPercent >= 0 ? '+' : ''}${buyPercent.toFixed(2)}` : undefined}
-                      sellChange={showTrading ? `${sellPercent >= 0 ? '+' : ''}${sellPercent.toFixed(2)}` : undefined}
-                      change={`${avgPercent >= 0 ? '+' : ''}${avgPercent.toFixed(2)}`}
+                      value={Number(currentAverage).toFixed(2)}
+                      buy={showTrading ? Number(currentBuy).toFixed(2) : undefined}
+                      sell={showTrading ? Number(currentSell).toFixed(2) : undefined}
+                      buyChange={showTrading ? `${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}` : undefined}
+                      sellChange={showTrading ? `${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}` : undefined}
+                      change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
                       isUp={direction === 'up'}
                       sublabel={rate.source === 'BCV' ? 'Banco Central de Venezuela' : rate.source}
                     />
@@ -450,7 +474,6 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                 </Grid>
             </MarketCard>
 
-            {/* Bolsa de Valores */}
             <MarketCard 
               icon={ShowChartIcon} 
               title="Bolsa de Valores" 
@@ -458,31 +481,53 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
               color="#00FF94"
               loading={loading}
             >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, mb: 1 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, mb: 1 }}>
                 <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.6rem' }}>Instrumento</Typography>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', mr: 1, fontSize: '0.6rem' }}>
+                    PÁGINA {bvcPage} {marketData?.bvcMeta?.pages ? `DE ${marketData.bvcMeta.pages}` : ''}
+                  </Typography>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => handleBvcPageChange(bvcPage - 1)}
+                    disabled={bvcPage <= 1 || loading}
+                    sx={{ p: 0.2, color: 'text.secondary', '&:disabled': { opacity: 0.3 } }}
+                  >
+                    <NavigateBeforeIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => handleBvcPageChange(bvcPage + 1)}
+                    disabled={(marketData?.bvcMeta?.pages && bvcPage >= marketData.bvcMeta.pages) || loading || !marketData?.bvc?.length}
+                    sx={{ p: 0.2, color: 'text.secondary', '&:disabled': { opacity: 0.3 } }}
+                  >
+                    <NavigateNextIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+
                 <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.6rem' }}>Precio</Typography>
               </Box>
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                 {Array.isArray(marketData?.bvc) ? marketData.bvc.slice(0, 6).map((quote: any) => (
-                   <MarketRow 
-                     key={quote.symbol}
-                     label={quote.symbol}
-                     value={(quote.price || 0).toFixed(2)}
-                     change={`${(quote.change?.percent || 0).toFixed(2)}%`}
-                     isUp={(quote.change?.percent || 0) >= 0}
-                     sublabel={quote.name || quote.symbol}
-                   />
-                 )) : (
-                   marketData?.bvc?.quotes?.slice(0, 6).map((quote: any) => (
+                 {Array.isArray(marketData?.bvc) && marketData.bvc.length > 0 ? marketData.bvc.map((quote: any, idx: number) => {
+                   const price = quote.price || quote.rate?.average || quote.rate || 0;
+                   const changePercent = quote.change?.percent || quote.change?.average?.percent || (typeof quote.change === 'number' ? quote.change : 0);
+                   const direction = quote.change?.direction || quote.change?.average?.direction || (changePercent >= 0 ? 'up' : 'down');
+                   
+                   return (
                      <MarketRow 
-                       key={quote.symbol}
-                       label={quote.symbol}
-                       value={(quote.price || 0).toFixed(2)}
-                       change={`${(quote.changePercent || 0).toFixed(2)}%`}
-                       isUp={(quote.change || 0) >= 0}
-                       sublabel={quote.symbol}
+                       key={`${quote.symbol || idx}-${idx}`}
+                       label={quote.symbol || 'S/S'}
+                       value={Number(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                       change={`${changePercent >= 0 ? '+' : ''}${Number(changePercent).toFixed(2)}%`}
+                       isUp={direction === 'up'}
+                       sublabel={quote.name || quote.symbol || 'Stock'}
                      />
-                   ))
+                   );
+                 }) : !loading && (
+                   <Box sx={{ gridColumn: '1 / -1', py: 4, textAlign: 'center' }}>
+                     <Typography variant="body2" color="text.secondary">No hay datos disponibles en esta página</Typography>
+                   </Box>
                  )}
                </Box>
               {!marketData?.bvc && !loading && <Typography variant="caption" color="error">Error al cargar datos BVC</Typography>}
@@ -497,63 +542,44 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
               loading={loading}
             >
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <Box sx={{ 
-                    p: 3, 
-                    borderRadius: 4, 
-                    height: '100%',
-                    bgcolor: alpha('#F7931A', 0.03), 
-                    border: `1px solid ${alpha('#F7931A', 0.1)}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
-                  }}>
-                    <Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: alpha('#F7931A', 0.1), color: '#F7931A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 900 }}>₮</Box>
-                        <Typography variant="caption" fontWeight="900">USDT/VES P2P</Typography>
-                      </Box>
-                      <Typography variant="h4" sx={{ fontFamily: 'monospace', fontWeight: 900, letterSpacing: '-0.02em' }}>
-                        <Box component="span" sx={{ fontSize: '0.5em', color: 'text.secondary', mr: 0.5 }}>Bs.</Box>
-                        {(() => {
-                          const usdtRate = marketData?.crypto?.find((r: any) => r.currency === 'USDT');
-                          return (usdtRate?.rate?.buy || 0).toFixed(2);
-                        })()}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ mt: 2, height: 40, display: 'flex', alignItems: 'flex-end', gap: 0.5 }}>
-                      {[40, 60, 55, 80, 70, 90, 85].map((h, i) => (
-                        <Box key={i} sx={{ flexGrow: 1, bgcolor: alpha('#F7931A', 0.3), height: `${h}%`, borderRadius: '2px 2px 0 0' }} />
-                      ))}
-                    </Box>
-                  </Box>
-                </Grid>
                 <Grid size={{ xs: 12, md: 8 }}>
                   <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-                    {marketData?.crypto?.map((coin: any) => {
-                       const currentBuy = coin.rate?.buy || 0;
-                       const currentSell = coin.rate?.sell || 0;
-                       const currentPrice = coin.rate?.average || coin.rate?.buy || 0;
+                    {marketData?.crypto?.map((coin: any, index: number) => {
+                       const isRateObject = typeof coin.rate === 'object' && coin.rate !== null;
+                       const currentBuy = isRateObject ? (coin.rate.buy || 0) : 0;
+                       const currentSell = isRateObject ? (coin.rate.sell || 0) : 0;
+                       const currentPrice = isRateObject 
+                         ? (coin.rate.average || coin.rate.buy || coin.rate.sell || 0) 
+                         : (coin.rate || 0);
                        
-                       const avgPercent = coin.change?.average?.percent || coin.change?.buy?.percent || 0;
-                       const buyPercent = coin.change?.buy?.percent || 0;
-                       const sellPercent = coin.change?.sell?.percent || 0;
-                       const direction = coin.change?.average?.direction || coin.change?.buy?.direction || 'stable';
+                       const isChangeObject = typeof coin.change === 'object' && coin.change !== null;
+                       const avgPercent = isChangeObject 
+                         ? (coin.change.average?.percent || coin.change.buy?.percent || coin.change.sell?.percent || 0)
+                         : (typeof coin.change === 'number' ? coin.change : 0);
+                         
+                       const buyPercent = isChangeObject ? (coin.change.buy?.percent || 0) : 0;
+                       const sellPercent = isChangeObject ? (coin.change.sell?.percent || 0) : 0;
+                       
+                       const direction = isChangeObject 
+                         ? (coin.change.average?.direction || coin.change.buy?.direction || coin.change.sell?.direction || 'stable')
+                         : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
+                       
+                       const hasBuySell = (currentBuy > 0 && currentSell > 0);
                        
                        return (
-                         <MarketRow 
-                           key={coin.currency}
-                           label={`${coin.currency}/VES`}
-                           value={currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                           buy={coin.currency === 'USDT' ? currentBuy.toFixed(2) : undefined}
-                           sell={coin.currency === 'USDT' ? currentSell.toFixed(2) : undefined}
-                           buyChange={coin.currency === 'USDT' ? `${buyPercent >= 0 ? '+' : ''}${buyPercent.toFixed(2)}` : undefined}
-                           sellChange={coin.currency === 'USDT' ? `${sellPercent >= 0 ? '+' : ''}${sellPercent.toFixed(2)}` : undefined}
-                           change={`${avgPercent >= 0 ? '+' : ''}${avgPercent.toFixed(2)}`}
-                           isUp={direction === 'up'}
-                           sublabel={coin.source}
-                         />
-                       );
+                          <MarketRow 
+                            key={`${coin.currency}-${coin.source || index}-${index}`}
+                            label={`${coin.currency}/VES`}
+                            value={Number(currentPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            buy={hasBuySell ? Number(currentBuy).toFixed(2) : undefined}
+                            sell={hasBuySell ? Number(currentSell).toFixed(2) : undefined}
+                            buyChange={hasBuySell ? `${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}` : undefined}
+                            sellChange={hasBuySell ? `${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}` : undefined}
+                            change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
+                            isUp={direction === 'up'}
+                            sublabel={`${coin.source || 'P2P'} - ${coin.currency}`}
+                          />
+                        );
                      })}
                   </Box>
                 </Grid>
@@ -569,26 +595,35 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
               loading={loading}
             >
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                {marketData?.border?.map((fiat: any) => {
-                   const currentBuy = fiat.rate?.buy || 0;
-                   const currentSell = fiat.rate?.sell || 0;
-                   const currentAverage = fiat.rate?.average || (currentBuy + currentSell) / 2;
+                {marketData?.border?.map((fiat: any, idx: number) => {
+                   const isRateObject = typeof fiat.rate === 'object' && fiat.rate !== null;
+                   const currentBuy = isRateObject ? (fiat.rate.buy || 0) : 0;
+                   const currentSell = isRateObject ? (fiat.rate.sell || 0) : 0;
+                   const currentAverage = isRateObject 
+                     ? (fiat.rate.average || (currentBuy + currentSell) / 2) 
+                     : (fiat.rate || 0);
                    
-                   const buyPercent = fiat.change?.buy?.percent || 0;
-                   const sellPercent = fiat.change?.sell?.percent || 0;
-                   const avgPercent = (buyPercent + sellPercent) / 2;
-                   const direction = fiat.change?.buy?.direction || 'stable';
+                   const isChangeObject = typeof fiat.change === 'object' && fiat.change !== null;
+                   const buyPercent = isChangeObject ? (fiat.change.buy?.percent || 0) : 0;
+                   const sellPercent = isChangeObject ? (fiat.change.sell?.percent || 0) : 0;
+                   const avgPercent = isChangeObject 
+                     ? (fiat.change.average?.percent || (buyPercent + sellPercent) / 2)
+                     : (typeof fiat.change === 'number' ? fiat.change : 0);
+                   
+                   const direction = isChangeObject 
+                     ? (fiat.change.average?.direction || fiat.change.buy?.direction || 'stable')
+                     : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
                    
                    return (
                      <MarketRow 
-                       key={fiat.currency}
+                       key={`${fiat.currency}-${idx}`}
                        label={`${fiat.currency}/VES`}
-                       value={currentAverage.toFixed(4)}
-                       buy={currentBuy.toFixed(4)}
-                       sell={currentSell.toFixed(4)}
-                       buyChange={`${buyPercent >= 0 ? '+' : ''}${buyPercent.toFixed(2)}`}
-                       sellChange={`${sellPercent >= 0 ? '+' : ''}${sellPercent.toFixed(2)}`}
-                       change={`${avgPercent >= 0 ? '+' : ''}${avgPercent.toFixed(2)}`}
+                       value={Number(currentAverage).toFixed(4)}
+                       buy={Number(currentBuy).toFixed(4)}
+                       sell={Number(currentSell).toFixed(4)}
+                       buyChange={`${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}`}
+                       sellChange={`${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}`}
+                       change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
                        isUp={direction === 'up'}
                        sublabel={fiat.source}
                      />
