@@ -6,6 +6,8 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 
+import Link from 'next/link';
+
 interface StockItem {
   symbol: string;
   name: string;
@@ -39,9 +41,11 @@ const StockListCard = ({ items }: StockListCardProps) => {
     <Box sx={{ mt: 2.5 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, px: 1 }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'white', fontSize: '0.9rem', letterSpacing: '0.02em' }}>Mercado Bursátil</Typography>
-        <Typography variant="caption" sx={{ color: '#00FF94', fontWeight: 700, cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.05em' }}>
-          VER TODO
-        </Typography>
+        <Link href="/cuenta" passHref style={{ textDecoration: 'none' }}>
+            <Typography variant="caption" sx={{ color: '#00FF94', fontWeight: 700, cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.05em' }}>
+              VER TODO
+            </Typography>
+        </Link>
       </Box>
 
       {items.map((item, index) => (
@@ -69,8 +73,9 @@ const StockListCard = ({ items }: StockListCardProps) => {
               fontSize: '0.75rem',
               fontWeight: 800
             }}
+            src={item.logo}
           >
-            {item.logo ? <img src={item.logo} alt={item.symbol} style={{ width: '100%' }} /> : item.symbol.substring(0, 2)}
+            {!item.logo && item.symbol.substring(0, 2)}
           </Avatar>
           
           <Box sx={{ flexGrow: 1 }}>
@@ -81,7 +86,7 @@ const StockListCard = ({ items }: StockListCardProps) => {
           </Box>
 
           <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: 'white', lineHeight: 1.2, fontSize: '0.85rem' }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: 'white', lineHeight: 1.2, fontSize: '0.8rem' }}>
               {item.price}
             </Typography>
             <Box sx={{ 
@@ -91,7 +96,7 @@ const StockListCard = ({ items }: StockListCardProps) => {
               px: 0.8,
               py: 0.2,
               borderRadius: 1,
-              mt: 0.3
+              mt: 1
             }}>
               <Box sx={{ color: item.trend === 'down' ? '#FF4444' : item.trend === 'up' ? '#00FF94' : 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center' }}>
                 {getTrendIcon(item.trend)}

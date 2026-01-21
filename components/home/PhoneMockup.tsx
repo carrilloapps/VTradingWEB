@@ -4,7 +4,6 @@ import React from 'react';
 import { Box, Paper, Typography, CircularProgress, useTheme, alpha, Grow } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import RateCard from './RateCard';
@@ -124,13 +123,24 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
   
   const bvcQuotes = Array.isArray(marketData?.bvc) ? marketData.bvc : [];
   // Take first 2 items for the mockup
-  const stockItems = bvcQuotes.slice(0, 2).map((quote: any) => ({
-    symbol: quote.symbol,
-    name: quote.name,
-    price: `${fmt(quote.price)} Bs`,
-    change: fmtPct(quote.change?.percent),
-    trend: (quote.change?.direction || 'stable') as 'up' | 'down' | 'stable'
-  }));
+  const stockItems = bvcQuotes.slice(0, 2).map((quote: any) => {
+    const percent = quote.change?.percent || 0;
+    let trend = quote.change?.direction;
+    
+    // Ensure trend matches the sign of the percentage
+    if (percent < 0) trend = 'down';
+    else if (percent > 0) trend = 'up';
+    else trend = 'stable';
+
+    return {
+      symbol: quote.symbol,
+      name: quote.name,
+      price: `${fmt(quote.price)} Bs`,
+      change: fmtPct(percent),
+      trend: trend as 'up' | 'down' | 'stable',
+      logo: quote.meta?.iconUrl || quote.image
+    };
+  });
 
   // Debug log
   React.useEffect(() => {
@@ -155,7 +165,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
             mx: 0,
             borderRadius: 12,
             border: `12px solid ${theme.palette.mode === 'dark' ? '#1A1A1A' : '#E0E0E0'}`,
-            bgcolor: '#121212', // Force dark background as per image
+            bgcolor: theme.palette.mode === 'dark' ? '#191C1A' : '#FBFDF9', // Force dark background as per image
             overflow: 'hidden',
             position: 'relative',
             zIndex: 2,
