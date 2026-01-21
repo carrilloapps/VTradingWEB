@@ -94,7 +94,8 @@ export async function normalizeMarketData(data: any) {
     border: borderArr,
     crypto: cryptoArr,
     bvc: bvcNormalized,
-    bvcMeta: bvcMeta
+    bvcMeta: bvcMeta,
+    status: data.rates?.status || data.status || null
   };
 }
 

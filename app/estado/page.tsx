@@ -129,13 +129,34 @@ const ActivityLogs = () => {
   );
 };
 
+import { getMarketDataAction } from '@/app/actions/market';
+
 export default function StatusPage() {
   const theme = useTheme();
+  const [marketData, setMarketData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getMarketDataAction();
+        setMarketData(data);
+      } catch (error) {
+        console.error('Error fetching market status:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const services = [
-    { name: 'BCV-API-RELAY', source: 'bcv.org.ve', uptime: '99.98%', status: 'OPERATIONAL', color: '#00FF94' },
-    { name: 'BVC-MARKET-FEED', source: 'bolsadecaracas.com', uptime: '99.92%', status: 'OPERATIONAL', color: '#00FF94' },
-    { name: 'P2P-BIN-AGGREGATOR', source: 'p2p.distributed.io', uptime: '98.45%', status: 'DEGRADED', color: '#F59E0B' },
+    { name: 'BCV-API-RELAY', source: 'bcv.org.ve', uptime: '99.98%', status: marketData?.status?.state || 'OPERATIONAL', color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94' },
+    { name: 'BVC-MARKET-FEED', source: 'bolsadecaracas.com', uptime: '99.92%', status: marketData?.status?.state || 'OPERATIONAL', color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94' },
+    { name: 'P2P-BIN-AGGREGATOR', source: 'p2p.distributed.io', uptime: '98.45%', status: 'OPERATIONAL', color: '#00FF94' },
     { name: 'AUTH-V3-GATEWAY', source: 'internal-aws-us-east', uptime: '100.00%', status: 'OPERATIONAL', color: '#00FF94' },
     { name: 'TICKER-WEBSOCKET', source: 'ws.vtrading.io', uptime: '99.99%', status: 'OPERATIONAL', color: '#00FF94' },
   ];
@@ -204,16 +225,18 @@ export default function StatusPage() {
                 }
               }}
             >
-              <IntegrityGauge value={99.2} />
+              <IntegrityGauge value={marketData?.status?.state === 'CERRADO' ? 95.0 : 99.2} />
               <Chip 
-                label="All Systems Operational" 
+                label={marketData?.status?.state === 'CERRADO' ? "Market Closed" : "All Systems Operational"} 
                 sx={{ 
-                  bgcolor: alpha('#00FF94', 0.1), 
-                  color: '#00FF94', 
-                  fontWeight: 800, 
-                  fontSize: '0.65rem',
-                  borderRadius: 1.5,
-                  border: `1px solid ${alpha('#00FF94', 0.2)}`
+                  bgcolor: alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.1), 
+                  color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 
+                  fontWeight: 900, 
+                  fontSize: '0.7rem',
+                  borderRadius: 2,
+                  border: `1px solid ${alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.2)}`,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
                 }} 
               />
             </Paper>

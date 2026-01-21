@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import {
   Box,
   Container,
@@ -13,7 +12,6 @@ import {
   Fade,
   CircularProgress,
   IconButton,
-  Tooltip
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import MarketTicker from '@/components/MarketTicker';
@@ -381,7 +379,94 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
           </Fade>
 
           <Grid container spacing={3}>
-            {/* Mercado Cambiario */}
+            {/* 1. Estado del Mercado */}
+            <Grid size={{ xs: 12 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 6,
+                  bgcolor: alpha(theme.palette.background.paper, 0.5),
+                  border: `1px solid ${theme.palette.divider}`,
+                  backdropFilter: 'blur(10px)',
+                  display: 'flex',
+                  flexDirection: { xs: 'column', md: 'row' },
+                  alignItems: 'center',
+                  gap: 4,
+                  mb: 2
+                }}
+              >
+                <Box sx={{ flexShrink: 0 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    Bolsa de Valores
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
+                    <Box sx={{ 
+                      width: 10, 
+                      height: 10, 
+                      borderRadius: '50%', 
+                      bgcolor: marketData?.status?.state === 'ABIERTO' || marketData?.status?.state === 'operational' || !marketData?.status ? '#00FF94' : 
+                               marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#F59E0B',
+                      boxShadow: `0 0 10px ${marketData?.status?.state === 'ABIERTO' || marketData?.status?.state === 'operational' || !marketData?.status ? alpha('#00FF94', 0.5) : 
+                                  marketData?.status?.state === 'CERRADO' ? alpha('#FF3B3B', 0.5) : alpha('#F59E0B', 0.5)}`,
+                      animation: 'pulse 2s infinite'
+                    }} />
+                    <Typography variant="h6" fontWeight="900" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {marketData?.status?.state === 'ABIERTO' ? 'ABIERTA' : 'CERRADA'}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box sx={{ height: { xs: '1px', md: '40px' }, width: { xs: '100%', md: '1px' }, bgcolor: theme.palette.divider }} />
+
+                <Box sx={{ flexGrow: 1, display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3 }}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Mercado fronterizo</Typography>
+                    <Typography 
+                      variant="h6" 
+                      fontWeight="900" 
+                      sx={{ 
+                        color: '#00FF94',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.02em',
+                        mt: -0.5
+                      }}
+                    >
+                      ABIERTO
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Mercado P2P</Typography>
+                    <Typography 
+                      variant="h6" 
+                      fontWeight="900" 
+                      sx={{ 
+                        color: '#00FF94',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.02em',
+                        mt: -0.5
+                      }}
+                    >
+                      ABIERTO
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Fecha de Referencia</Typography>
+                    <Typography variant="body1" fontWeight="900" sx={{ fontFamily: 'monospace' }}>
+                      {marketData?.status?.date || '---'}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem' }}>Última Actualización</Typography>
+                    <Typography variant="body1" fontWeight="900" sx={{ fontSize: '0.85rem' }}>
+                      {marketData?.status?.lastUpdate ? new Date(marketData.status.lastUpdate).toLocaleTimeString() : new Date().toLocaleTimeString()}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Paper>
+            </Grid>
+
+            {/* 2. Mercado Cambiario */}
             <MarketCard 
               icon={PaymentsIcon} 
               title="Mercado Cambiario" 
@@ -474,6 +559,53 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                 </Grid>
             </MarketCard>
 
+            {/* 3. Divisas Fronterizas */}
+            <MarketCard 
+              icon={LanguageIcon} 
+              title="Divisas Fronterizas" 
+              subtitle="Tasas Regionales P2P"
+              color="#9C27B0"
+              loading={loading}
+            >
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                {marketData?.border?.map((fiat: any, idx: number) => {
+                   const isRateObject = typeof fiat.rate === 'object' && fiat.rate !== null;
+                   const currentBuy = isRateObject ? (fiat.rate.buy || 0) : 0;
+                   const currentSell = isRateObject ? (fiat.rate.sell || 0) : 0;
+                   const currentAverage = isRateObject 
+                     ? (fiat.rate.average || (currentBuy + currentSell) / 2) 
+                     : (fiat.rate || 0);
+                   
+                   const isChangeObject = typeof fiat.change === 'object' && fiat.change !== null;
+                   const buyPercent = isChangeObject ? (fiat.change.buy?.percent || 0) : 0;
+                   const sellPercent = isChangeObject ? (fiat.change.sell?.percent || 0) : 0;
+                   const avgPercent = isChangeObject 
+                     ? (fiat.change.average?.percent || (buyPercent + sellPercent) / 2)
+                     : (typeof fiat.change === 'number' ? fiat.change : 0);
+                   
+                   const direction = isChangeObject 
+                     ? (fiat.change.average?.direction || fiat.change.buy?.direction || 'stable')
+                     : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
+                   
+                   return (
+                     <MarketRow 
+                       key={`${fiat.currency}-${idx}`}
+                       label={`${fiat.currency}/VES`}
+                       value={Number(currentAverage).toFixed(4)}
+                       buy={Number(currentBuy).toFixed(4)}
+                       sell={Number(currentSell).toFixed(4)}
+                       buyChange={`${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}`}
+                       sellChange={`${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}`}
+                       change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
+                       isUp={direction === 'up'}
+                       sublabel={fiat.source}
+                     />
+                   );
+                 })}
+              </Box>
+            </MarketCard>
+
+            {/* 4. Bolsa de Valores */}
             <MarketCard 
               icon={ShowChartIcon} 
               title="Bolsa de Valores" 
@@ -509,31 +641,31 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                 <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.6rem' }}>Precio</Typography>
               </Box>
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                 {Array.isArray(marketData?.bvc) && marketData.bvc.length > 0 ? marketData.bvc.map((quote: any, idx: number) => {
-                   const price = quote.price || quote.rate?.average || quote.rate || 0;
-                   const changePercent = quote.change?.percent || quote.change?.average?.percent || (typeof quote.change === 'number' ? quote.change : 0);
-                   const direction = quote.change?.direction || quote.change?.average?.direction || (changePercent >= 0 ? 'up' : 'down');
-                   
-                   return (
-                     <MarketRow 
-                       key={`${quote.symbol || idx}-${idx}`}
-                       label={quote.symbol || 'S/S'}
-                       value={Number(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                       change={`${changePercent >= 0 ? '+' : ''}${Number(changePercent).toFixed(2)}%`}
-                       isUp={direction === 'up'}
-                       sublabel={quote.name || quote.symbol || 'Stock'}
-                     />
-                   );
-                 }) : !loading && (
-                   <Box sx={{ gridColumn: '1 / -1', py: 4, textAlign: 'center' }}>
-                     <Typography variant="body2" color="text.secondary">No hay datos disponibles en esta página</Typography>
-                   </Box>
-                 )}
+                  {Array.isArray(marketData?.bvc) && marketData.bvc.length > 0 ? marketData.bvc.map((quote: any, idx: number) => {
+                    const price = quote.price || quote.rate?.average || quote.rate || 0;
+                    const changePercent = quote.change?.percent || quote.change?.average?.percent || (typeof quote.change === 'number' ? quote.change : 0);
+                    const direction = quote.change?.direction || quote.change?.average?.direction || (changePercent >= 0 ? 'up' : 'down');
+                    
+                    return (
+                      <MarketRow 
+                        key={`${quote.symbol || idx}-${idx}`}
+                        label={quote.symbol || 'S/S'}
+                        value={Number(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        change={`${changePercent >= 0 ? '+' : ''}${Number(changePercent).toFixed(2)}%`}
+                        isUp={direction === 'up'}
+                        sublabel={quote.name || quote.symbol || 'Stock'}
+                      />
+                    );
+                  }) : !loading && (
+                    <Box sx={{ gridColumn: '1 / -1', py: 4, textAlign: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">No hay datos disponibles en esta página</Typography>
+                    </Box>
+                  )}
                </Box>
               {!marketData?.bvc && !loading && <Typography variant="caption" color="error">Error al cargar datos BVC</Typography>}
             </MarketCard>
 
-            {/* Ecosistema Cripto */}
+            {/* 5. Ecosistema Cripto */}
             <MarketCard 
               icon={CurrencyBitcoinIcon} 
               title="Ecosistema Cripto" 
@@ -584,52 +716,6 @@ export default function MercadosContent({ initialData }: { initialData: any }) {
                   </Box>
                 </Grid>
               </Grid>
-            </MarketCard>
-
-            {/* Divisas Fronterizas */}
-            <MarketCard 
-              icon={LanguageIcon} 
-              title="Divisas Fronterizas" 
-              subtitle="Tasas Regionales P2P"
-              color="#9C27B0"
-              loading={loading}
-            >
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                {marketData?.border?.map((fiat: any, idx: number) => {
-                   const isRateObject = typeof fiat.rate === 'object' && fiat.rate !== null;
-                   const currentBuy = isRateObject ? (fiat.rate.buy || 0) : 0;
-                   const currentSell = isRateObject ? (fiat.rate.sell || 0) : 0;
-                   const currentAverage = isRateObject 
-                     ? (fiat.rate.average || (currentBuy + currentSell) / 2) 
-                     : (fiat.rate || 0);
-                   
-                   const isChangeObject = typeof fiat.change === 'object' && fiat.change !== null;
-                   const buyPercent = isChangeObject ? (fiat.change.buy?.percent || 0) : 0;
-                   const sellPercent = isChangeObject ? (fiat.change.sell?.percent || 0) : 0;
-                   const avgPercent = isChangeObject 
-                     ? (fiat.change.average?.percent || (buyPercent + sellPercent) / 2)
-                     : (typeof fiat.change === 'number' ? fiat.change : 0);
-                   
-                   const direction = isChangeObject 
-                     ? (fiat.change.average?.direction || fiat.change.buy?.direction || 'stable')
-                     : (avgPercent > 0 ? 'up' : (avgPercent < 0 ? 'down' : 'stable'));
-                   
-                   return (
-                     <MarketRow 
-                       key={`${fiat.currency}-${idx}`}
-                       label={`${fiat.currency}/VES`}
-                       value={Number(currentAverage).toFixed(4)}
-                       buy={Number(currentBuy).toFixed(4)}
-                       sell={Number(currentSell).toFixed(4)}
-                       buyChange={`${buyPercent >= 0 ? '+' : ''}${Number(buyPercent).toFixed(2)}`}
-                       sellChange={`${sellPercent >= 0 ? '+' : ''}${Number(sellPercent).toFixed(2)}`}
-                       change={`${avgPercent >= 0 ? '+' : ''}${Number(avgPercent).toFixed(2)}`}
-                       isUp={direction === 'up'}
-                       sublabel={fiat.source}
-                     />
-                   );
-                 })}
-              </Box>
             </MarketCard>
           </Grid>
         </Container>

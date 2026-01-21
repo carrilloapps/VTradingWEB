@@ -25,6 +25,41 @@ async function fetchVTrading(endpoint: string, options: RequestInit = {}) {
 }
 
 export const getRates = () => fetchVTrading('/api/rates');
+
+/**
+ * Fetches the current market status from the rates endpoint.
+ */
+export async function getMarketStatus() {
+  try {
+    const data = await getRates();
+    
+    if (!data || !data.status) {
+      throw new Error('Invalid response structure: missing status object');
+    }
+
+    const { state, date, lastUpdate } = data.status;
+
+    // Validation
+    if (!state || !date || !lastUpdate) {
+      throw new Error('Missing required status fields');
+    }
+
+    // Basic date format validation (DD-MM-YYYY)
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+    if (!dateRegex.test(date)) {
+      console.warn(`Invalid date format received: ${date}`);
+    }
+
+    return {
+      state,
+      date,
+      lastUpdate
+    };
+  } catch (error) {
+    console.error('Error fetching market status:', error);
+    throw error;
+  }
+}
 export const getCrypto = (asset = '', fiat = 'VES', tradeType = 'BUY') => {
   const params = new URLSearchParams();
   if (asset) params.append('asset', asset);
