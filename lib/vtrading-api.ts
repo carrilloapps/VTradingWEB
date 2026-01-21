@@ -27,7 +27,8 @@ async function fetchVTrading(endpoint: string, options: RequestInit = {}) {
 export const getRates = () => fetchVTrading('/api/rates');
 export const getCrypto = (asset = 'USDT', fiat = 'VES', tradeType = 'BUY') => 
   fetchVTrading(`/api/crypto?asset=${asset}&fiat=${fiat}&tradeType=${tradeType}`);
-export const getBVCMarket = () => fetchVTrading('/api/bvc/market');
+export const getBVCMarket = (symbol = '', page = 1, limit = 30) => 
+  fetchVTrading(`/api/bvc/market?symbol=${symbol}&page=${page}&limit=${limit}`);
 export const getBankRates = () => fetchVTrading('/api/rates/banks');
 
 export async function fetchMarketData() {

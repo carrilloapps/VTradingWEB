@@ -66,9 +66,44 @@ export default function MarketTicker({ initialItems }: MarketTickerProps) {
   useEffect(() => {
     const fetchTickerData = async () => {
       try {
-        const data = await getMarketDataAction('ticker');
-        if (data && Array.isArray(data)) {
-          setItems(data);
+        const data = await getMarketDataAction();
+        if (data) {
+          const items = [];
+          
+          // BCV
+          const rates = Array.isArray(data.rates) ? data.rates : [];
+          const bcv = rates.find((r: any) => r.source === 'BCV' && r.currency === 'USD');
+          if (bcv) {
+            items.push({ 
+              label: 'USD/VES', 
+              value: (bcv.rate?.average || 0).toFixed(2), 
+              trend: bcv.change?.average?.direction || 'stable'
+            });
+          }
+
+          // Crypto USDT
+          const crypto = Array.isArray(data.crypto) ? data.crypto : [];
+          const usdt = crypto.find((r: any) => r.currency === 'USDT');
+          if (usdt) {
+            items.push({ 
+              label: 'USDT', 
+              value: (usdt.rate?.buy || 0).toFixed(2), 
+              trend: usdt.change?.buy?.direction || 'stable'
+            });
+          }
+
+          // BVC
+          if (data.bvc?.summary) {
+            items.push({ 
+              label: 'IBVC Index', 
+              value: (data.bvc.summary.index || 0).toLocaleString(), 
+              trend: data.bvc.summary.change >= 0 ? 'up' : 'down' 
+            });
+          }
+
+          if (items.length > 0) {
+            setItems(items);
+          }
         }
       } catch (error) {
         console.error('Error fetching ticker data:', error);

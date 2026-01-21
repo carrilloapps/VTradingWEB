@@ -3,78 +3,50 @@
 import { fetchMarketData } from '@/lib/vtrading-api';
 
 /**
+ * Normalizes the raw API response into a consistent format.
+ * The API sometimes returns nested 'rates' or 'crypto' objects.
+ */
+export async function normalizeMarketData(data: any) {
+  if (!data) return null;
+
+  // Extract arrays safely
+  const ratesArr = Array.isArray(data.rates) 
+    ? data.rates 
+    : (Array.isArray(data.rates?.rates) ? data.rates.rates : []);
+    
+  const banksArr = Array.isArray(data.rates?.banks) 
+    ? data.rates.banks 
+    : [];
+    
+  const borderArr = Array.isArray(data.rates?.border) 
+    ? data.rates.border 
+    : [];
+    
+  const cryptoArr = Array.isArray(data.crypto) 
+    ? data.crypto 
+    : (Array.isArray(data.crypto?.rates) ? data.crypto.rates : []);
+
+  return {
+    rates: ratesArr,
+    banks: banksArr,
+    border: borderArr,
+    crypto: cryptoArr,
+    bvc: Array.isArray(data.bvc) ? data.bvc : (Array.isArray(data.bvc?.data) ? data.bvc.data : data.bvc)
+  };
+}
+
+/**
  * Server Action to fetch market data without exposing a public API endpoint.
  * This is used for client-side polling while keeping the requests "internal" to Next.js.
  */
-export async function getMarketDataAction(type: 'full' | 'ticker' | 'summary' = 'summary') {
+export async function getMarketDataAction() {
   try {
-    const data = await fetchMarketData();
+    const rawData = await fetchMarketData();
+    const data = await normalizeMarketData(rawData);
     
-    if (type === 'ticker') {
-      const tickerItems = [];
-      
-      // BCV
-      if (data.rates?.rates) {
-        const rates = Array.isArray(data.rates.rates) ? data.rates.rates : Object.values(data.rates.rates);
-        const usd = rates.find((r: any) => r.currency === 'USD');
-        if (usd) {
-          tickerItems.push({ 
-            label: 'USD/VES BCV', 
-            value: (usd.rate?.buy || usd.rate || 0).toFixed(2), 
-            trend: usd.change === 'up' ? 'up' : 'down' 
-          });
-        }
-      }
+    if (!data) throw new Error('No data received from API');
 
-      // Crypto USDT
-      if (data.crypto?.rates) {
-        const usdt = data.crypto.rates.find((r: any) => r.currency === 'USDT');
-        if (usdt) {
-          tickerItems.push({ 
-            label: 'USDT P2P', 
-            value: (usdt.price || 0).toFixed(2), 
-            trend: 'up' 
-          });
-        }
-      }
-
-      // BVC
-      if (data.bvc?.summary) {
-        tickerItems.push({ 
-          label: 'IBVC Index', 
-          value: (data.bvc.summary.index || 0).toLocaleString(), 
-          trend: data.bvc.summary.change >= 0 ? 'up' : 'down' 
-        });
-      }
-
-      return tickerItems;
-    }
-
-    if (type === 'full') {
-      return {
-        rates: {
-          ...data.rates,
-          rates: Array.isArray(data.rates?.rates) ? data.rates.rates : (data.rates?.rates ? Object.values(data.rates.rates) : []),
-          banks: Array.isArray(data.rates?.banks) ? data.rates.banks : (data.rates?.banks ? Object.values(data.rates.banks) : []),
-          border: Array.isArray(data.rates?.border) ? data.rates.border : (data.rates?.border ? Object.values(data.rates.border) : [])
-        },
-        crypto: data.crypto,
-        bvc: {
-          ...data.bvc,
-          quotes: Array.isArray(data.bvc?.quotes) ? data.bvc.quotes : (data.bvc?.quotes ? Object.values(data.bvc.quotes) : [])
-        }
-      };
-    }
-
-    return {
-      rates: {
-        rates: Array.isArray(data.rates?.rates) ? data.rates.rates : (data.rates?.rates ? Object.values(data.rates.rates) : []),
-      },
-      bvc: {
-        quotes: Array.isArray(data.bvc?.quotes) ? data.bvc.quotes : (data.bvc?.quotes ? Object.values(data.bvc.quotes) : []),
-        summary: data.bvc?.summary
-      }
-    };
+    return data;
   } catch (error) {
     console.error('Error in getMarketDataAction:', error);
     throw new Error('Failed to fetch market data');

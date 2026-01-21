@@ -321,7 +321,10 @@ export default function HomeContent({ initialData }: { initialData: any }) {
                           </Typography>
                         </Box>
                         <Typography variant="h4" fontWeight="800">
-                          {marketData?.rates?.rates?.find((r: any) => r.currency === 'USD')?.rate.buy.toFixed(2) || '36.42'} 
+                          {(() => {
+                            const usdRate = marketData?.rates?.rates?.find((r: any) => r.currency === 'USD');
+                            return (usdRate?.rate?.buy || 0).toFixed(2);
+                          })()} 
                           <Box component="span" sx={{ fontSize: '1rem', color: 'text.secondary' }}>Bs</Box>
                         </Typography>
                       </Paper>
@@ -331,8 +334,8 @@ export default function HomeContent({ initialData }: { initialData: any }) {
                         {marketData?.bvc?.quotes?.slice(0, 3).map((item: any) => (
                           <Box key={item.symbol} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
                             <Typography variant="caption" fontWeight="700">{item.symbol}</Typography>
-                            <Typography variant="caption" sx={{ color: item.change >= 0 ? 'trendUp' : 'error.main', fontWeight: 800 }}>
-                              {item.price.toFixed(2)} {item.change >= 0 ? '▲' : '▼'}
+                            <Typography variant="caption" sx={{ color: (item.change || 0) >= 0 ? 'trendUp' : 'error.main', fontWeight: 800 }}>
+                              {(item.price || 0).toFixed(2)} {(item.change || 0) >= 0 ? '▲' : '▼'}
                             </Typography>
                           </Box>
                         )) || (
