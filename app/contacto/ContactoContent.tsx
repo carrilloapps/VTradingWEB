@@ -12,25 +12,83 @@ import {
   TextField,
   Button,
   Fade,
-  Stack
+  Stack,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Checkbox,
+  FormControlLabel,
+  Snackbar,
+  Alert,
+  Link as MuiLink,
+  SelectChangeEvent
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SendIcon from '@mui/icons-material/Send';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PhoneIcon from '@mui/icons-material/Phone';
+import BusinessIcon from '@mui/icons-material/Business';
 
 import flagVe from '@/app/assets/flags/ve.svg';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ContactoPage() {
   const theme = useTheme();
   const [isSending, setIsSending] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: '',
+    privacyAccepted: false
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
+  ) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      [name as string]: value
+    }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      privacyAccepted: e.target.checked
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.privacyAccepted) return;
+    
     setIsSending(true);
-    setTimeout(() => setIsSending(false), 2000);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSending(false);
+      setOpenSnackbar(true);
+      setFormData({
+        name: '',
+        company: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+        privacyAccepted: false
+      });
+    }, 2000);
   };
 
   return (
@@ -40,7 +98,7 @@ export default function ContactoPage() {
       <Box 
         sx={{ 
           flexGrow: 1,
-          pt: { xs: 16, md: 12 }, 
+          pt: { xs: 20, md: 24 }, 
           pb: { xs: 8, md: 8 },
           position: 'relative',
           display: 'flex',
@@ -52,6 +110,7 @@ export default function ContactoPage() {
       >
         <Container maxWidth="lg">
           <Grid container spacing={8} alignItems="center">
+            {/* Left Side: Info */}
             <Grid size={{ xs: 12, lg: 5 }}>
               <Fade in timeout={1000}>
                 <Box>
@@ -88,7 +147,7 @@ export default function ContactoPage() {
                       background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                    }}>finanzas en</Box> <Box 
+                    }}>negocios en</Box> <Box 
                       component="span" 
                       sx={{ 
                         display: 'inline-block',
@@ -113,14 +172,16 @@ export default function ContactoPage() {
                   </Typography>
                   
                   <Typography variant="h6" color="text.secondary" sx={{ mb: 6, lineHeight: 1.6, fontWeight: 400 }}>
-                    ¿Tienes dudas sobre nuestra API, necesitas soporte personalizado o quieres colaborar con nosotros? Nuestro equipo está listo para ayudarte.
+                    ¿Interesado en nuestras licencias de datos, integraciones API o soporte empresarial? 
+                    Nuestro equipo especializado está listo para brindarte la mejor solución.
                   </Typography>
 
                   <Stack spacing={4}>
                     {[
-                      { icon: EmailIcon, title: 'Correo electrónico', detail: 'soporte@vtrading.app' },
-                      { icon: EmailIcon, title: 'Correo electrónico', detail: 'info@vtrading.app' },
-                      { icon: LocationOnIcon, title: 'Oficina', detail: 'Caracas, Venezuela' }
+                      { icon: EmailIcon, title: 'Ventas y Licencias', detail: 'ventas@vtrading.app' },
+                      { icon: BusinessIcon, title: 'Soporte Corporativo', detail: 'soporte@vtrading.app' },
+                      { icon: PhoneIcon, title: 'Atención Telefónica', detail: '+58 (212) 555-0199' },
+                      { icon: LocationOnIcon, title: 'Oficina Central', detail: 'Caracas, Venezuela' }
                     ].map((item, idx) => (
                       <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <Box sx={{ 
@@ -147,6 +208,7 @@ export default function ContactoPage() {
               </Fade>
             </Grid>
 
+            {/* Right Side: Form */}
             <Grid size={{ xs: 12, lg: 7 }}>
               <Fade in timeout={1500}>
                 <Paper 
@@ -161,52 +223,127 @@ export default function ContactoPage() {
                 >
                   <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
+                      
+                      {/* Nombre y Apellido */}
                       <Grid size={{ xs: 12, md: 6 }}>
                         <TextField 
                           fullWidth 
-                          label="Nombre" 
+                          label="Nombre Completo" 
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
                           variant="outlined" 
                           required 
                           InputProps={{ sx: { borderRadius: 3 } }}
                         />
                       </Grid>
+
+                      {/* Empresa (Opcional) */}
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField 
+                          fullWidth 
+                          label="Empresa / Organización" 
+                          name="company"
+                          value={formData.company}
+                          onChange={handleChange}
+                          variant="outlined" 
+                          InputProps={{ sx: { borderRadius: 3 } }}
+                        />
+                      </Grid>
+
+                      {/* Email */}
                       <Grid size={{ xs: 12, md: 6 }}>
                         <TextField 
                           fullWidth 
                           label="Correo Electrónico" 
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
                           type="email" 
                           variant="outlined" 
                           required 
                           InputProps={{ sx: { borderRadius: 3 } }}
                         />
                       </Grid>
-                      <Grid size={{ xs: 12 }}>
+
+                      {/* Teléfono */}
+                      <Grid size={{ xs: 12, md: 6 }}>
                         <TextField 
                           fullWidth 
-                          label="Asunto" 
+                          label="Teléfono de Contacto" 
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          type="tel"
                           variant="outlined" 
-                          required 
                           InputProps={{ sx: { borderRadius: 3 } }}
                         />
                       </Grid>
+
+                      {/* Asunto (Select) */}
+                      <Grid size={{ xs: 12 }}>
+                        <FormControl fullWidth required>
+                          <InputLabel id="subject-label">Asunto / Departamento</InputLabel>
+                          <Select
+                            labelId="subject-label"
+                            label="Asunto / Departamento"
+                            name="subject"
+                            value={formData.subject}
+                            onChange={handleChange}
+                            sx={{ borderRadius: 3 }}
+                          >
+                            <MenuItem value="ventas">Ventas y Licencias de Datos</MenuItem>
+                            <MenuItem value="soporte">Soporte Técnico API</MenuItem>
+                            <MenuItem value="facturacion">Facturación y Pagos</MenuItem>
+                            <MenuItem value="alianzas">Alianzas Comerciales</MenuItem>
+                            <MenuItem value="otros">Otros Consultas</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      {/* Mensaje */}
                       <Grid size={{ xs: 12 }}>
                         <TextField 
                           fullWidth 
-                          label="Mensaje" 
+                          label="Detalle de su solicitud" 
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
                           multiline 
-                          rows={4} 
+                          rows={5} 
                           variant="outlined" 
                           required 
+                          placeholder="Por favor describa sus requerimientos, volumen de datos esperado o cualquier duda técnica..."
                           InputProps={{ sx: { borderRadius: 3 } }}
                         />
                       </Grid>
+
+                      {/* Privacidad */}
+                      <Grid size={{ xs: 12 }}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox 
+                              checked={formData.privacyAccepted}
+                              onChange={handleCheckboxChange}
+                              color="primary" 
+                            />
+                          }
+                          label={
+                            <Typography variant="body2" color="text.secondary">
+                              He leído y acepto la <Link href="/privacidad" passHref legacyBehavior><MuiLink underline="hover" color="primary">Política de Privacidad</MuiLink></Link> y el procesamiento de mis datos.
+                            </Typography>
+                          }
+                        />
+                      </Grid>
+
+                      {/* Botón de Envío */}
                       <Grid size={{ xs: 12 }}>
                         <Button 
                           type="submit"
                           variant="contained" 
                           size="large" 
                           fullWidth
-                          disabled={isSending}
+                          disabled={isSending || !formData.privacyAccepted}
                           startIcon={<SendIcon />}
                           sx={{ 
                             py: 2, 
@@ -217,7 +354,7 @@ export default function ContactoPage() {
                             boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}`
                           }}
                         >
-                          {isSending ? 'Enviando...' : 'Enviar Mensaje'}
+                          {isSending ? 'Enviando Solicitud...' : 'Enviar Mensaje'}
                         </Button>
                       </Grid>
                     </Grid>
@@ -228,6 +365,12 @@ export default function ContactoPage() {
           </Grid>
         </Container>
       </Box>
+      
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+          Mensaje enviado correctamente. Nuestro equipo le contactará pronto.
+        </Alert>
+      </Snackbar>
 
       <Footer />
     </Box>
