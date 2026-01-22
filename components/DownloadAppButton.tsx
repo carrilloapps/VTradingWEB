@@ -13,6 +13,10 @@ export default function DownloadAppButton({ sx, ...props }: DownloadAppButtonPro
 
   return (
     <Button
+      component="a"
+      href={process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL}
+      target="_blank"
+      rel="noopener noreferrer"
       variant="contained"
       startIcon={<GetAppIcon />}
       sx={{

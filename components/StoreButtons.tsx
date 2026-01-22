@@ -41,6 +41,10 @@ export default function StoreButtons({
       ...sx 
     }}>
       <Button
+        component="a"
+        href={process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL}
+        target="_blank"
+        rel="noopener noreferrer"
         variant="contained"
         fullWidth={fullWidth}
         onClick={() => handleDownload('android')}
