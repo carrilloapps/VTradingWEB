@@ -10,8 +10,7 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged
 } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import logo from '../app/assets/logotipo.png';
 
@@ -91,19 +90,8 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
     setError(null);
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
+      await signInWithPopup(auth, provider);
       
-      const userRef = doc(db, 'users', result.user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          uid: result.user.uid,
-          displayName: result.user.displayName,
-          email: result.user.email,
-          photoURL: result.user.photoURL,
-          createdAt: new Date().toISOString()
-        });
-      }
       setIsProcessing(false);
       onSuccess?.();
       handleClose();
@@ -130,12 +118,6 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
       } else if (authMode === 'register') {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(result.user, { displayName: name });
-        await setDoc(doc(db, 'users', result.user.uid), {
-          uid: result.user.uid,
-          displayName: name,
-          email: email,
-          createdAt: new Date().toISOString()
-        });
       } else {
         await sendPasswordResetEmail(auth, email);
         setError('Correo de recuperación enviado. Revisa tu bandeja de entrada.');
