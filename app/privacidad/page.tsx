@@ -100,7 +100,7 @@ export default function PrivacyPage() {
                 }}
               >
                 <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', fontWeight: 500 }}>
-                  Última actualización: 20 de enero de 2026. Si tienes dudas sobre nuestra política de privacidad, contáctanos en <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>privacidad@vtrading.com.ve</Box>
+                  Última actualización: 20 de enero de 2026. Si tienes dudas sobre nuestra política de privacidad, contáctanos en <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>privacidad@vtrading.app</Box>
                 </Typography>
               </Paper>
             </Box>

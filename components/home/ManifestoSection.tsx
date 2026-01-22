@@ -38,9 +38,9 @@ const ManifestoSection = () => {
                   <TerminalIcon color="primary" />
                 </Box>
                 <Box>
-                  <Typography variant="h6" fontWeight="800">Lead Developer</Typography>
+                  <Typography variant="h6" fontWeight="800">José P. Carrillo</Typography>
                   <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, color: 'text.secondary' }}>
-                    Senior Software Engineer
+                    CEO @ VTrading.app
                   </Typography>
                 </Box>
               </Box>

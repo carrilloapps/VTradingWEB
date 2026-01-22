@@ -17,8 +17,8 @@ export default function NotFound() {
         component="main"
         sx={{ 
           flexGrow: 1,
-          pt: { xs: 12, md: 0 },
-          pb: { xs: 8, md: 0 },
+          pt: { xs: 16, md: 24 },
+          pb: { xs: 8, md: 8 },
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',

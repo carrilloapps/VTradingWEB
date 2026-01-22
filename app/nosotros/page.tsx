@@ -143,9 +143,9 @@ export default function SobreNosotrosPage() {
                   <TerminalIcon color="primary" />
                 </Box>
                 <Box>
-                  <Typography variant="h6" fontWeight="800">Software Engineering First</Typography>
+                  <Typography variant="h6" fontWeight="800">José P. Carrillo</Typography>
                   <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, color: 'text.secondary' }}>
-                    Nuestra Filosofía de Desarrollo
+                    CEO @ VTrading.app
                   </Typography>
                 </Box>
               </Box>

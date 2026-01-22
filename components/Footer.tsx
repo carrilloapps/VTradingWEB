@@ -37,7 +37,7 @@ const footerLinks = {
     { label: 'Privacidad', href: '/privacidad' },
     { label: 'Términos', href: '/terminos' },
     { label: 'Cookies', href: '/cookies' },
-    { label: 'Licencias', href: '#' },
+    { label: 'Licencias', href: '/licencias' },
   ]
 };
 
