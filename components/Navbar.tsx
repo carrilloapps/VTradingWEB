@@ -20,9 +20,12 @@ import {
   MenuItem,
   ListItemIcon,
   Avatar,
-  Divider
+  Divider,
+  Stack,
+  Typography
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CheckIcon from '@mui/icons-material/Check';
 import PersonIcon from '@mui/icons-material/Person';
@@ -30,6 +33,10 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import SecurityIcon from '@mui/icons-material/Security';
 import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import XIcon from '@mui/icons-material/X';
 import Image from 'next/image';
 import logo from '../app/assets/logotipo.png';
 import flagVe from '../app/assets/flags/ve.svg';
@@ -478,35 +485,146 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         PaperProps={{
-          sx: { width: 280, bgcolor: 'background.default' }
+          sx: { width: 300, bgcolor: 'background.default' }
         }}
       >
-        <Box sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          {/* Drawer Header */}
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${theme.palette.divider}` }}>
+            <Box sx={{ position: 'relative', width: 100, height: 30 }}>
+              <Image
+                src={logo}
+                alt="V-Trading"
+                fill
+                style={{ objectFit: 'contain', filter: theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'none' }}
+              />
+            </Box>
             <IconButton onClick={handleDrawerToggle}>
-              <MenuIcon />
+              <CloseIcon />
             </IconButton>
           </Box>
-          <List>
+
+          {/* User Section (Mobile) */}
+          <Box sx={{ p: 3, bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
+            {user ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Avatar 
+                  src={user.photoURL || (user.email ? getGravatarUrl(user.email) : '')}
+                  sx={{ width: 48, height: 48, bgcolor: 'primary.main' }}
+                >
+                  {user.displayName?.charAt(0) || user.email?.charAt(0)}
+                </Avatar>
+                <Box sx={{ overflow: 'hidden' }}>
+                  <Typography variant="subtitle1" fontWeight={700} noWrap>
+                    {user.displayName || 'Usuario'}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" noWrap display="block">
+                    {user.email}
+                  </Typography>
+                  <Button 
+                    component={Link} 
+                    href="/cuenta?tab=profile"
+                    size="small" 
+                    sx={{ mt: 0.5, p: 0, minWidth: 'auto', textTransform: 'none' }}
+                    onClick={handleDrawerToggle}
+                  >
+                    Ver mi perfil
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<PersonIcon />}
+                onClick={() => {
+                  setAuthModalOpen(true);
+                  handleDrawerToggle();
+                }}
+                sx={{ borderRadius: 2 }}
+              >
+                Iniciar Sesión / Registro
+              </Button>
+            )}
+          </Box>
+
+          {/* Navigation Links */}
+          <List sx={{ flexGrow: 1, px: 2, py: 2 }}>
+            <Typography variant="overline" color="text.secondary" sx={{ px: 2, mb: 1, display: 'block' }}>
+              Menú Principal
+            </Typography>
             {navItems.map((item) => (
               <ListItem key={item.label} disablePadding>
                 <ListItemButton 
                   href={item.href} 
                   onClick={handleDrawerToggle}
-                  sx={{ borderRadius: 2, mb: 1 }}
+                  sx={{ borderRadius: 2, mb: 0.5 }}
                 >
                   <ListItemText 
                     primary={item.label} 
-                    primaryTypographyProps={{ 
-                      fontWeight: 600,
-                      fontSize: '0.9rem'
-                    }} 
+                    primaryTypographyProps={{ fontWeight: 600 }} 
                   />
                 </ListItemButton>
               </ListItem>
             ))}
+            
+            {user && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="overline" color="text.secondary" sx={{ px: 2, mb: 1, display: 'block' }}>
+                  Mi Cuenta
+                </Typography>
+                <ListItem disablePadding>
+                  <ListItemButton component={Link} href="/cuenta?tab=security" onClick={handleDrawerToggle} sx={{ borderRadius: 2 }}>
+                    <ListItemIcon sx={{ minWidth: 40 }}><SecurityIcon fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Seguridad" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton component={Link} href="/cuenta?tab=activity" onClick={handleDrawerToggle} sx={{ borderRadius: 2 }}>
+                    <ListItemIcon sx={{ minWidth: 40 }}><HistoryIcon fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Actividad" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton component={Link} href="/cuenta?tab=settings" onClick={handleDrawerToggle} sx={{ borderRadius: 2 }}>
+                    <ListItemIcon sx={{ minWidth: 40 }}><SettingsIcon fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Ajustes" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, color: 'error.main' }}>
+                    <ListItemIcon sx={{ minWidth: 40 }}><LogoutIcon fontSize="small" color="error" /></ListItemIcon>
+                    <ListItemText primary="Cerrar Sesión" />
+                  </ListItemButton>
+                </ListItem>
+              </>
+            )}
           </List>
-          <DownloadAppButton fullWidth sx={{ mt: 4 }} />
+
+          {/* Footer / Socials */}
+          <Box sx={{ p: 3, borderTop: `1px solid ${theme.palette.divider}` }}>
+            <DownloadAppButton fullWidth sx={{ mb: 3 }} />
+            
+            <Stack direction="row" justifyContent="center" spacing={2} sx={{ mb: 2 }}>
+              <IconButton component="a" href="https://x.com/vtrading" target="_blank" size="small">
+                <XIcon fontSize="small" />
+              </IconButton>
+              <IconButton component="a" href="https://linkedin.com/company/vtrading" target="_blank" size="small">
+                <LinkedInIcon fontSize="small" />
+              </IconButton>
+              <IconButton component="a" href="https://facebook.com/vtrading" target="_blank" size="small">
+                <FacebookIcon fontSize="small" />
+              </IconButton>
+              <IconButton component="a" href="https://instagram.com/vtrading" target="_blank" size="small">
+                <InstagramIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+            
+            <Typography variant="caption" align="center" display="block" color="text.secondary">
+              © {new Date().getFullYear()} V-Trading. v0.1.0
+            </Typography>
+          </Box>
         </Box>
       </Drawer>
     </AppBar>
