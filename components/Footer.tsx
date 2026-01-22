@@ -28,7 +28,7 @@ const footerLinks = {
     { label: 'Estado del sistema', href: '/estado' },
   ],
   company: [
-    { label: 'Sobre nosotros', href: '/sobre-nosotros' },
+    { label: 'Sobre nosotros', href: '/nosotros' },
     { label: 'Blog', href: '#' },
     { label: 'Carreras', href: '#' },
     { label: 'Contacto', href: '/contacto' },
