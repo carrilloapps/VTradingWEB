@@ -4,6 +4,7 @@ import { getAnalytics, isSupported, Analytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getMessaging, isSupported as isMessagingSupported, Messaging } from "firebase/messaging";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,6 +26,16 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+// Initialize Messaging safely (only on client side)
+let messaging: Messaging | undefined;
+if (typeof window !== 'undefined') {
+  isMessagingSupported().then((supported) => {
+    if (supported) {
+      messaging = getMessaging(app);
+    }
+  });
+}
+
 // Initialize Analytics safely (only on client side)
 let analytics: Analytics | undefined;
 if (typeof window !== 'undefined') {
@@ -35,4 +46,4 @@ if (typeof window !== 'undefined') {
   });
 }
 
-export { app, auth, db, storage, analytics };
+export { app, auth, db, storage, analytics, messaging };
