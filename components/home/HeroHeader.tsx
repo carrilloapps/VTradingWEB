@@ -547,10 +547,10 @@ export default function HeroHeader() {
             <DownloadAppButton fullWidth sx={{ mb: 3 }} />
             
             <Stack direction="row" justifyContent="center" spacing={2} sx={{ mb: 2 }}>
-              <IconButton component="a" href="https://x.com/vtrading" target="_blank" size="small">
+              <IconButton component="a" href="https://x.com/VTradingAPP" target="_blank" size="small">
                 <XIcon fontSize="small" />
               </IconButton>
-              <IconButton component="a" href="https://linkedin.com/company/vtrading" target="_blank" size="small">
+              <IconButton component="a" href="https://www.linkedin.com/company/vtradingapp" target="_blank" size="small">
                 <LinkedInIcon fontSize="small" />
               </IconButton>
               <IconButton component="a" href="https://www.facebook.com/vtradingapp" target="_blank" size="small">
