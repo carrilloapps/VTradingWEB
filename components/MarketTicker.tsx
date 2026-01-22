@@ -94,7 +94,7 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
   );
 };
 
-export default function MarketTicker({ items, hide, onClose }: { items?: TickerItemProps[], hide?: boolean, onClose?: () => void }) {
+export default function MarketTicker({ items, hide, onClose, fadeEdges }: { items?: TickerItemProps[], hide?: boolean, onClose?: () => void, fadeEdges?: boolean }) {
   const theme = useTheme();
   const { marketData } = useMarketData();
   const [offset, setOffset] = useState(0);
@@ -272,26 +272,35 @@ export default function MarketTicker({ items, hide, onClose }: { items?: TickerI
         userSelect: 'none'
       }}
     >
-      <Box 
-        ref={contentRef}
-        sx={{ 
-          display: 'flex', 
-          width: 'fit-content',
-          transform: `translateX(${offset}px)`,
-          willChange: 'transform',
-        }}
-      >
-        {/* Render twice for seamless loop */}
-        {[...displayItems, ...displayItems].map((item, index) => (
-          <Box key={index} sx={{ px: 4, display: 'inline-block' }}>
-            <TickerItem 
-              symbol={item.symbol} 
-              type={item.type} 
-              value={item.value} 
-              trend={item.trend as 'up' | 'down' | 'stable'} 
-            />
-          </Box>
-        ))}
+      <Box sx={{
+        width: '100%',
+        overflow: 'hidden',
+        ...(fadeEdges && {
+          maskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
+        })
+      }}>
+        <Box 
+          ref={contentRef}
+          sx={{ 
+            display: 'flex', 
+            width: 'fit-content',
+            transform: `translateX(${offset}px)`,
+            willChange: 'transform',
+          }}
+        >
+          {/* Render twice for seamless loop */}
+          {[...displayItems, ...displayItems].map((item, index) => (
+            <Box key={index} sx={{ px: 4, display: 'inline-block' }}>
+              <TickerItem 
+                symbol={item.symbol} 
+                type={item.type} 
+                value={item.value} 
+                trend={item.trend as 'up' | 'down' | 'stable'} 
+              />
+            </Box>
+          ))}
+        </Box>
       </Box>
 
       {onClose && (

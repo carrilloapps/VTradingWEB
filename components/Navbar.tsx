@@ -264,6 +264,7 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
                   anchorEl={countryAnchorEl}
                   open={Boolean(countryAnchorEl)}
                   onClose={handleCountryClose}
+                  disableScrollLock
                   elevation={8}
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                   transformOrigin={{ vertical: 'top', horizontal: 'right' }}

@@ -255,6 +255,7 @@ export default function HeroHeader() {
           anchorEl={countryAnchorEl}
           open={Boolean(countryAnchorEl)}
           onClose={handleCountryClose}
+          disableScrollLock
           elevation={8}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -335,7 +336,8 @@ export default function HeroHeader() {
       {!isTickerHidden && (
         <MarketTicker 
           hide={isTickerHidden} 
-          onClose={() => setIsTickerHidden(true)} 
+          onClose={() => setIsTickerHidden(true)}
+          fadeEdges 
         />
       )}
     </Box>
