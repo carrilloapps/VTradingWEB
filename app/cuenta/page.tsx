@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from 'react';
 import { 
   signInWithEmailAndPassword, 
@@ -22,6 +23,7 @@ import {
 } from 'firebase/auth';
 import { messaging } from '@/lib/firebase';
 import { getToken } from 'firebase/messaging';
+import { subscribeToTopicAction, unsubscribeFromTopicAction } from '@/app/actions/notifications';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -58,7 +60,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   Alert,
   Dialog,
   DialogTitle,
@@ -83,13 +84,9 @@ import {
   Lock as LockIcon,
   LaptopMac as LaptopMacIcon,
   Smartphone as SmartphoneIcon,
-  Login as LoginIcon,
-  VpnKey as VpnKeyIcon,
-  NotificationsActive as NotificationsActiveIcon,
   Email as EmailIcon,
   LightMode as LightIcon,
-  DarkMode as DarkIcon,
-  ArrowForward as ArrowForwardIcon
+  DarkMode as DarkIcon
 } from '@mui/icons-material';
 
 import { useColorMode } from '@/context/ThemeContext';
@@ -330,14 +327,55 @@ export default function CuentaPage() {
     return () => unsubscribe();
   }, []);
 
-  const handleToggleNewsletter = () => {
-    setNewsletterEnabled(!newsletterEnabled);
-    showMessage(
-      !newsletterEnabled 
-        ? 'Suscrito al newsletter exitosamente' 
-        : 'Suscripción al newsletter cancelada', 
-      'success'
-    );
+  const handleToggleNewsletter = async () => {
+    if (newsletterEnabled) {
+      // Unsubscribe
+      try {
+        if (messaging) {
+          const token = await getToken(messaging, { 
+             vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY 
+          });
+          if (token) {
+            await unsubscribeFromTopicAction(token, 'newsletter');
+          }
+        }
+        setNewsletterEnabled(false);
+        showMessage('Suscripción al newsletter cancelada', 'success');
+      } catch (error) {
+        console.error('Error unsubscribing:', error);
+        // Even if server action fails, we update UI? Better to warn.
+        // But for UX we might just disable it locally.
+        setNewsletterEnabled(false);
+        showMessage('Notificaciones desactivadas localmente', 'info');
+      }
+    } else {
+      // Subscribe
+      try {
+        // Request permission if not granted
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          if (messaging) {
+            const token = await getToken(messaging, { 
+               vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY 
+            });
+            if (token) {
+              const result = await subscribeToTopicAction(token, 'newsletter');
+              if (result.success) {
+                setNewsletterEnabled(true);
+                showMessage('Suscrito al newsletter exitosamente', 'success');
+              } else {
+                throw new Error(result.error);
+              }
+            }
+          }
+        } else {
+          showMessage('Permiso de notificaciones denegado', 'warning');
+        }
+      } catch (error: any) {
+        console.error('Error subscribing:', error);
+        showMessage('Error al suscribir: ' + error.message, 'error');
+      }
+    }
   };
 
   const handleTogglePush = async () => {
@@ -492,7 +530,8 @@ export default function CuentaPage() {
     try {
       await auth.signOut();
       showMessage('Sesión cerrada', 'info');
-    } catch (err) {
+    } catch (error: any) {
+      console.error(error);
       showMessage('Error al cerrar sesión', 'error');
     }
   };
@@ -796,7 +835,7 @@ export default function CuentaPage() {
                           <ListItemText 
                             primary={<Typography fontWeight="600">Contraseña</Typography>}
                             secondary={user?.metadata?.lastSignInTime 
-                              ? `Último acceso: ${user.metadata.lastSignInTime}` 
+                              ? `Último acceso: ${new Date(user.metadata.lastSignInTime).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' })}` 
                               : 'Protege tu cuenta con una contraseña segura.'}
                           />
                           <Button 
