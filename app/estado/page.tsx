@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import { 
   Box, 
   Container, 
@@ -16,7 +19,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Chip
+  Chip,
+  CircularProgress,
+  Button
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -133,9 +138,26 @@ import { RatesResponse } from '@/lib/vtrading-types';
 
 export default function StatusPage() {
   const theme = useTheme();
+  const router = useRouter();
   const [marketData, setMarketData] = useState<RatesResponse | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+      } else {
+        router.push('/');
+      }
+      setIsAuthChecking(false);
+    });
+    return () => unsubscribe();
+  }, [router]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchData = async () => {
       try {
         const data = await getMarketDataAction();
@@ -148,7 +170,7 @@ export default function StatusPage() {
     fetchData();
     const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]);
 
   const services = [
     { name: 'BCV-API-RELAY', source: 'bcv.org.ve', uptime: '99.98%', status: marketData?.status?.state || 'OPERATIONAL', color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94' },
@@ -158,239 +180,311 @@ export default function StatusPage() {
     { name: 'TICKER-WEBSOCKET', source: 'ws.vtrading.io', uptime: '99.99%', status: 'OPERATIONAL', color: '#00FF94' },
   ];
 
+  if (isAuthChecking) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Redirecting
+  }
+
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
 
-      <Container maxWidth="lg" sx={{ pt: { xs: 20, md: 25 }, pb: 15, flex: 1 }}>
-        <Fade in timeout={1000}>
-          <Box sx={{ mb: 8 }}>
-            <Box 
-              sx={{ 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                gap: 1.5, 
-                px: 2, 
-                py: 0.8, 
-                borderRadius: 2, 
-                bgcolor: alpha(theme.palette.primary.main, 0.05),
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                mb: 3
-              }}
-            >
-              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00FF94', animation: 'pulse 2s infinite' }} />
-              <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.65rem' }}>
-                System Infrastructure Health
+      <Box sx={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Blurred Content */}
+        <Container 
+          maxWidth="lg" 
+          sx={{ 
+            pt: { xs: 20, md: 25 }, 
+            pb: 15, 
+            flex: 1,
+            filter: 'blur(12px)',
+            pointerEvents: 'none',
+            userSelect: 'none',
+            opacity: 0.5
+          }}
+        >
+          <Fade in timeout={1000}>
+            <Box sx={{ mb: 8 }}>
+              <Box 
+                sx={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: 1.5, 
+                  px: 2, 
+                  py: 0.8, 
+                  borderRadius: 2, 
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                  mb: 3
+                }}
+              >
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00FF94', animation: 'pulse 2s infinite' }} />
+                <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.65rem' }}>
+                  System Infrastructure Health
+                </Typography>
+              </Box>
+              
+              <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, letterSpacing: '-0.03em', fontSize: { xs: '2.5rem', md: '4rem' } }}>
+                System <Box component="span" sx={{ color: 'primary.main' }}>Status</Box>
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 600, fontSize: '1.1rem', lineHeight: 1.6 }}>
+                Real-time status of data ingestion clusters, gateway nodes, and distributed service health.
               </Typography>
             </Box>
-            
-            <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, letterSpacing: '-0.03em', fontSize: { xs: '2.5rem', md: '4rem' } }}>
-              System <Box component="span" sx={{ color: 'primary.main' }}>Status</Box>
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 600, fontSize: '1.1rem', lineHeight: 1.6 }}>
-              Real-time status of data ingestion clusters, gateway nodes, and distributed service health.
-            </Typography>
-          </Box>
-        </Fade>
+          </Fade>
 
-        <Grid container spacing={4} sx={{ mb: 8 }}>
-          {/* Integrity Index Gauge */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 4,
-                height: '100%',
-                borderRadius: 6,
-                bgcolor: 'background.paper',
-                border: `1px solid ${theme.palette.divider}`,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '4px',
-                  bgcolor: '#00FF94',
-                }
-              }}
-            >
-              <IntegrityGauge value={marketData?.status?.state === 'CERRADO' ? 95.0 : 99.2} />
-              <Chip 
-                label={marketData?.status?.state === 'CERRADO' ? "Market Closed" : "All Systems Operational"} 
-                sx={{ 
-                  bgcolor: alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.1), 
-                  color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 
-                  fontWeight: 900, 
-                  fontSize: '0.7rem',
-                  borderRadius: 2,
-                  border: `1px solid ${alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.2)}`,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }} 
-              />
-            </Paper>
-          </Grid>
+          <Grid container spacing={4} sx={{ mb: 8 }}>
+            {/* Integrity Index Gauge */}
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 4,
+                  height: '100%',
+                  borderRadius: 6,
+                  bgcolor: 'background.paper',
+                  border: `1px solid ${theme.palette.divider}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    bgcolor: '#00FF94',
+                  }
+                }}
+              >
+                <IntegrityGauge value={marketData?.status?.state === 'CERRADO' ? 95.0 : 99.2} />
+                <Chip 
+                  label={marketData?.status?.state === 'CERRADO' ? "Market Closed" : "All Systems Operational"} 
+                  sx={{ 
+                    bgcolor: alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.1), 
+                    color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 
+                    fontWeight: 900, 
+                    fontSize: '0.7rem',
+                    borderRadius: 2,
+                    border: `1px solid ${alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.2)}`,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }} 
+                />
+              </Paper>
+            </Grid>
 
-          {/* Node Distribution Grid */}
-          <Grid size={{ xs: 12, md: 8 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 4,
-                height: '100%',
-                borderRadius: 6,
-                bgcolor: 'background.paper',
-                border: `1px solid ${theme.palette.divider}`,
-                position: 'relative',
-              }}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
-                <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Node Distribution</Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Active regional data relays & ingestors</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  {['AMER: ACTIVE', 'EMEA: ACTIVE'].map((region) => (
-                    <Box 
-                      key={region}
-                      sx={{ 
-                        px: 1.5, 
-                        py: 0.5, 
-                        bgcolor: alpha(theme.palette.divider, 0.05), 
-                        border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 1,
-                        fontSize: '0.6rem',
-                        fontFamily: 'JetBrains Mono, monospace',
-                        fontWeight: 700,
-                        color: 'text.secondary'
-                      }}
-                    >
-                      {region}
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-
-              <Grid container spacing={1.5}>
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <Grid key={i} size={{ xs: 3, sm: 1.5 }}>
-                    <Box
-                      sx={{
-                        aspectRatio: '1/1',
-                        borderRadius: 2,
-                        bgcolor: alpha(i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94', 0.1),
-                        border: '1px solid',
-                        borderColor: alpha(i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94', 0.2),
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'all 0.2s',
-                        '&:hover': {
-                          transform: 'scale(1.05)',
-                          bgcolor: alpha(i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94', 0.2),
-                        }
-                      }}
-                    >
+            {/* Node Distribution Grid */}
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 4,
+                  height: '100%',
+                  borderRadius: 6,
+                  bgcolor: 'background.paper',
+                  border: `1px solid ${theme.palette.divider}`,
+                  position: 'relative',
+                }}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Node Distribution</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Active regional data relays & ingestors</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    {['AMER: ACTIVE', 'EMEA: ACTIVE'].map((region) => (
                       <Box 
+                        key={region}
                         sx={{ 
-                          width: 6, 
-                          height: 6, 
-                          borderRadius: '50%', 
-                          bgcolor: i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94',
-                          animation: i === 0 ? 'pulse 2s infinite' : 'none'
-                        }} 
-                      />
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-
-              <Box sx={{ position: 'absolute', bottom: 24, left: 32, right: 32, display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: 'text.secondary' }}>
-                  VTR-GATEWAY-X1-CLUSTER: <Box component="span" sx={{ color: '#00FF94' }}>ONLINE</Box>
-                </Typography>
-                <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: 'text.secondary' }}>
-                  LATENCY: 42ms
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={4}>
-          {/* Active Service Nodes Table */}
-          <Grid size={{ xs: 12, lg: 8 }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box sx={{ color: 'primary.main', display: 'flex' }}>
-                <span className="material-symbols-outlined">dns</span>
-              </Box>
-              Active Service Nodes
-            </Typography>
-            <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 6, border: `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper' }}>
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ bgcolor: alpha(theme.palette.divider, 0.05) }}>
-                    {['Service Name', 'Source', 'Uptime', 'Status'].map((head) => (
-                      <TableCell key={head} sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-                        <Typography variant="caption" sx={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary' }}>
-                          {head}
-                        </Typography>
-                      </TableCell>
+                          px: 1.5, 
+                          py: 0.5, 
+                          bgcolor: alpha(theme.palette.divider, 0.05), 
+                          border: `1px solid ${theme.palette.divider}`,
+                          borderRadius: 1,
+                          fontSize: '0.6rem',
+                          fontFamily: 'JetBrains Mono, monospace',
+                          fontWeight: 700,
+                          color: 'text.secondary'
+                        }}
+                      >
+                        {region}
+                      </Box>
                     ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {services.map((service) => (
-                    <TableRow key={service.name} sx={{ '&:hover': { bgcolor: alpha(theme.palette.divider, 0.02) } }}>
-                      <TableCell sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
-                        <Typography variant="body2" sx={{ fontWeight: 800 }}>{service.name}</Typography>
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
-                        <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', color: 'text.secondary' }}>{service.source}</Typography>
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
-                        <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', color: 'text.secondary' }}>{service.uptime}</Typography>
-                      </TableCell>
-                      <TableCell align="right" sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
-                        <Chip 
-                          label={service.status} 
+                  </Box>
+                </Box>
+
+                <Grid container spacing={1.5}>
+                  {Array.from({ length: 16 }).map((_, i) => (
+                    <Grid key={i} size={{ xs: 3, sm: 1.5 }}>
+                      <Box
+                        sx={{
+                          aspectRatio: '1/1',
+                          borderRadius: 2,
+                          bgcolor: alpha(i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94', 0.1),
+                          border: '1px solid',
+                          borderColor: alpha(i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94', 0.2),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            transform: 'scale(1.05)',
+                            bgcolor: alpha(i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94', 0.2),
+                          }
+                        }}
+                      >
+                        <Box 
                           sx={{ 
-                            height: 24,
-                            bgcolor: alpha(service.color, 0.1), 
-                            color: service.color, 
-                            fontWeight: 800, 
-                            fontSize: '0.6rem',
-                            borderRadius: 1.5,
-                            border: `1px solid ${alpha(service.color, 0.2)}`
+                            width: 6, 
+                            height: 6, 
+                            borderRadius: '50%', 
+                            bgcolor: i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94',
+                            animation: i === 0 ? 'pulse 2s infinite' : 'none'
                           }} 
                         />
-                      </TableCell>
-                    </TableRow>
+                      </Box>
+                    </Grid>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </Grid>
+
+                <Box sx={{ position: 'absolute', bottom: 24, left: 32, right: 32, display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: 'text.secondary' }}>
+                    VTR-GATEWAY-X1-CLUSTER: <Box component="span" sx={{ color: '#00FF94' }}>ONLINE</Box>
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: 'text.secondary' }}>
+                    LATENCY: 42ms
+                  </Typography>
+                </Box>
+              </Paper>
+            </Grid>
           </Grid>
 
-          {/* Activity Logs */}
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box sx={{ color: '#00FF94', display: 'flex' }}>
-                <span className="material-symbols-outlined">terminal</span>
-              </Box>
-              Live Activity Logs
-            </Typography>
-            <ActivityLogs />
+          <Grid container spacing={4}>
+            {/* Active Service Nodes Table */}
+            <Grid size={{ xs: 12, lg: 8 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box sx={{ color: 'primary.main', display: 'flex' }}>
+                  <span className="material-symbols-outlined">dns</span>
+                </Box>
+                Active Service Nodes
+              </Typography>
+              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 6, border: `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ bgcolor: alpha(theme.palette.divider, 0.05) }}>
+                      {['Service Name', 'Source', 'Uptime', 'Status'].map((head) => (
+                        <TableCell key={head} sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
+                          <Typography variant="caption" sx={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary' }}>
+                            {head}
+                          </Typography>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {services.map((service) => (
+                      <TableRow key={service.name} sx={{ '&:hover': { bgcolor: alpha(theme.palette.divider, 0.02) } }}>
+                        <TableCell sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
+                          <Typography variant="body2" sx={{ fontWeight: 800 }}>{service.name}</Typography>
+                        </TableCell>
+                        <TableCell sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
+                          <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', color: 'text.secondary' }}>{service.source}</Typography>
+                        </TableCell>
+                        <TableCell sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
+                          <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', color: 'text.secondary' }}>{service.uptime}</Typography>
+                        </TableCell>
+                        <TableCell align="right" sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
+                          <Chip 
+                            label={service.status} 
+                            sx={{ 
+                              height: 24,
+                              bgcolor: alpha(service.color, 0.1), 
+                              color: service.color, 
+                              fontWeight: 800, 
+                              fontSize: '0.6rem',
+                              borderRadius: 1.5,
+                              border: `1px solid ${alpha(service.color, 0.2)}`
+                            }} 
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+
+            {/* Activity Logs */}
+            <Grid size={{ xs: 12, lg: 4 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box sx={{ color: '#00FF94', display: 'flex' }}>
+                  <span className="material-symbols-outlined">terminal</span>
+                </Box>
+                Live Activity Logs
+              </Typography>
+              <ActivityLogs />
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+        </Container>
+
+        {/* Construction Overlay */}
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            zIndex: 10,
+            p: 3,
+            textAlign: 'center'
+          }}
+        >
+          <Box 
+            sx={{ 
+              p: 4, 
+              bgcolor: alpha(theme.palette.background.paper, 0.8),
+              backdropFilter: 'blur(20px)',
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: theme.shadows[10],
+              maxWidth: 500
+            }}
+          >
+            <Typography variant="h1" sx={{ fontSize: '4rem', mb: 2 }}>🚧</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
+              En Construcción
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
+              Estamos trabajando duro para traerte esta funcionalidad. 
+              Por favor vuelve más tarde.
+            </Typography>
+            <Button 
+              variant="contained" 
+              onClick={() => router.push('/')}
+              sx={{ borderRadius: 2 }}
+            >
+              Volver al Inicio
+            </Button>
+          </Box>
+        </Box>
+      </Box>
 
       <Footer />
       

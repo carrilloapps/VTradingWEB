@@ -562,7 +562,7 @@ export default function HeroHeader() {
             </Stack>
             
             <Typography variant="caption" align="center" display="block" color="text.secondary">
-              © {new Date().getFullYear()} VTrading. Todos los derechos reservados.
+              © {new Date().getFullYear()} VTrading
             </Typography>
           </Box>
         </Box>

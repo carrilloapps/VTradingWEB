@@ -22,22 +22,22 @@ import StoreButtons from './StoreButtons';
 
 const footerLinks = {
   product: [
-    { label: 'Mercados', href: '/mercados' },
+    { label: 'Aplicación', href: '/' },
     { label: 'Características', href: '/#caracteristicas' },
-    { label: 'API Docs', href: '#' }, // TODO: Update with real link
-    { label: 'Estado del Sistema', href: '/estado' },
+    { label: 'API de servicios', href: '#' }, // TODO: Update with real link
+    { label: 'Estado del sistema', href: '/estado' },
   ],
   company: [
     { label: 'Sobre nosotros', href: '/sobre-nosotros' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Carreras', href: '/carreras' },
+    { label: 'Blog', href: '#' },
+    { label: 'Carreras', href: '#' },
     { label: 'Contacto', href: '/contacto' },
   ],
   legal: [
     { label: 'Privacidad', href: '/privacidad' },
     { label: 'Términos', href: '/terminos' },
     { label: 'Cookies', href: '/cookies' },
-    { label: 'Licencias', href: '/licencias' },
+    { label: 'Licencias', href: '#' },
   ]
 };
 
@@ -217,7 +217,7 @@ export default function Footer() {
           gap: 3 
         }}>
           <Typography variant="caption" color="text.secondary">
-            © {new Date().getFullYear()} VTrading. Todos los derechos reservados.
+            © {new Date().getFullYear()} VTrading
           </Typography>
 
           <Stack direction="row" spacing={3} sx={{ flexWrap: 'wrap', justifyContent: 'center' }}>
