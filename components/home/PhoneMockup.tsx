@@ -157,15 +157,6 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
     };
   });
 
-  // Debug log
-  React.useEffect(() => {
-    if (marketData?.status) {
-      console.log('PhoneMockup marketData.status:', marketData.status);
-    } else {
-      console.log('PhoneMockup marketData.status is missing', marketData);
-    }
-  }, [marketData]);
-
   const isDark = theme.palette.mode === 'dark';
   
   // Colors based on the provided palette

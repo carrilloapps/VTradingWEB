@@ -23,6 +23,7 @@ import {
   CircularProgress,
   Button
 } from '@mui/material';
+import { Construction as ConstructionIcon } from '@mui/icons-material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -467,7 +468,7 @@ export default function StatusPage() {
               maxWidth: 500
             }}
           >
-            <Typography variant="h1" sx={{ fontSize: '4rem', mb: 2 }}>🚧</Typography>
+            <ConstructionIcon sx={{ fontSize: '4rem', mb: 2, color: 'warning.main' }} />
             <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
               En Construcción
             </Typography>

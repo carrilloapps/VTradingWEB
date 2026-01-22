@@ -11,7 +11,6 @@ import { RatesResponse, CurrencyRate, BVCQuote } from '@/lib/vtrading-types';
 export async function getMarketHistoryAction(page = 1, limit = 30) {
   try {
     const rawHistory = await getRatesHistory(page, limit);
-    console.log('DEBUG: rawHistory structure:', JSON.stringify(rawHistory).substring(0, 200));
     
     // API might return { data: [...] }, { history: [...] }, { rates: [...] }, or just [...]
     let historyArray: any[] = [];
@@ -35,7 +34,6 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
     }
 
     if (historyArray.length === 0) {
-      console.log('DEBUG: No array found in rawHistory keys:', Object.keys(rawHistory || {}));
       return [];
     }
 
@@ -209,15 +207,9 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
 export async function getMarketDataAction(bvcPage = 1, bvcLimit = 30) {
   try {
     const rawData = await fetchMarketData(bvcPage, bvcLimit);
-    console.log('--- DEBUG MARKET DATA ---');
-    console.log('Crypto data structure keys:', Object.keys(rawData.crypto || {}));
-    if (rawData.crypto && !Array.isArray(rawData.crypto)) {
-      console.log('Crypto keys:', Object.keys(rawData.crypto));
-    }
     
     // Check if status exists in rawData (from fetchMarketData modification) or in rates
-    const statusFound = rawData.status || rawData.rates?.status;
-    console.log('DEBUG: Status found in action:', statusFound ? 'YES' : 'NO', statusFound);
+    // const statusFound = rawData.status || rawData.rates?.status;
 
     const data = await normalizeMarketData(rawData);
     
