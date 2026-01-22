@@ -1,9 +1,8 @@
-import React from 'react';
 import HomeContent from './HomeContent';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Inicio | VTrading',
+  title: 'VTrading - El monitor financiero que Venezuela necesitaba',
   description: 'Accede a datos de mercado en tiempo real, gráficos interactivos y herramientas de análisis técnico para criptomonedas, forex y acciones.',
   alternates: {
     canonical: 'https://vtrading.app',
@@ -30,7 +29,7 @@ export default function Home() {
     },
     author: {
       '@type': 'Organization',
-      name: 'VTrading Team',
+      name: 'VTrading',
       url: 'https://vtrading.app',
     },
   };

@@ -12,28 +12,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${baseUrl}/mercados`,
-      lastModified,
-      changeFrequency: 'hourly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/terminos`,
+      url: `${baseUrl}/contacto`,
       lastModified,
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.7,
     },
     {
-      url: `${baseUrl}/privacidad`,
+      url: `${baseUrl}/nosotros`,
       lastModified,
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.6,
     },
     {
-      url: `${baseUrl}/cookies`,
+      url: `${baseUrl}/soporte`,
       lastModified,
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.6,
     },
   ];
 }

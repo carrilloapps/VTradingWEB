@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://vtrading.app/cookies',
   },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function CookiesPage() {
