@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Box, Container, Grid, Typography, Button, Fade, useTheme, alpha } from '@mui/material';
-import AndroidIcon from '@mui/icons-material/Android';
-import AppleIcon from '@mui/icons-material/Apple';
+import { Box, Container, Grid, Typography, Fade, useTheme, alpha } from '@mui/material';
 import PhoneMockup from './PhoneMockup';
+import StoreButtons from '../StoreButtons';
 import HeroHeader from './HeroHeader';
 import { RatesResponse } from '@/lib/vtrading-types';
 
@@ -92,64 +90,10 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
                   Precisión absoluta en tiempo real. Bolsa de Valores de Caracas, Banco Central de Venezuela, Mercado P2P y divisas en una sola interfaz diseñada para la máxima eficiencia.
                 </Typography>
 
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: { xs: 'center', lg: 'flex-start' } }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => onDownload('android')}
-                    sx={{ 
-                      borderRadius: 2, 
-                      px: 2, 
-                      py: 1,
-                      bgcolor: 'text.primary',
-                      color: 'background.paper',
-                      textTransform: 'none',
-                      minHeight: 52,
-                      '&:hover': { bgcolor: 'text.secondary' },
-                      display: 'flex',
-                      gap: 1.5,
-                      alignItems: 'center',
-                      boxShadow: '0 4px 14px 0 rgba(0,0,0,0.2)',
-                    }}
-                  >
-                    <AndroidIcon fontSize="large" />
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-                      <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        DISPONIBLE EN
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.3px' }}>
-                        Google Play
-                      </Typography>
-                    </Box>
-                  </Button>
-
-                  <Button
-                    disabled
-                    variant="contained"
-                    sx={{ 
-                      borderRadius: 2, 
-                      px: 2, 
-                      py: 1,
-                      bgcolor: alpha(theme.palette.text.primary, 0.8), // Slightly lighter/transparent for disabled look
-                      color: 'background.paper',
-                      textTransform: 'none',
-                      minHeight: 52,
-                      opacity: 0.7, // Visual cue for disabled
-                      display: 'flex',
-                      gap: 1.5,
-                      alignItems: 'center',
-                    }}
-                  >
-                    <AppleIcon fontSize="large" />
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-                      <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        PRÓXIMAMENTE
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.3px' }}>
-                        App Store
-                      </Typography>
-                    </Box>
-                  </Button>
-                </Box>
+                <StoreButtons 
+                  onDownload={onDownload}
+                  justifyContent={{ xs: 'center', lg: 'flex-start' }}
+                />
               </Box>
             </Fade>
           </Grid>
