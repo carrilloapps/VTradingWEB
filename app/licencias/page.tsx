@@ -75,7 +75,7 @@ export default function LicenciasPage() {
             </Typography>
             
             <Typography variant="h5" color="text.secondary" sx={{ mb: 6, maxWidth: '800px' }}>
-              Soluciones escalables diseñadas para adaptarse al volumen de operaciones de su negocio financiero.
+              Soluciones escalables de monitoreo de datos. (Nota: El pago es exclusivamente por el acceso a la infraestructura de datos, no por servicios financieros ni de inversión).
             </Typography>
 
             <Grid container spacing={4} sx={{ mb: 6 }}>

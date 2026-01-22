@@ -8,12 +8,23 @@ import {
   alpha,
   Paper,
   Breadcrumbs,
-  Link as MuiLink
+  Link as MuiLink,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Alert,
+  AlertTitle,
+  Divider
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import CookieIcon from '@mui/icons-material/Cookie';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import SettingsIcon from '@mui/icons-material/Settings';
+import InfoIcon from '@mui/icons-material/Info';
 
 export default function CookiesPage() {
   const theme = useTheme();
@@ -71,36 +82,75 @@ export default function CookiesPage() {
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  1. ¿Qué son las cookies?
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <InfoIcon color="primary" /> 1. ¿Qué son las cookies?
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
                   Las cookies son pequeños archivos de texto que los sitios web que visita guardan en su ordenador o dispositivo móvil. Permiten que el sitio web recuerde sus acciones y preferencias (como inicio de sesión, idioma, tamaño de fuente y otras preferencias de visualización) durante un período de tiempo, para que no tenga que volver a introducirlas cada vez que vuelva al sitio o navegue de una página a otra.
                 </Typography>
               </section>
 
+              <Divider />
+
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  2. ¿Cómo utilizamos las cookies?
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CookieIcon color="primary" /> 2. ¿Cómo utilizamos las cookies?
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
                   En VTrading, utilizamos cookies para mejorar su experiencia de navegación, analizar el tráfico del sitio y personalizar el contenido. Específicamente, utilizamos:
                 </Typography>
-                <Typography component="ul" variant="body1" color="text.secondary" sx={{ pl: 4 }}>
-                  <li><strong>Cookies esenciales:</strong> Necesarias para el funcionamiento del sitio web.</li>
-                  <li><strong>Cookies de rendimiento:</strong> Nos ayudan a entender cómo interactúan los visitantes con el sitio.</li>
-                  <li><strong>Cookies de funcionalidad:</strong> Permiten recordar sus preferencias.</li>
-                </Typography>
+                <List sx={{ bgcolor: alpha(theme.palette.primary.main, 0.03), borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
+                  <ListItem>
+                    <ListItemIcon>
+                      <CookieIcon color="secondary" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Cookies esenciales" 
+                      secondary="Necesarias para el funcionamiento del sitio web." 
+                      primaryTypographyProps={{ fontWeight: 'bold' }}
+                    />
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                  <ListItem>
+                    <ListItemIcon>
+                      <BarChartIcon color="secondary" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Cookies de rendimiento" 
+                      secondary="Nos ayudan a entender cómo interactúan los visitantes con el sitio." 
+                      primaryTypographyProps={{ fontWeight: 'bold' }}
+                    />
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                  <ListItem>
+                    <ListItemIcon>
+                      <SettingsIcon color="secondary" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Cookies de funcionalidad" 
+                      secondary="Permiten recordar sus preferencias." 
+                      primaryTypographyProps={{ fontWeight: 'bold' }}
+                    />
+                  </ListItem>
+                </List>
               </section>
 
+              <Divider />
+
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  3. Gestión de cookies
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SettingsIcon color="primary" /> 3. Gestión de cookies
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  Puede controlar y/o eliminar las cookies según desee. Puede eliminar todas las cookies que ya están en su ordenador y puede configurar la mayoría de los navegadores para evitar que se coloquen. Sin embargo, si hace esto, es posible que tenga que ajustar manualmente algunas preferencias cada vez que visite un sitio y que algunos servicios y funcionalidades no funcionen.
+                  Puede controlar y/o eliminar las cookies según desee. Puede eliminar todas las cookies que ya están en su ordenador y puede configurar la mayoría de los navegadores para evitar que se coloquen.
                 </Typography>
+                <Alert severity="warning" variant="outlined" sx={{ mt: 2, mb: 2 }}>
+                  <AlertTitle>Importante</AlertTitle>
+                  Si decide deshabilitar las cookies, es posible que tenga que ajustar manualmente algunas preferencias cada vez que visite un sitio y que <strong>algunos servicios y funcionalidades no funcionen correctamente</strong>.
+                </Alert>
               </section>
+
+              <Divider />
 
               <section>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>

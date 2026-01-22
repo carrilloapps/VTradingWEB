@@ -8,12 +8,25 @@ import {
   alpha,
   Paper,
   Breadcrumbs,
-  Link as MuiLink
+  Link as MuiLink,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Alert,
+  AlertTitle,
+  Divider
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import WarningIcon from '@mui/icons-material/Warning';
+import GavelIcon from '@mui/icons-material/Gavel';
+import BlockIcon from '@mui/icons-material/Block';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import SecurityIcon from '@mui/icons-material/Security';
+import CopyrightIcon from '@mui/icons-material/Copyright';
 
 export default function TerminosPage() {
   const theme = useTheme();
@@ -71,59 +84,124 @@ export default function TerminosPage() {
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  1. Aceptación de los Términos
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <WarningIcon color="warning" /> 1. Naturaleza del Servicio (No Transaccional)
+                </Typography>
+                <Alert 
+                  severity="warning" 
+                  variant="filled" 
+                  sx={{ 
+                    mt: 2, 
+                    borderRadius: 2,
+                    '& .MuiAlert-message': { width: '100%' }
+                  }}
+                >
+                  <AlertTitle sx={{ fontWeight: 'bold' }}>ADVERTENCIA IMPORTANTE</AlertTitle>
+                  <Typography variant="body2" sx={{ lineHeight: 1.6 }}>
+                    VTrading es <strong>EXCLUSIVAMENTE</strong> una plataforma de monitoreo, análisis e inteligencia de datos financieros. 
+                    <br /><br />
+                    <strong>NO SOMOS:</strong>
+                    <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                      <li>Un banco o institución financiera.</li>
+                      <li>Una billetera digital (wallet).</li>
+                      <li>Una plataforma de inversión o trading.</li>
+                      <li>Un intermediario financiero.</li>
+                      <li>Operadores o corredores de bolsa.</li>
+                    </ul>
+                    En ningún momento captamos fondos, custodiamos activos de usuarios ni procesamos transacciones monetarias entre particulares.
+                  </Typography>
+                </Alert>
+              </section>
+
+              <Divider />
+
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <GavelIcon color="primary" /> 2. Aceptación de los Términos
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
                   Al acceder y utilizar VTrading (en adelante, &quot;la Plataforma&quot;), usted acepta cumplir y estar legalmente obligado por los presentes Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.
                 </Typography>
               </section>
 
-              <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  2. Servicios y Licencias
-                </Typography>
-                <Typography variant="body1" color="text.secondary" paragraph>
-                  VTrading ofrece acceso a datos financieros y herramientas de análisis. El acceso a nuestros servicios se rige por planes de suscripción basados en RPM (Requests Per Minute). El usuario se compromete a no exceder los límites establecidos en su plan contratado. El uso no autorizado o excesivo de la API puede resultar en la suspensión temporal o permanente del servicio.
-                </Typography>
-              </section>
+              <Divider />
 
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  3. Descargo de Responsabilidad Financiera
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <AttachMoneyIcon color="primary" /> 3. Servicios y Licencias
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  La información proporcionada por VTrading es únicamente con fines informativos y educativos. <strong>No constituye asesoramiento financiero, de inversión o comercial.</strong> VTrading no se hace responsable de las decisiones financieras tomadas por el usuario basadas en la información de la plataforma. El trading conlleva riesgos significativos y usted debe consultar con un asesor financiero certificado antes de tomar decisiones de inversión.
+                  VTrading ofrece acceso a datos financieros y herramientas de análisis. El acceso a nuestros servicios se rige por planes de suscripción basados en RPM (Requests Per Minute).
                 </Typography>
+                <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
+                  El usuario se compromete a no exceder los límites establecidos en su plan contratado. El uso no autorizado o excesivo de la API puede resultar en la suspensión temporal o permanente del servicio.
+                </Alert>
               </section>
 
+              <Divider />
+
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  4. Uso Aceptable
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <WarningIcon color="error" /> 4. Descargo de Responsabilidad Financiera
+                </Typography>
+                <Paper variant="outlined" sx={{ p: 3, bgcolor: alpha(theme.palette.error.main, 0.05), borderColor: alpha(theme.palette.error.main, 0.2) }}>
+                  <Typography variant="body1" color="text.secondary" paragraph>
+                    La información proporcionada por VTrading es únicamente con fines informativos y educativos.
+                  </Typography>
+                  <Typography variant="body1" fontWeight="bold" color="error" paragraph>
+                    No constituye asesoramiento financiero, de inversión o comercial.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    VTrading no se hace responsable de las decisiones financieras tomadas por el usuario basadas en la información de la plataforma. El trading conlleva riesgos significativos y usted debe consultar con un asesor financiero certificado antes de tomar decisiones de inversión.
+                  </Typography>
+                </Paper>
+              </section>
+
+              <Divider />
+
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <BlockIcon color="primary" /> 5. Uso Aceptable
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
                   Queda estrictamente prohibido utilizar la plataforma para:
                 </Typography>
-                <Typography component="ul" variant="body1" color="text.secondary" sx={{ pl: 4 }}>
-                  <li>Realizar ingeniería inversa, descompilar o intentar extraer el código fuente.</li>
-                  <li>Revender, sublicenciar o redistribuir los datos sin autorización expresa.</li>
-                  <li>Realizar actividades fraudulentas o ilegales.</li>
-                  <li>Interferir con la seguridad o el rendimiento de nuestros servidores.</li>
-                </Typography>
+                <List sx={{ bgcolor: alpha(theme.palette.background.paper, 0.5), borderRadius: 2 }}>
+                  <ListItem>
+                    <ListItemIcon><BlockIcon color="error" fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Realizar ingeniería inversa, descompilar o intentar extraer el código fuente." />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon><BlockIcon color="error" fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Revender, sublicenciar o redistribuir los datos sin autorización expresa." />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon><BlockIcon color="error" fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Realizar actividades fraudulentas o ilegales." />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon><BlockIcon color="error" fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Interferir con la seguridad o el rendimiento de nuestros servidores." />
+                  </ListItem>
+                </List>
               </section>
 
+              <Divider />
+
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  5. Propiedad Intelectual
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CopyrightIcon color="primary" /> 6. Propiedad Intelectual
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
                   Todos los derechos, títulos e intereses sobre la plataforma, incluyendo pero no limitado a software, textos, gráficos, logotipos y marcas, son propiedad exclusiva de VTrading o sus licenciantes y están protegidos por las leyes de propiedad intelectual internacionales.
                 </Typography>
               </section>
 
+              <Divider />
+
               <section>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  6. Limitación de Responsabilidad
+                <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SecurityIcon color="primary" /> 7. Limitación de Responsabilidad
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                   En la medida máxima permitida por la ley, VTrading no será responsable de daños indirectos, incidentales, especiales, consecuentes o punitivos, ni de ninguna pérdida de beneficios o ingresos, ya sea incurrida directa o indirectamente, o cualquier pérdida de datos, uso, fondo de comercio u otras pérdidas intangibles.
