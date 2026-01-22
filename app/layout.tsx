@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://vtrading.app'),
   title: {
-    default: "VTrading | Plataforma de Análisis Financiero y Trading",
+    default: "VTrading | Plataforma de análisis financiero en Venezuela",
     template: "%s | VTrading"
   },
   description: "Monitorea mercados en tiempo real, analiza tendencias y optimiza tus estrategias de trading con VTrading. Datos financieros precisos y herramientas profesionales.",
@@ -41,12 +41,12 @@ export const metadata: Metadata = {
       { url: '/images/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
     other: [
-      { rel: 'mask-icon', url: '/images/icon-192-maskable.png', color: '#5D3FD3' },
+      { rel: 'mask-icon', url: '/images/icon-192-maskable.png', color: '#6DDBAC' },
     ],
   },
   manifest: '/manifest.json',
   openGraph: {
-    title: "VTrading | Inteligencia de Mercados",
+    title: "VTrading | Análisis financiero",
     description: "Plataforma líder en análisis de mercados financieros. Datos en tiempo real, gráficos avanzados y herramientas para traders profesionales.",
     url: 'https://vtrading.app',
     siteName: 'VTrading',
@@ -54,10 +54,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/icon-512.png',
-        width: 512,
-        height: 512,
-        alt: 'VTrading Logo',
+        url: '/images/cover.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'VTrading - El monitor financiero que Venezuela necesitaba',
       },
     ],
   },
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     title: "VTrading | Análisis Financiero",
     description: "Datos de mercado en tiempo real y herramientas de análisis profesional.",
     creator: '@vtradingapp',
-    images: ['/images/icon-512.png'],
+    images: ['/images/cover.jpg'],
   },
   robots: {
     index: true,
