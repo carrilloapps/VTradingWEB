@@ -16,7 +16,8 @@ import {
   Alert,
   AlertTitle,
   Divider,
-  Grid
+  Grid,
+  Chip
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -24,12 +25,14 @@ import Link from 'next/link';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import SecurityIcon from '@mui/icons-material/Security';
 import PersonIcon from '@mui/icons-material/Person';
-import EmailIcon from '@mui/icons-material/Email';
 import StorageIcon from '@mui/icons-material/Storage';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
 import ShareIcon from '@mui/icons-material/Share';
 import GavelIcon from '@mui/icons-material/Gavel';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import BusinessIcon from '@mui/icons-material/Business';
 
 export default function PrivacidadPage() {
   const theme = useTheme();
@@ -71,19 +74,22 @@ export default function PrivacidadPage() {
               backdropFilter: 'blur(10px)'
             }}
           >
-            <Typography 
-              variant="h1" 
-              sx={{ 
-                fontSize: { xs: '2rem', md: '3rem' }, 
-                fontWeight: 800, 
-                mb: 6,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Política de Privacidad
-            </Typography>
+            <Box sx={{ mb: 6 }}>
+              <Typography 
+                variant="h1" 
+                sx={{ 
+                  fontSize: { xs: '2rem', md: '3rem' }, 
+                  fontWeight: 800, 
+                  mb: 2,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Política de Privacidad y Datos
+              </Typography>
+              <Chip label="Última actualización: 21 de Enero de 2026" color="primary" variant="outlined" size="small" />
+            </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <section>
@@ -91,40 +97,67 @@ export default function PrivacidadPage() {
                   <InfoIcon color="primary" /> 1. Información que Recopilamos
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  En VTrading, recopilamos información limitada necesaria para proporcionarle nuestros servicios. Esto incluye:
+                  En VTrading (Web y App), recopilamos información específica para garantizar el funcionamiento, la seguridad y la personalización del servicio.
                 </Typography>
                 
                 <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), border: `1px solid ${theme.palette.divider}`, height: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
                         <PersonIcon color="primary" />
-                        <Typography variant="subtitle1" fontWeight="bold">Información de Cuenta</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold">Autenticación (Firebase Auth)</Typography>
                       </Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Cuando se registra utilizando Google Auth, recibimos su dirección de correo electrónico, nombre y foto de perfil.
-                      </Typography>
+                      <List dense>
+                        <ListItem disablePadding>
+                          <ListItemText primary="Email y Contraseña" secondary="Para gestión de cuenta." />
+                        </ListItem>
+                        <ListItem disablePadding>
+                          <ListItemText primary="Identidad de Google" secondary="Nombre, email y foto (si usa Social Login)." />
+                        </ListItem>
+                        <ListItem disablePadding>
+                          <ListItemText primary="Firebase UID" secondary="Identificador único interno." />
+                        </ListItem>
+                      </List>
                     </Paper>
                   </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), border: `1px solid ${theme.palette.divider}`, height: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
                         <StorageIcon color="primary" />
-                        <Typography variant="subtitle1" fontWeight="bold">Datos de Uso</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold">Analíticas y Rendimiento</Typography>
+                      </Box>
+                      <List dense>
+                         <ListItem disablePadding>
+                          <ListItemText primary="Eventos de Navegación" secondary="Pantallas visitadas y tiempo de uso." />
+                        </ListItem>
+                        <ListItem disablePadding>
+                          <ListItemText primary="Datos del Dispositivo" secondary="Modelo, SO, resolución y preferencias." />
+                        </ListItem>
+                         <ListItem disablePadding>
+                          <ListItemText primary="Logs de Errores" secondary="Crashlytics para diagnósticos." />
+                        </ListItem>
+                      </List>
+                    </Paper>
+                  </Grid>
+                   <Grid size={{ xs: 12, md: 6 }}>
+                    <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), border: `1px solid ${theme.palette.divider}`, height: '100%' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+                        <CampaignIcon color="primary" />
+                        <Typography variant="subtitle1" fontWeight="bold">Publicidad (AdMob)</Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Recopilamos métricas sobre su interacción con nuestra API y plataforma, incluyendo RPM (peticiones por minuto).
+                        Para usuarios no premium, utilizamos identificadores de publicidad (AdID) para mostrar anuncios relevantes a través de Google AdMob.
                       </Typography>
                     </Paper>
                   </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), border: `1px solid ${theme.palette.divider}`, height: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
-                        <EmailIcon color="primary" />
-                        <Typography variant="subtitle1" fontWeight="bold">Comunicaciones</Typography>
+                        <NotificationsIcon color="primary" />
+                        <Typography variant="subtitle1" fontWeight="bold">Notificaciones (FCM)</Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Información que nos proporciona cuando contacta con nuestro soporte técnico.
+                         Utilizamos Tokens de Dispositivo para enviar alertas de precios y notificaciones push segmentadas.
                       </Typography>
                     </Paper>
                   </Grid>
@@ -135,27 +168,32 @@ export default function PrivacidadPage() {
 
               <section>
                 <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <CheckCircleIcon color="primary" /> 2. Uso de la Información
+                  <BusinessIcon color="primary" /> 2. Proveedores de Servicios
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  Utilizamos la información recopilada para:
+                  Compartimos datos estrictamente necesarios con proveedores de infraestructura de confianza:
                 </Typography>
                 <List>
-                  <ListItem disablePadding sx={{ mb: 1 }}>
+                  <ListItem>
                     <ListItemIcon><CheckCircleIcon color="success" fontSize="small" /></ListItemIcon>
-                    <ListItemText primary="Proporcionar, mantener y mejorar nuestros servicios." />
+                    <ListItemText 
+                        primary="Google / Firebase" 
+                        secondary="Infraestructura principal: Autenticación, Base de Datos, Analíticas y Notificaciones." 
+                    />
                   </ListItem>
-                  <ListItem disablePadding sx={{ mb: 1 }}>
+                  <ListItem>
                     <ListItemIcon><CheckCircleIcon color="success" fontSize="small" /></ListItemIcon>
-                    <ListItemText primary="Procesar transacciones y gestionar su suscripción." />
+                    <ListItemText 
+                        primary="Google AdMob" 
+                        secondary="Proveedor de servicios publicitarios para versiones gratuitas." 
+                    />
                   </ListItem>
-                  <ListItem disablePadding sx={{ mb: 1 }}>
+                  <ListItem>
                     <ListItemIcon><CheckCircleIcon color="success" fontSize="small" /></ListItemIcon>
-                    <ListItemText primary="Enviar notificaciones técnicas, actualizaciones de seguridad y mensajes administrativos." />
-                  </ListItem>
-                  <ListItem disablePadding sx={{ mb: 1 }}>
-                    <ListItemIcon><CheckCircleIcon color="success" fontSize="small" /></ListItemIcon>
-                    <ListItemText primary="Detectar, investigar y prevenir actividades fraudulentas o no autorizadas." />
+                    <ListItemText 
+                        primary="VTrading API" 
+                        secondary="Proveedor de datos de mercado y financieros." 
+                    />
                   </ListItem>
                 </List>
               </section>
@@ -167,12 +205,14 @@ export default function PrivacidadPage() {
                   <SecurityIcon color="primary" /> 3. Seguridad de los Datos
                 </Typography>
                 <Alert severity="success" icon={<SecurityIcon fontSize="inherit" />} sx={{ borderRadius: 2 }}>
-                  <AlertTitle>Infraestructura Segura</AlertTitle>
-                  La seguridad de sus datos es nuestra prioridad. Utilizamos servicios de infraestructura de clase mundial (Firebase/Google Cloud) que implementan medidas de seguridad avanzadas para proteger su información contra el acceso no autorizado, la alteración o la destrucción.
+                  <AlertTitle>Infraestructura Protegida</AlertTitle>
+                  Implementamos estándares de seguridad de la industria:
+                  <ul style={{ margin: '8px 0', paddingLeft: '20px', listStyleType: 'disc' }}>
+                    <li><strong>Firebase App Check:</strong> Protege nuestra API contra tráfico no autorizado y bots.</li>
+                    <li><strong>HTTPS/TLS:</strong> Cifrado en tránsito para todas las comunicaciones de red.</li>
+                    <li><strong>Minimización:</strong> No solicitamos permisos invasivos como Cámara o Micrófono.</li>
+                  </ul>
                 </Alert>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontStyle: 'italic' }}>
-                  Nota: No almacenamos datos sensibles de pago directamente en nuestros servidores.
-                </Typography>
               </section>
 
               <Divider />
@@ -183,7 +223,7 @@ export default function PrivacidadPage() {
                 </Typography>
                 <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha(theme.palette.info.main, 0.05), borderColor: alpha(theme.palette.info.main, 0.2) }}>
                   <Typography variant="body1" color="text.secondary">
-                    No vendemos, comercializamos ni transferimos su información personal a terceros. Esto no incluye a los terceros de confianza que nos ayudan a operar nuestro sitio web o llevar a cabo nuestro negocio, siempre que dichas partes acuerden mantener esta información confidencial.
+                    No vendemos sus datos personales. La información compartida con terceros (como Google) es exclusivamente para la operatividad del servicio (analítica, publicidad y autenticación).
                   </Typography>
                 </Paper>
               </section>
@@ -195,7 +235,7 @@ export default function PrivacidadPage() {
                   <GavelIcon color="primary" /> 5. Sus Derechos
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Usted tiene derecho a acceder, corregir o eliminar su información personal en cualquier momento. Puede ejercer estos derechos a través de la configuración de su cuenta o contactándonos directamente a través de nuestra página de contacto.
+                  Usted tiene derecho a solicitar la eliminación de su cuenta y todos los datos asociados (incluyendo UID y logs) a través de la configuración de la aplicación o contactando a soporte.
                 </Typography>
               </section>
             </Box>

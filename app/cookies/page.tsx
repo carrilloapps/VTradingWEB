@@ -15,16 +15,17 @@ import {
   ListItemText,
   Alert,
   AlertTitle,
-  Divider
+  Divider,
+  Chip
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CookieIcon from '@mui/icons-material/Cookie';
-import BarChartIcon from '@mui/icons-material/BarChart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
+import StorageIcon from '@mui/icons-material/Storage';
 
 export default function CookiesPage() {
   const theme = useTheme();
@@ -66,27 +67,30 @@ export default function CookiesPage() {
               backdropFilter: 'blur(10px)'
             }}
           >
-            <Typography 
-              variant="h1" 
-              sx={{ 
-                fontSize: { xs: '2rem', md: '3rem' }, 
-                fontWeight: 800, 
-                mb: 6,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Política de Cookies
-            </Typography>
+            <Box sx={{ mb: 6 }}>
+              <Typography 
+                variant="h1" 
+                sx={{ 
+                  fontSize: { xs: '2rem', md: '3rem' }, 
+                  fontWeight: 800, 
+                  mb: 2,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Política de Cookies y Datos Locales
+              </Typography>
+              <Chip label="Última actualización: 21 de Enero de 2026" color="primary" variant="outlined" size="small" />
+            </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <section>
                 <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <InfoIcon color="primary" /> 1. ¿Qué son las cookies?
+                  <InfoIcon color="primary" /> 1. ¿Qué son las cookies y el almacenamiento local?
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  Las cookies son pequeños archivos de texto que los sitios web que visita guardan en su ordenador o dispositivo móvil. Permiten que el sitio web recuerde sus acciones y preferencias (como inicio de sesión, idioma, tamaño de fuente y otras preferencias de visualización) durante un período de tiempo, para que no tenga que volver a introducirlas cada vez que vuelva al sitio o navegue de una página a otra.
+                  Las cookies y las tecnologías de almacenamiento local (como AsyncStorage o LocalStorage) permiten que nuestra aplicación web y móvil guarde información en su dispositivo para mejorar el rendimiento y recordar sus preferencias.
                 </Typography>
               </section>
 
@@ -94,31 +98,20 @@ export default function CookiesPage() {
 
               <section>
                 <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <CookieIcon color="primary" /> 2. ¿Cómo utilizamos las cookies?
+                  <CookieIcon color="primary" /> 2. Tecnologías Específicas que Utilizamos
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  En VTrading, utilizamos cookies para mejorar su experiencia de navegación, analizar el tráfico del sitio y personalizar el contenido. Específicamente, utilizamos:
+                  En VTrading (Web y App), utilizamos los siguientes mecanismos de persistencia de datos:
                 </Typography>
                 <List sx={{ bgcolor: alpha(theme.palette.primary.main, 0.03), borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
                   <ListItem>
                     <ListItemIcon>
-                      <CookieIcon color="secondary" />
+                      <StorageIcon color="secondary" />
                     </ListItemIcon>
                     <ListItemText 
-                      primary="Cookies esenciales" 
-                      secondary="Necesarias para el funcionamiento del sitio web." 
-                      primaryTypographyProps={{ fontWeight: 'bold' }}
-                    />
-                  </ListItem>
-                  <Divider variant="inset" component="li" />
-                  <ListItem>
-                    <ListItemIcon>
-                      <BarChartIcon color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="Cookies de rendimiento" 
-                      secondary="Nos ayudan a entender cómo interactúan los visitantes con el sitio." 
-                      primaryTypographyProps={{ fontWeight: 'bold' }}
+                      primary="api_cache_*" 
+                      secondary="Caché temporal de tasas de cambio y datos financieros (TTL: 5 min) para reducir el consumo de datos y mejorar la velocidad." 
+                      primaryTypographyProps={{ fontWeight: 'bold', fontFamily: 'monospace' }}
                     />
                   </ListItem>
                   <Divider variant="inset" component="li" />
@@ -127,8 +120,30 @@ export default function CookiesPage() {
                       <SettingsIcon color="secondary" />
                     </ListItemIcon>
                     <ListItemText 
-                      primary="Cookies de funcionalidad" 
-                      secondary="Permiten recordar sus preferencias." 
+                      primary="app_settings" 
+                      secondary="Almacena sus preferencias de usuario, como el tema (claro/oscuro) y configuración de notificaciones." 
+                      primaryTypographyProps={{ fontWeight: 'bold', fontFamily: 'monospace' }}
+                    />
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                   <ListItem>
+                    <ListItemIcon>
+                      <StorageIcon color="secondary" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="user_alerts & widget_config" 
+                      secondary="Guarda localmente sus alertas de precios configuradas y la personalización de widgets." 
+                      primaryTypographyProps={{ fontWeight: 'bold', fontFamily: 'monospace' }}
+                    />
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                  <ListItem>
+                    <ListItemIcon>
+                      <CookieIcon color="secondary" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Firebase Auth Token" 
+                      secondary="Mantiene su sesión activa de forma segura para que no tenga que iniciar sesión cada vez." 
                       primaryTypographyProps={{ fontWeight: 'bold' }}
                     />
                   </ListItem>
@@ -139,14 +154,14 @@ export default function CookiesPage() {
 
               <section>
                 <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <SettingsIcon color="primary" /> 3. Gestión de cookies
+                  <SettingsIcon color="primary" /> 3. Gestión de Datos
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  Puede controlar y/o eliminar las cookies según desee. Puede eliminar todas las cookies que ya están en su ordenador y puede configurar la mayoría de los navegadores para evitar que se coloquen.
+                  Puede controlar y eliminar estos datos limpiando la caché de su navegador o los datos de la aplicación en su dispositivo móvil.
                 </Typography>
                 <Alert severity="warning" variant="outlined" sx={{ mt: 2, mb: 2 }}>
                   <AlertTitle>Importante</AlertTitle>
-                  Si decide deshabilitar las cookies, es posible que tenga que ajustar manualmente algunas preferencias cada vez que visite un sitio y que <strong>algunos servicios y funcionalidades no funcionen correctamente</strong>.
+                  Si elimina estos datos, deberá iniciar sesión nuevamente y perderá sus configuraciones personalizadas y alertas guardadas localmente.
                 </Alert>
               </section>
 
@@ -154,10 +169,10 @@ export default function CookiesPage() {
 
               <section>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  4. Actualizaciones de esta política
+                  4. Actualizaciones
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Podemos actualizar nuestra Política de Cookies de vez en cuando. Le notificaremos cualquier cambio publicando la nueva Política de Cookies en esta página.
+                  Podemos actualizar esta política para reflejar cambios en nuestra tecnología de almacenamiento.
                 </Typography>
               </section>
             </Box>
