@@ -1,9 +1,8 @@
-import React from 'react';
 import AuthActionContent from './AuthActionContent';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Autenticación | VTrading',
+  title: 'Autenticación',
   robots: {
     index: false,
     follow: false,
