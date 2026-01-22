@@ -32,6 +32,7 @@ import flagCo from '../app/assets/flags/co.svg';
 import flagPe from '../app/assets/flags/pe.svg';
 import ThemeToggle from './ThemeToggle';
 import AuthModal from './AuthModal';
+import DownloadAppButton from './DownloadAppButton';
 import MarketTicker from './MarketTicker';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -335,22 +336,7 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
                   ))}
                 </Menu>
 
-                <Button 
-                  variant="contained" 
-                  color="primary"
-                  sx={{ 
-                    borderRadius: 10, 
-                    px: 3, 
-                    py: 1,
-                    fontSize: '0.85rem', 
-                    fontWeight: 700,
-                    textTransform: 'none', // Improved readability
-                    letterSpacing: '0.02em',
-                    minHeight: 40
-                  }}
-                >
-                  Descargar App
-                </Button>
+                <DownloadAppButton />
               </Box>
             </Box>
           )}
@@ -450,13 +436,7 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
               </ListItem>
             ))}
           </List>
-          <Button 
-            fullWidth 
-            variant="contained" 
-            sx={{ mt: 4, borderRadius: 3, py: 1.5 }}
-          >
-            Descargar App
-          </Button>
+          <DownloadAppButton fullWidth sx={{ mt: 4 }} />
         </Box>
       </Drawer>
     </AppBar>

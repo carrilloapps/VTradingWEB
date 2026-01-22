@@ -28,6 +28,7 @@ import flagPe from '../../app/assets/flags/pe.svg';
 import AuthModal from '../AuthModal';
 import ThemeToggle from '../ThemeToggle';
 import MarketTicker from '../MarketTicker';
+import DownloadAppButton from '../DownloadAppButton';
 
 const navItems = [
   { label: 'Aplicación', href: '/' },
@@ -231,24 +232,7 @@ export default function HeroHeader() {
           </Button>
 
           {/* Action Button */}
-          <Button 
-            variant="contained" 
-            color="primary"
-            sx={{ 
-              borderRadius: 10, 
-              px: 3, 
-              py: 1,
-              fontSize: '0.85rem', 
-              fontWeight: 700,
-              textTransform: 'none',
-              letterSpacing: '0.02em',
-              minHeight: 40,
-              whiteSpace: 'nowrap',
-              flexShrink: 0
-            }}
-          >
-            Descargar App
-          </Button>
+          <DownloadAppButton sx={{ whiteSpace: 'nowrap', flexShrink: 0 }} />
         </Box>
 
         <Menu
