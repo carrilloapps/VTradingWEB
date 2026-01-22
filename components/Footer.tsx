@@ -44,8 +44,8 @@ const footerLinks = {
 const socialLinks = [
   { icon: <XIcon fontSize="small" />, href: 'https://x.com/vtrading', label: 'X (Twitter)' },
   { icon: <LinkedInIcon fontSize="small" />, href: 'https://linkedin.com/company/vtrading', label: 'LinkedIn' },
-  { icon: <FacebookIcon fontSize="small" />, href: 'https://facebook.com/vtrading', label: 'Facebook' },
-  { icon: <InstagramIcon fontSize="small" />, href: 'https://instagram.com/vtrading', label: 'Instagram' },
+  { icon: <FacebookIcon fontSize="small" />, href: 'https://www.facebook.com/vtradingapp', label: 'Facebook' },
+  { icon: <InstagramIcon fontSize="small" />, href: 'https://www.instagram.com/vtradingapp/', label: 'Instagram' },
 ];
 
 export default function Footer() {

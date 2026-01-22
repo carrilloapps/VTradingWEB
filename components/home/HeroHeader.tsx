@@ -553,10 +553,10 @@ export default function HeroHeader() {
               <IconButton component="a" href="https://linkedin.com/company/vtrading" target="_blank" size="small">
                 <LinkedInIcon fontSize="small" />
               </IconButton>
-              <IconButton component="a" href="https://facebook.com/vtrading" target="_blank" size="small">
+              <IconButton component="a" href="https://www.facebook.com/vtradingapp" target="_blank" size="small">
                 <FacebookIcon fontSize="small" />
               </IconButton>
-              <IconButton component="a" href="https://instagram.com/vtrading" target="_blank" size="small">
+              <IconButton component="a" href="https://www.instagram.com/vtradingapp/" target="_blank" size="small">
                 <InstagramIcon fontSize="small" />
               </IconButton>
             </Stack>
