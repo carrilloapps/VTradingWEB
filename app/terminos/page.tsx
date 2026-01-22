@@ -1,125 +1,138 @@
 'use client';
 
-import React from 'react';
 import {
   Box,
   Container,
   Typography,
-  Grid,
   useTheme,
   alpha,
   Paper,
-  Fade
+  Breadcrumbs,
+  Link as MuiLink
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import Link from 'next/link';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 export default function TerminosPage() {
   const theme = useTheme();
 
-  const sections = [
-    {
-      title: "1. Aceptación de los Términos",
-      content: "Al acceder y utilizar VTrading, usted acepta cumplir y estar sujeto a los siguientes términos y condiciones de uso. Si no está de acuerdo con alguna parte de estos términos, no podrá utilizar nuestros servicios."
-    },
-    {
-      title: "2. Uso del Servicio",
-      content: "VTrading proporciona información financiera en tiempo real con fines informativos únicamente. No somos asesores financieros y la información proporcionada no constituye asesoramiento de inversión, financiero o comercial."
-    },
-    {
-      title: "3. Precisión de los Datos",
-      content: "Aunque nos esforzamos por garantizar que todos los datos sean precisos y se actualicen en tiempo real, VTrading no garantiza la exactitud, integridad o puntualidad de la información proporcionada. No nos hacemos responsables de las decisiones tomadas basadas en estos datos."
-    },
-    {
-      title: "4. Propiedad Intelectual",
-      content: "Todo el contenido, marcas comerciales, logotipos y software utilizado en VTrading son propiedad de sus respectivos dueños y están protegidos por las leyes de propiedad intelectual."
-    },
-    {
-      title: "5. Limitación de Responsabilidad",
-      content: "En ningún caso VTrading será responsable por cualquier pérdida o daño, incluyendo sin limitación, pérdidas financieras resultantes del uso de esta plataforma."
-    }
-  ];
-
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box sx={{ pt: { xs: 20, md: 25 }, pb: 10 }}>
+      <Box 
+        component="main"
+        sx={{ 
+          flexGrow: 1,
+          pt: { xs: 16, md: 20 }, 
+          pb: { xs: 8, md: 12 },
+          position: 'relative',
+          backgroundImage: `linear-gradient(${alpha(theme.palette.text.primary, 0.08)} 1px, transparent 1px), linear-gradient(90deg, ${alpha(theme.palette.text.primary, 0.08)} 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+        }}
+      >
         <Container maxWidth="lg">
-          <Fade in timeout={1000}>
-            <Box sx={{ mb: 8 }}>
-              <Box 
-                sx={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: 1.5, 
-                  px: 2, 
-                  py: 0.8, 
-                  borderRadius: 2, 
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                  mb: 3
-                }}
-              >
-                <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'text.secondary', fontSize: '0.65rem' }}>
-                  Legal & Compliance
-                </Typography>
-              </Box>
-              
-              <Typography 
-                variant="h2" 
-                fontWeight="800" 
-                sx={{ 
-                  fontSize: { xs: '2.5rem', md: '4rem' },
-                  letterSpacing: '-0.03em',
-                  mb: 2,
-                  lineHeight: 1.1
-                }}
-              >
-                Términos y Condiciones
-              </Typography>
-              <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 650, fontWeight: 400, lineHeight: 1.6 }}>
-                Reglas y lineamientos para el uso de nuestra plataforma de inteligencia financiera.
-              </Typography>
-            </Box>
-          </Fade>
+          <Breadcrumbs 
+            separator={<NavigateNextIcon fontSize="small" />} 
+            aria-label="breadcrumb"
+            sx={{ mb: 4 }}
+          >
+            <MuiLink component={Link} href="/" color="inherit" underline="hover">
+              Inicio
+            </MuiLink>
+            <Typography color="text.primary">Términos y Condiciones</Typography>
+          </Breadcrumbs>
 
-          <Grid container spacing={4}>
-            {sections.map((section, index) => (
-              <Grid size={{ xs: 12 }} key={index}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: { xs: 3, md: 5 },
-                    borderRadius: 6,
-                    bgcolor: 'background.paper',
-                    border: `1px solid ${theme.palette.divider}`,
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.3),
-                      boxShadow: `0 20px 40px ${alpha(theme.palette.primary.main, 0.04)}`
-                    }
-                  }}
-                >
-                  <Typography variant="h5" fontWeight="800" sx={{ mb: 3, color: 'text.primary' }}>
-                    {section.title}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                    {section.content}
-                  </Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-          
-          <Box sx={{ mt: 8, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-              Última actualización: 20 de enero de 2026
+          <Paper 
+            elevation={0} 
+            sx={{ 
+              p: { xs: 4, md: 8 }, 
+              borderRadius: 4, 
+              border: `1px solid ${theme.palette.divider}`, 
+              bgcolor: alpha(theme.palette.background.paper, 0.8),
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <Typography 
+              variant="h1" 
+              sx={{ 
+                fontSize: { xs: '2rem', md: '3rem' }, 
+                fontWeight: 800, 
+                mb: 6,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              Términos y Condiciones de Uso
             </Typography>
-          </Box>
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  1. Aceptación de los Términos
+                </Typography>
+                <Typography variant="body1" color="text.secondary" paragraph>
+                  Al acceder y utilizar VTrading (en adelante, &quot;la Plataforma&quot;), usted acepta cumplir y estar legalmente obligado por los presentes Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.
+                </Typography>
+              </section>
+
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  2. Servicios y Licencias
+                </Typography>
+                <Typography variant="body1" color="text.secondary" paragraph>
+                  VTrading ofrece acceso a datos financieros y herramientas de análisis. El acceso a nuestros servicios se rige por planes de suscripción basados en RPM (Requests Per Minute). El usuario se compromete a no exceder los límites establecidos en su plan contratado. El uso no autorizado o excesivo de la API puede resultar en la suspensión temporal o permanente del servicio.
+                </Typography>
+              </section>
+
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  3. Descargo de Responsabilidad Financiera
+                </Typography>
+                <Typography variant="body1" color="text.secondary" paragraph>
+                  La información proporcionada por VTrading es únicamente con fines informativos y educativos. <strong>No constituye asesoramiento financiero, de inversión o comercial.</strong> VTrading no se hace responsable de las decisiones financieras tomadas por el usuario basadas en la información de la plataforma. El trading conlleva riesgos significativos y usted debe consultar con un asesor financiero certificado antes de tomar decisiones de inversión.
+                </Typography>
+              </section>
+
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  4. Uso Aceptable
+                </Typography>
+                <Typography variant="body1" color="text.secondary" paragraph>
+                  Queda estrictamente prohibido utilizar la plataforma para:
+                </Typography>
+                <Typography component="ul" variant="body1" color="text.secondary" sx={{ pl: 4 }}>
+                  <li>Realizar ingeniería inversa, descompilar o intentar extraer el código fuente.</li>
+                  <li>Revender, sublicenciar o redistribuir los datos sin autorización expresa.</li>
+                  <li>Realizar actividades fraudulentas o ilegales.</li>
+                  <li>Interferir con la seguridad o el rendimiento de nuestros servidores.</li>
+                </Typography>
+              </section>
+
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  5. Propiedad Intelectual
+                </Typography>
+                <Typography variant="body1" color="text.secondary" paragraph>
+                  Todos los derechos, títulos e intereses sobre la plataforma, incluyendo pero no limitado a software, textos, gráficos, logotipos y marcas, son propiedad exclusiva de VTrading o sus licenciantes y están protegidos por las leyes de propiedad intelectual internacionales.
+                </Typography>
+              </section>
+
+              <section>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  6. Limitación de Responsabilidad
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  En la medida máxima permitida por la ley, VTrading no será responsable de daños indirectos, incidentales, especiales, consecuentes o punitivos, ni de ninguna pérdida de beneficios o ingresos, ya sea incurrida directa o indirectamente, o cualquier pérdida de datos, uso, fondo de comercio u otras pérdidas intangibles.
+                </Typography>
+              </section>
+            </Box>
+          </Paper>
         </Container>
       </Box>
-
       <Footer />
     </Box>
   );
