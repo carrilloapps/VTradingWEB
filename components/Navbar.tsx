@@ -19,12 +19,17 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
-  Avatar
+  Avatar,
+  Divider
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CheckIcon from '@mui/icons-material/Check';
 import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SecurityIcon from '@mui/icons-material/Security';
+import HistoryIcon from '@mui/icons-material/History';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Image from 'next/image';
 import logo from '../app/assets/logotipo.png';
 import flagVe from '../app/assets/flags/ve.svg';
@@ -37,7 +42,7 @@ import MarketTicker from './MarketTicker';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { auth } from '@/lib/firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import md5 from 'md5';
 
 const navItems = [
@@ -63,6 +68,7 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isTickerHidden, setIsTickerHidden] = useState(false);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const pathname = usePathname();
   const isHome = pathname === '/';
 
@@ -84,6 +90,19 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
       setSelectedCountry(country);
     }
     handleCountryClose();
+  };
+
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLogout = async () => {
+    handleCloseUserMenu();
+    await signOut(auth);
   };
 
   useEffect(() => {
@@ -172,33 +191,84 @@ export default function Navbar({ hideTicker }: { hideTicker?: boolean }) {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
                 {/* Login Button / Profile */}
                 {user ? (
-                  <Button
-                    component={Link}
-                    href="/cuenta"
-                    sx={{
-                      p: 0.5,
-                      borderRadius: '50px',
-                      minWidth: 'auto',
-                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                      '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        bgcolor: alpha(theme.palette.primary.main, 0.05)
-                      }
-                    }}
-                  >
-                    <Avatar 
-                      src={user.photoURL || (user.email ? getGravatarUrl(user.email) : '')}
-                      sx={{ 
-                        width: 32, 
-                        height: 32,
-                        bgcolor: 'primary.main',
-                        fontSize: '0.9rem',
-                        fontWeight: 700
+                  <>
+                    <Button
+                      onClick={handleOpenUserMenu}
+                      sx={{
+                        p: 0.5,
+                        borderRadius: '50px',
+                        minWidth: 'auto',
+                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                        '&:hover': {
+                          borderColor: theme.palette.primary.main,
+                          bgcolor: alpha(theme.palette.primary.main, 0.05)
+                        }
                       }}
                     >
-                      {user.displayName?.charAt(0) || user.email?.charAt(0)}
-                    </Avatar>
-                  </Button>
+                      <Avatar 
+                        src={user.photoURL || (user.email ? getGravatarUrl(user.email) : '')}
+                        sx={{ 
+                          width: 32, 
+                          height: 32,
+                          bgcolor: 'primary.main',
+                          fontSize: '0.9rem',
+                          fontWeight: 700
+                        }}
+                      >
+                        {user.displayName?.charAt(0) || user.email?.charAt(0)}
+                      </Avatar>
+                    </Button>
+                    <Menu
+                      anchorEl={anchorElUser}
+                      open={Boolean(anchorElUser)}
+                      onClose={handleCloseUserMenu}
+                      disableScrollLock
+                      elevation={8}
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                      PaperProps={{
+                        sx: { 
+                          mt: 1.5, 
+                          minWidth: 200,
+                          borderRadius: 3,
+                          border: `1px solid ${theme.palette.divider}`,
+                          bgcolor: 'background.paper'
+                        }
+                      }}
+                    >
+                      <MenuItem component={Link} href="/cuenta?tab=profile" onClick={handleCloseUserMenu}>
+                        <ListItemIcon>
+                          <PersonIcon fontSize="small" />
+                        </ListItemIcon>
+                        Mi Perfil
+                      </MenuItem>
+                      <MenuItem component={Link} href="/cuenta?tab=security" onClick={handleCloseUserMenu}>
+                        <ListItemIcon>
+                          <SecurityIcon fontSize="small" />
+                        </ListItemIcon>
+                        Seguridad
+                      </MenuItem>
+                      <MenuItem component={Link} href="/cuenta?tab=activity" onClick={handleCloseUserMenu}>
+                        <ListItemIcon>
+                          <HistoryIcon fontSize="small" />
+                        </ListItemIcon>
+                        Actividad
+                      </MenuItem>
+                      <MenuItem component={Link} href="/cuenta?tab=settings" onClick={handleCloseUserMenu}>
+                        <ListItemIcon>
+                          <SettingsIcon fontSize="small" />
+                        </ListItemIcon>
+                        Ajustes
+                      </MenuItem>
+                      <Divider />
+                      <MenuItem onClick={handleLogout}>
+                        <ListItemIcon>
+                          <LogoutIcon fontSize="small" />
+                        </ListItemIcon>
+                        Cerrar Sesión
+                      </MenuItem>
+                    </Menu>
+                  </>
                 ) : (
                   <Button
                     onClick={() => setAuthModalOpen(true)}

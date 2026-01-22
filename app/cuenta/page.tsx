@@ -90,6 +90,7 @@ import {
 } from '@mui/icons-material';
 
 import { useColorMode } from '@/context/ThemeContext';
+import { useSearchParams } from 'next/navigation';
 
 // --- Styled Components / Reusable Styles ---
 
@@ -127,10 +128,23 @@ const SectionTitle = ({ icon, title }: { icon: React.ReactNode, title: string })
 
 export default function CuentaPage() {
   const theme = useTheme();
+  const searchParams = useSearchParams();
   const colorMode = useColorMode();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('profile'); // profile, security, activity, settings
+  
+  // Get initial tab from URL or default to 'profile'
+  const initialTab = searchParams.get('tab') || 'profile';
+  const [activeTab, setActiveTab] = useState(initialTab); 
+
+  // Update activeTab when URL changes
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['profile', 'security', 'activity', 'settings'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   
   // Form states
