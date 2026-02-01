@@ -19,22 +19,35 @@ async function fetchVTrading<T>(endpoint: string, options: RequestInit = {}): Pr
     throw new Error('VTRADING_API_URL or VTRADING_API_KEY is not configured');
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      ...options.headers,
-      'X-API-Key': API_KEY,
-      'Content-Type': 'application/json',
-    },
-    next: { revalidate: 60, ...(options.next || {}) },
-  });
+  // Ensure leading slash for endpoint and no trailing slash for API_URL
+  const cleanBaseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${cleanBaseUrl}${cleanEndpoint}`;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'X-API-Key': API_KEY,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      next: { revalidate: 60, ...(options.next || {}) },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`VTrading API Error: ${response.status} ${response.statusText}`, errorText);
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`Fetch error in ${endpoint}:`, error.message);
+    }
+    throw error;
   }
-
-  return response.json();
 }
 
 /**
@@ -48,7 +61,7 @@ export const getRates = () => fetchVTrading<RatesResponse>('/api/rates');
 export async function getMarketStatus(): Promise<MarketStatus> {
   try {
     const data = await getRates();
-    
+
     if (!data || !data.status) {
       throw new Error('Invalid response structure: missing status object');
     }
@@ -76,7 +89,7 @@ export const getCrypto = (asset = '', fiat = 'VES', tradeType = 'BUY', page = 1,
   if (tradeType) params.append('tradeType', tradeType);
   params.append('page', page.toString());
   params.append('limit', limit.toString());
-  
+
   const query = params.toString();
   return fetchVTrading<CryptoResponse>(`/api/crypto${query ? `?${query}` : ''}`);
 };
@@ -89,20 +102,20 @@ export const getBVCMarket = (symbol = '', page = 1, limit = 30) => {
   if (symbol) params.append('symbol', symbol);
   params.append('page', page.toString());
   params.append('limit', limit.toString());
-  
+
   return fetchVTrading<BVCMarketData>(`/api/bvc/market?${params.toString()}`);
 };
 
 /**
  * Get Bank Rates (Paginated)
  */
-export const getBankRates = (page = 1, limit = 30) => 
+export const getBankRates = (page = 1, limit = 30) =>
   fetchVTrading<BanksResponse>(`/api/rates/banks?page=${page}&limit=${limit}`);
 
 /**
  * Get Historical Data for a specific symbol (Fiat or Crypto)
  */
-export const getAssetHistory = (symbol: string, page = 1, limit = 30) => 
+export const getAssetHistory = (symbol: string, page = 1, limit = 30) =>
   fetchVTrading<HistoryResponse>(`/api/rates/history/${symbol}?page=${page}&limit=${limit}`, { next: { revalidate: 0 } });
 
 /**
@@ -113,13 +126,13 @@ export const getRatesHistory = (page = 1, limit = 30) => getAssetHistory('usd', 
 /**
  * Get Historical Data for a specific Bank
  */
-export const getBankHistory = (bankName: string, page = 1, limit = 30) => 
+export const getBankHistory = (bankName: string, page = 1, limit = 30) =>
   fetchVTrading<HistoryResponse>(`/api/rates/banks/history/${encodeURIComponent(bankName)}?page=${page}&limit=${limit}`);
 
 /**
  * Send Firebase Cloud Messaging Notification
  */
-export const sendNotification = (payload: NotificationRequest) => 
+export const sendNotification = (payload: NotificationRequest) =>
   fetchVTrading<void>('/api/notifications/send', {
     method: 'POST',
     body: JSON.stringify(payload),

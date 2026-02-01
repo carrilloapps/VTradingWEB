@@ -11,7 +11,7 @@ import { RatesResponse, CurrencyRate, BVCQuote } from '@/lib/vtrading-types';
 export async function getMarketHistoryAction(page = 1, limit = 30) {
   try {
     const rawHistory = await getRatesHistory(page, limit);
-    
+
     // API might return { data: [...] }, { history: [...] }, { rates: [...] }, or just [...]
     let historyArray: any[] = [];
     if (Array.isArray(rawHistory)) {
@@ -19,7 +19,7 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
     } else if (rawHistory && typeof rawHistory === 'object') {
       // Cast to any to access dynamic properties
       const rawObj = rawHistory as any;
-      
+
       // Look for any array property
       const arrayProp = Object.values(rawObj).find(val => Array.isArray(val));
       if (arrayProp) {
@@ -41,7 +41,7 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
     return historyArray.map((entry: any) => {
       // API might return price directly or inside a rate object
       let rawPrice = 0;
-      
+
       if (typeof entry === 'number') {
         rawPrice = entry;
       } else if (typeof entry === 'object' && entry !== null) {
@@ -59,11 +59,11 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
           rawPrice = Number(entry.value);
         }
       }
-      
+
       const price = Number(rawPrice) || 0;
       const buy = Number(entry.rate?.buy || entry.buy || 0) || 0;
       const sell = Number(entry.rate?.sell || entry.sell || 0) || 0;
-      
+
       return {
         date: entry.createdAt || entry.date || entry.timestamp || new Date().toISOString(),
         price,
@@ -71,7 +71,7 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
         sell
       };
     }).filter((entry: any) => entry.price > 0) // Filter out invalid entries
-    .reverse(); // Reverse to have chronological order (oldest to newest)
+      .reverse(); // Reverse to have chronological order (oldest to newest)
   } catch (error) {
     console.error('Error in getMarketHistoryAction:', error);
     return [];
@@ -86,62 +86,57 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
   if (!data) return null;
 
   // Extract arrays safely
-  const ratesArr: CurrencyRate[] = Array.isArray(data.rates) 
-    ? data.rates 
+  const ratesArr: CurrencyRate[] = Array.isArray(data.rates)
+    ? data.rates
     : (Array.isArray(data.rates?.rates) ? data.rates.rates : (Array.isArray(data.rates?.data) ? data.rates.data : []));
-    
-  const banksArr: CurrencyRate[] = Array.isArray(data.rates?.banks) 
-    ? data.rates.banks 
+
+  const banksArr: CurrencyRate[] = Array.isArray(data.rates?.banks)
+    ? data.rates.banks
     : (Array.isArray(data.banks) ? data.banks : []);
-    
-  const borderArr: CurrencyRate[] = Array.isArray(data.rates?.border) 
-    ? data.rates.border 
+
+  const borderArr: CurrencyRate[] = Array.isArray(data.rates?.border)
+    ? data.rates.border
     : (Array.isArray(data.border) ? data.border : []);
-    
+
   // Extract crypto safely from multiple possible locations
   const cryptoData = data.crypto;
   const ratesCryptoData = data.rates?.crypto;
-  
+
   let cryptoArr: CurrencyRate[] = [];
-  
+
   const processCrypto = (source: any) => {
     if (!source) return;
-    
+
     if (Array.isArray(source)) {
       source.forEach((item: any) => {
-        if (item) cryptoArr.push(item);
+        if (item && typeof item === 'object') {
+          cryptoArr.push(item as CurrencyRate);
+        }
       });
     } else if (typeof source === 'object') {
-      // Priority 1: Summary rates (usually from rates.crypto)
-      if (Array.isArray(source.crypto)) {
-         // This is redundant usually, but safe
-         source.crypto.forEach((item: any) => cryptoArr.push(item));
-      } 
-      // Priority 2: P2P Offers (from /api/crypto)
-      else if (Array.isArray(source.rates)) {
-         // P2P offers have a different structure. We should ideally separate them.
-         // But for now, let's include them. The frontend must handle the difference.
-         // Or better, we should prefer the 'summary' crypto rates if available.
-         source.rates.forEach((item: any) => {
-             // Tag them as P2P if not already tagged
-             cryptoArr.push({ ...item, isP2P: true });
-         });
-      } 
-      // ... rest of logic
-      else if (Array.isArray(source.data)) {
-        source.data.forEach((item: any) => cryptoArr.push(item));
+      // Priority: Check nested arrays first (from different API versions/endpoints)
+      const dataSources = [source.crypto, source.rates, source.data];
+      const foundArray = dataSources.find(ds => Array.isArray(ds));
+
+      if (foundArray) {
+        foundArray.forEach((item: any) => {
+          if (item) {
+            // Tag P2P data if it's from the /api/crypto endpoint
+            const isP2P = source.rates === foundArray;
+            cryptoArr.push({ ...item, isP2P: item.isP2P ?? isP2P });
+          }
+        });
       } else {
-        // Objeto de objetos (monedas como claves)
+        // Handle object of objects (currencies as keys)
         Object.entries(source).forEach(([key, val]: [string, any]) => {
+          if (key === 'pagination' || key === 'meta' || key === 'status') return;
+
           if (Array.isArray(val)) {
             val.forEach((item: any) => {
               cryptoArr.push({ ...item, currency: item.currency || key });
             });
           } else if (val && typeof val === 'object') {
-            // Avoid pushing the pagination/meta objects
-            if (key !== 'pagination' && key !== 'meta') {
-                cryptoArr.push({ ...val, currency: val.currency || key } as CurrencyRate);
-            }
+            cryptoArr.push({ ...val, currency: val.currency || key } as CurrencyRate);
           }
         });
       }
@@ -150,18 +145,18 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
 
   // We want to prioritize the "Summary" crypto rates (from rates.crypto) over the P2P offers (from crypto.rates)
   // because the summary rates have the average/buy/sell structure we use in the UI cards.
-  
+
   // 1. First process rates.crypto (Summary)
   processCrypto(ratesCryptoData);
-  
+
   // 2. Then process crypto (P2P Offers) - append them
   processCrypto(cryptoData);
 
-  // Remove duplicates by currency and source
-  const seen = new Set();
-  cryptoArr = cryptoArr.filter((item: CurrencyRate) => {
+  // Remove duplicates by currency and source, preferring stability
+  const seen = new Set<string>();
+  cryptoArr = cryptoArr.filter((item) => {
     if (!item || !item.currency) return false;
-    const key = `${item.currency}-${item.source || ''}`;
+    const key = `${item.currency}-${item.source || 'default'}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -183,7 +178,7 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
       // bvcMeta = bvcData.meta || bvcData.pagination || null;
     } else {
       // Cast to BVCQuote[] if it looks like one, otherwise []
-      bvcNormalized = []; 
+      bvcNormalized = [];
       // If bvcData is just a single object or unknown structure, we skip for safety unless we know
     }
   }
@@ -207,12 +202,12 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
 export async function getMarketDataAction(bvcPage = 1, bvcLimit = 30) {
   try {
     const rawData = await fetchMarketData(bvcPage, bvcLimit);
-    
+
     // Check if status exists in rawData (from fetchMarketData modification) or in rates
     // const statusFound = rawData.status || rawData.rates?.status;
 
     const data = await normalizeMarketData(rawData);
-    
+
     if (!data) throw new Error('No data received from API');
 
     return data;

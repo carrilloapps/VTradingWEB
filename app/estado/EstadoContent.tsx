@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Grid, 
-  Paper, 
-  useTheme, 
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  Paper,
+  useTheme,
   alpha,
   Fade,
   Table,
@@ -199,28 +199,27 @@ export default function StatusPage() {
 
       <Box sx={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Blurred Content */}
-        <Container 
-          maxWidth="lg" 
-          sx={{ 
-            pt: { xs: 20, md: 25 }, 
-            pb: 15, 
+        <Container
+          maxWidth="lg"
+          sx={{
+            pt: { xs: 20, md: 25 },
+            pb: 15,
             flex: 1,
-            filter: 'blur(12px)',
-            pointerEvents: 'none',
-            userSelect: 'none',
-            opacity: 0.5
+            pointerEvents: 'auto',
+            userSelect: 'auto',
+            opacity: 1
           }}
         >
           <Fade in timeout={1000}>
             <Box sx={{ mb: 8 }}>
-              <Box 
-                sx={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: 1.5, 
-                  px: 2, 
-                  py: 0.8, 
-                  borderRadius: 2, 
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  px: 2,
+                  py: 0.8,
+                  borderRadius: 2,
                   bgcolor: alpha(theme.palette.primary.main, 0.05),
                   border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
                   mb: 3
@@ -231,7 +230,7 @@ export default function StatusPage() {
                   System Infrastructure Health
                 </Typography>
               </Box>
-              
+
               <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, letterSpacing: '-0.03em', fontSize: { xs: '2.5rem', md: '4rem' } }}>
                 System <Box component="span" sx={{ color: 'primary.main' }}>Status</Box>
               </Typography>
@@ -270,18 +269,18 @@ export default function StatusPage() {
                 }}
               >
                 <IntegrityGauge value={marketData?.status?.state === 'CERRADO' ? 95.0 : 99.2} />
-                <Chip 
-                  label={marketData?.status?.state === 'CERRADO' ? "Market Closed" : "All Systems Operational"} 
-                  sx={{ 
-                    bgcolor: alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.1), 
-                    color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 
-                    fontWeight: 900, 
+                <Chip
+                  label={marketData?.status?.state === 'CERRADO' ? "Market Closed" : "All Systems Operational"}
+                  sx={{
+                    bgcolor: alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.1),
+                    color: marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94',
+                    fontWeight: 900,
                     fontSize: '0.7rem',
                     borderRadius: 2,
                     border: `1px solid ${alpha(marketData?.status?.state === 'CERRADO' ? '#FF3B3B' : '#00FF94', 0.2)}`,
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em'
-                  }} 
+                  }}
                 />
               </Paper>
             </Grid>
@@ -306,12 +305,12 @@ export default function StatusPage() {
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     {['AMER: ACTIVE', 'EMEA: ACTIVE'].map((region) => (
-                      <Box 
+                      <Box
                         key={region}
-                        sx={{ 
-                          px: 1.5, 
-                          py: 0.5, 
-                          bgcolor: alpha(theme.palette.divider, 0.05), 
+                        sx={{
+                          px: 1.5,
+                          py: 0.5,
+                          bgcolor: alpha(theme.palette.divider, 0.05),
                           border: `1px solid ${theme.palette.divider}`,
                           borderRadius: 1,
                           fontSize: '0.6rem',
@@ -346,14 +345,14 @@ export default function StatusPage() {
                           }
                         }}
                       >
-                        <Box 
-                          sx={{ 
-                            width: 6, 
-                            height: 6, 
-                            borderRadius: '50%', 
+                        <Box
+                          sx={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
                             bgcolor: i === 2 || i === 14 ? '#3B82F6' : i === 10 ? '#F59E0B' : '#00FF94',
                             animation: i === 0 ? 'pulse 2s infinite' : 'none'
-                          }} 
+                          }}
                         />
                       </Box>
                     </Grid>
@@ -407,17 +406,17 @@ export default function StatusPage() {
                           <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', color: 'text.secondary' }}>{service.uptime}</Typography>
                         </TableCell>
                         <TableCell align="right" sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
-                          <Chip 
-                            label={service.status} 
-                            sx={{ 
+                          <Chip
+                            label={service.status}
+                            sx={{
                               height: 24,
-                              bgcolor: alpha(service.color, 0.1), 
-                              color: service.color, 
-                              fontWeight: 800, 
+                              bgcolor: alpha(service.color, 0.1),
+                              color: service.color,
+                              fontWeight: 800,
                               fontSize: '0.6rem',
                               borderRadius: 1.5,
                               border: `1px solid ${alpha(service.color, 0.2)}`
-                            }} 
+                            }}
                           />
                         </TableCell>
                       </TableRow>
@@ -440,55 +439,11 @@ export default function StatusPage() {
           </Grid>
         </Container>
 
-        {/* Construction Overlay */}
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0, 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            zIndex: 10,
-            p: 3,
-            textAlign: 'center'
-          }}
-        >
-          <Box 
-            sx={{ 
-              p: 4, 
-              bgcolor: alpha(theme.palette.background.paper, 0.8),
-              backdropFilter: 'blur(20px)',
-              borderRadius: 4,
-              border: `1px solid ${theme.palette.divider}`,
-              boxShadow: theme.shadows[10],
-              maxWidth: 500
-            }}
-          >
-            <ConstructionIcon sx={{ fontSize: '4rem', mb: 2, color: 'warning.main' }} />
-            <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
-              En Construcción
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
-              Estamos trabajando duro para traerte esta funcionalidad. 
-              Por favor vuelve más tarde.
-            </Typography>
-            <Button 
-              variant="contained" 
-              onClick={() => router.push('/')}
-              sx={{ borderRadius: 2 }}
-            >
-              Volver al Inicio
-            </Button>
-          </Box>
-        </Box>
+
       </Box>
 
       <Footer />
-      
+
       <style jsx global>{`
         @keyframes pulse {
           0% { opacity: 1; transform: scale(1); }
