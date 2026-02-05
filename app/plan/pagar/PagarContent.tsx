@@ -21,10 +21,6 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  LinearProgress,
-  Stepper,
-  Step,
-  StepLabel,
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -160,88 +156,110 @@ export default function PagarContent() {
   };
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pt: { xs: '106px', md: '132px' } }}>
       <Navbar />
 
-      {/* Progress Indicator */}
-      <Fade in timeout={800}>
-        <Box
-          sx={{
-            position: 'fixed',
-            top: { xs: 60, md: 70 },
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            bgcolor: alpha(theme.palette.background.paper, 0.95),
-            backdropFilter: 'blur(20px)',
-            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-            boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.05)}`,
-          }}
-        >
+      {/* Progress Indicator - Minimalista */}
+      <Box
+        sx={{
+          width: '100%',
+          bgcolor: alpha(theme.palette.background.paper, 0.98),
+          backdropFilter: 'blur(20px)',
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.03)}`,
+        }}
+      >
           <Container maxWidth="lg">
-            <Box sx={{ py: 2 }}>
-              <Grid container spacing={2} alignItems="center">
-                {[
-                  { label: 'Duración', completed: currentStep >= 0 },
-                  { label: 'Método de pago', completed: currentStep >= 1 },
-                  { label: 'Confirmación', completed: false },
-                ].map((step, index) => (
-                  <Grid size={{ xs: 4 }} key={index}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: '50%',
-                          bgcolor: step.completed
-                            ? theme.palette.primary.main
-                            : alpha(theme.palette.divider, 0.15),
-                          color: step.completed ? 'white' : 'text.secondary',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 700,
-                          fontSize: '0.875rem',
-                          transition: 'all 0.3s',
-                        }}
-                      >
-                        {step.completed ? '✓' : index + 1}
-                      </Box>
-                      <Typography
-                        variant="caption"
-                        fontWeight={step.completed ? 700 : 500}
-                        color={step.completed ? 'primary.main' : 'text.secondary'}
-                        sx={{ display: { xs: 'none', sm: 'block' } }}
-                      >
-                        {step.label}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-              <LinearProgress
-                variant="determinate"
-                value={(currentStep / 2) * 100}
+            <Box sx={{ py: 1.5, display: 'flex', alignItems: 'center', gap: 2 }}>
+              {/* Step Label */}
+              <Typography
+                variant="caption"
                 sx={{
-                  mt: 2,
-                  height: 4,
-                  borderRadius: 2,
-                  bgcolor: alpha(theme.palette.divider, 0.1),
-                  '& .MuiLinearProgress-bar': {
-                    borderRadius: 2,
-                    bgcolor: theme.palette.primary.main,
-                  },
+                  fontWeight: 700,
+                  fontSize: { xs: '0.7rem', md: '0.75rem' },
+                  color: 'text.primary',
+                  minWidth: { xs: '70px', md: '100px' },
+                  textAlign: 'left',
                 }}
-              />
+              >
+                {['Duración', 'Pago', 'Confirmar'][currentStep]}
+              </Typography>
+              {/* Progress Bar */}
+              <Box sx={{ flex: 1, position: 'relative' }}>
+                <Box
+                  sx={{
+                    height: 3,
+                    bgcolor: alpha(theme.palette.divider, 0.1),
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      height: '100%',
+                      width: `${((currentStep + 1) / 3) * 100}%`,
+                      bgcolor: theme.palette.primary.main,
+                      transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      borderRadius: 2,
+                    }}
+                  />
+                </Box>
+                {/* Dots */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: 0,
+                    right: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    transform: 'translateY(-50%)',
+                    px: 0.5,
+                  }}
+                >
+                  {[0, 1, 2].map((index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        bgcolor:
+                          index <= currentStep
+                            ? theme.palette.primary.main
+                            : alpha(theme.palette.divider, 0.3),
+                        transition: 'all 0.3s',
+                        border: `2px solid ${theme.palette.background.paper}`,
+                        boxShadow:
+                          index === currentStep
+                            ? `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`
+                            : 'none',
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+              {/* Step Counter */}
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  color: 'text.secondary',
+                  fontFamily: 'monospace',
+                  minWidth: 'fit-content',
+                }}
+              >
+                {currentStep + 1}/3
+              </Typography>
             </Box>
           </Container>
         </Box>
-      </Fade>
 
       {/* Hero Section mejorado */}
       <Box
         sx={{
-          pt: { xs: 28, md: 32 },
+          pt: { xs: 4, md: 6 },
           pb: 6,
           position: 'relative',
           overflow: 'hidden',
