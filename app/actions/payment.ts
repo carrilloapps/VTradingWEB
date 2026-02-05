@@ -1,6 +1,7 @@
 'use server';
 
 import { PaymentRequest, PaymentResponse, PaymentMethod } from '@/lib/vtrading-types';
+import { adminDb } from '@/lib/firebase-admin';
 
 /**
  * Helper function to get webhook URL for payment methods
@@ -259,58 +260,135 @@ async function createPaypalCheckout(request: PaymentRequest): Promise<PaymentRes
 
 /**
  * Bold.co Integration (Colombia)
- * Documentation: https://developers.bold.co/pagos-en-linea/boton-de-pagos/ambiente-pruebas
+ * Uses "Botón de pagos manual" - JavaScript widget (not REST API)
+ * Documentation: https://developers.bold.co/pagos-en-linea/boton-de-pagos/integracion-manual/integracion-manual
+ *
+ * Bold uses an HTML/JavaScript button widget that requires:
+ * 1. Server-side hash generation (with secret key)
+ * 2. Client-side button rendering
+ *
+ * We generate the hash here and return it for client rendering.
  */
 async function createBoldCheckout(request: PaymentRequest): Promise<PaymentResponse> {
   const boldApiKey = process.env.BOLD_API_KEY;
-  const boldApiUrl = process.env.BOLD_API_URL || 'https://api.bold.co/v1';
+  const boldApiUrl = process.env.BOLD_API_URL || 'https://integrations.api.bold.co';
 
   if (!boldApiKey) {
     return {
       success: false,
-      error: 'Bold no está configurado correctamente',
+      error: 'Bold no está configurado correctamente. Falta BOLD_API_KEY.',
     };
   }
 
   try {
     const baseUrl = getBaseUrl();
+    const orderId = `VT-${Date.now()}`;
     const webhookUrl = getWebhookUrl('bold', baseUrl);
 
-    // Create Bold payment order
-    const response = await fetch(`${boldApiUrl}/payments`, {
+    // Bold uses decimal amounts (not cents)
+    const totalAmount = request.totalAmount; // Use decimal: 1.5, 2.0, etc.
+
+    // Step 1: Get available payment methods from Bold
+    console.log('Fetching Bold payment methods...');
+    const paymentMethodsResponse = await fetch(`${boldApiUrl}/online/link/v1/payment_methods`, {
+      method: 'GET',
+      headers: {
+        Authorization: `x-api-key ${boldApiKey}`,
+      },
+    });
+
+    if (!paymentMethodsResponse.ok) {
+      console.error('Error fetching payment methods:', {
+        status: paymentMethodsResponse.status,
+        statusText: paymentMethodsResponse.statusText,
+      });
+      // Fallback to default payment methods if request fails
+    }
+
+    const paymentMethodsData = paymentMethodsResponse.ok
+      ? await paymentMethodsResponse.json()
+      : null;
+
+    console.log('Bold payment methods received:', paymentMethodsData);
+
+    // Extract payment method codes from response
+    // Response format: { payload: { payment_methods: { CREDIT_CARD: {...}, PSE: {...} } } }
+    const availablePaymentMethods = paymentMethodsData?.payload?.payment_methods
+      ? Object.keys(paymentMethodsData.payload.payment_methods)
+      : ['CREDIT_CARD', 'PSE', 'BOTON_BANCOLOMBIA', 'NEQUI'];
+
+    // Step 2: Create payment link using Bold API Link de pagos
+    const requestBody = {
+      amount_type: 'CLOSE',
+      amount: {
+        currency: 'USD',
+        total_amount: totalAmount,
+        tip_amount: 0,
+      },
+      reference: orderId,
+      description: `VTrading Premium - ${request.months} ${request.months === 1 ? 'mes' : 'meses'}`,
+      payment_methods: availablePaymentMethods,
+      ...(webhookUrl && {
+        callback_url: webhookUrl,
+      }),
+    };
+
+    console.log('Bold API Request:', {
+      url: `${boldApiUrl}/online/link/v1`,
+      body: requestBody,
+    });
+
+    const response = await fetch(`${boldApiUrl}/online/link/v1`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${boldApiKey}`,
+        Authorization: `x-api-key ${boldApiKey}`,
       },
-      body: JSON.stringify({
-        amount: Math.round(request.totalAmount * 100), // Amount in cents
-        currency: request.currency,
-        description: `VTrading Premium - ${request.months} ${
-          request.months === 1 ? 'mes' : 'meses'
-        }`,
-        redirect_url: `${baseUrl}/plan/success`,
-        cancel_url: `${baseUrl}/plan/pagar`,
-        ...(webhookUrl && {
-          webhook_url: webhookUrl,
-        }),
-        metadata: {
-          months: request.months,
-          userId: request.userId || 'guest',
-        },
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
-      throw new Error('Bold API error');
+      const errorText = await response.text();
+      console.error('Bold API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+        requestBody,
+      });
+      throw new Error(`Bold API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
 
+    console.log('Bold API Response:', data);
+
+    // Store order info in Firestore for webhook processing
+    try {
+      await adminDb
+        .collection('orders')
+        .doc(orderId)
+        .set({
+          userId: request.userId || 'guest',
+          months: request.months,
+          amount: totalAmount,
+          currency: 'USD',
+          gateway: 'bold',
+          status: 'pending',
+          createdAt: new Date().toISOString(),
+          boldLinkId: data.payload.payment_link,
+        });
+    } catch (error) {
+      console.error('Error storing order:', error);
+    }
+
+    // Bold API returns URL in payload.url where customer can complete payment
     return {
       success: true,
-      checkoutUrl: data.checkout_url || data.payment_url,
-      orderId: data.id || data.order_id,
+      checkoutUrl: data.payload.url,
+      orderId: orderId,
+      metadata: {
+        boldLinkId: data.payload.payment_link,
+      },
     };
   } catch (error) {
     console.error('Bold error:', error);

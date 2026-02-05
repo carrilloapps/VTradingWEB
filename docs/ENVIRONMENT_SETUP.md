@@ -97,11 +97,36 @@ PAYPAL_MODE=sandbox  # o 'live' para producción
 
 ```env
 BOLD_API_KEY=tu_bold_api_key
-BOLD_PUBLIC_KEY=tu_bold_public_key
-BOLD_TEST_MODE=true  # false en producción
+BOLD_API_URL=https://integrations.api.bold.co
 ```
 
-**Documentación:** [Bold.co Developers](https://bold.co/developers/)
+**Características importantes:**
+
+- Usa **API Link de pagos** (mismas llaves que Botón de pagos)
+- Bold **NO tiene dominio sandbox separado**
+- El modo de pruebas se controla usando tus **llaves de prueba** en lugar de las llaves de producción
+- URL: `https://integrations.api.bold.co/online/link/v1`
+- Autenticación: Header `Authorization: x-api-key <tu_llave_identidad>`
+- Bold maneja pagos en **COP (Pesos Colombianos)**
+- Métodos de pago: PSE, Nequi, Botón Bancolombia, tarjetas crédito/débito
+- Funcionalidad: Crea un **link de pago** (similar a Stripe Payment Link)
+
+**Obtener llaves:**
+
+1. Accede a [panel.bold.co](https://panel.bold.co)
+2. Ve a la sección **Integraciones** en el menú lateral
+3. Haz clic en **Activar llaves** (si es la primera vez)
+4. Selecciona **Botón de pagos** (NO API Integrations)
+5. Copia tu **Llave de identidad** de pruebas o producción
+
+**Tarjetas de prueba:**
+
+- VISA aprobada: `4111111111111111`
+- Mastercard aprobada: `5100010000000015`
+- CVV: cualquier 3 dígitos
+- Fecha: cualquier fecha futura
+
+**Documentación:** [Bold API Link de pagos](https://developers.bold.co/pagos-en-linea/api-link-de-pagos)
 
 ### ePayco (LATAM)
 

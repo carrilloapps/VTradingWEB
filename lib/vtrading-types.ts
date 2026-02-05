@@ -169,6 +169,7 @@ export interface PaymentResponse {
   checkoutUrl?: string;
   orderId?: string;
   error?: string;
+  metadata?: Record<string, unknown>; // Additional info from payment gateway
 }
 
 export interface StripeCheckoutRequest extends PaymentRequest {
