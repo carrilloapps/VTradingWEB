@@ -485,6 +485,9 @@ export default function CountryPhoneInput({
               minLength: 7,
               maxLength: 15,
             }}
+            FormHelperTextProps={{
+              component: 'div',
+            }}
             helperText={
               phoneNumber && (
                 <Box
@@ -532,11 +535,10 @@ export default function CountryPhoneInput({
                       bgcolor: phoneValidation.isValid
                         ? alpha(theme.palette.success.main, 0.08)
                         : alpha(theme.palette.warning.main, 0.08),
-                      border: `1px solid ${
-                        phoneValidation.isValid
+                      border: `1px solid ${phoneValidation.isValid
                           ? alpha(theme.palette.success.main, 0.3)
                           : alpha(theme.palette.warning.main, 0.3)
-                      }`,
+                        }`,
                       backdropFilter: 'blur(8px)',
                       transition: theme.transitions.create(['background-color', 'border-color'], {
                         duration: theme.transitions.duration.short,
