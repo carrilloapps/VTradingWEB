@@ -8,22 +8,19 @@ import {
   Typography,
   Paper,
   Grid,
-  Button,
   Card,
   CardContent,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
   Divider,
   Chip,
-  CircularProgress,
-  Alert,
   useTheme,
   alpha,
   Stack,
   Fade,
   Zoom,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -31,8 +28,27 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import SecurityIcon from '@mui/icons-material/Security';
 import StarIcon from '@mui/icons-material/Star';
 import LockIcon from '@mui/icons-material/Lock';
-import { PaymentMethod, CryptoCurrency, PaymentRequest } from '@/lib/vtrading-types';
-import { createPaymentCheckout } from '@/app/actions/payment';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import FlashOnIcon from '@mui/icons-material/FlashOn';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import ArticleIcon from '@mui/icons-material/Article';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import { PaymentMethod } from '@/lib/vtrading-types';
+import {
+  StripePaymentMethod,
+  PayPalPaymentMethod,
+  BoldPaymentMethod,
+  EPaycoPaymentMethod,
+  BinancePayPaymentMethod,
+  PaymentPlanDetails,
+} from './payment-methods';
 
 // Payment method icons and info
 const paymentMethods = [
@@ -83,16 +99,6 @@ const paymentMethods = [
   },
 ];
 
-// Cryptocurrency options for Binance Pay
-const cryptoOptions: { value: CryptoCurrency; label: string; stable: boolean }[] = [
-  { value: 'USDT', label: 'Tether (USDT)', stable: true },
-  { value: 'USDC', label: 'USD Coin (USDC)', stable: true },
-  { value: 'BUSD', label: 'Binance USD (BUSD)', stable: true },
-  { value: 'BTC', label: 'Bitcoin (BTC)', stable: false },
-  { value: 'ETH', label: 'Ethereum (ETH)', stable: false },
-  { value: 'BNB', label: 'BNB', stable: false },
-];
-
 // Plan duration options with discounts
 const planDurations = [
   { months: 1, discount: 0, label: '1 Mes', recommended: false },
@@ -105,9 +111,7 @@ export default function PagarContent() {
   const theme = useTheme();
   const [selectedDuration, setSelectedDuration] = useState<number>(6);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('stripe');
-  const [selectedCrypto, setSelectedCrypto] = useState<CryptoCurrency>('USDT');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // Get price from environment variable
   const pricePerMonth = parseFloat(process.env.NEXT_PUBLIC_PREMIUM_PLAN_PRICE_USD || '1');
@@ -128,38 +132,18 @@ export default function PagarContent() {
       discount: duration.discount,
       discountAmount,
       total,
-    };
+    } as PaymentPlanDetails;
   }, [selectedDuration, pricePerMonth]);
 
-  const handlePayment = async () => {
-    if (!planDetails) return;
+  // Handle payment success
+  const handlePaymentSuccess = () => {
+    // Redirect will be handled by the individual payment component
+  };
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const paymentRequest: PaymentRequest = {
-        method: selectedMethod,
-        months: planDetails.months,
-        totalAmount: planDetails.total,
-        currency: 'USD',
-        ...(selectedMethod === 'binance' && { cryptoCurrency: selectedCrypto }),
-      };
-
-      const result = await createPaymentCheckout(paymentRequest);
-
-      if (result.success && result.checkoutUrl) {
-        // Redirect to payment gateway
-        window.location.href = result.checkoutUrl;
-      } else {
-        setError(result.error || 'Error al procesar el pago. Por favor, intenta de nuevo.');
-      }
-    } catch (err) {
-      setError('Error al conectar con el servicio de pagos. Por favor, intenta más tarde.');
-      console.error('Payment error:', err);
-    } finally {
-      setLoading(false);
-    }
+  // Handle payment error
+  const handlePaymentError = (errorMessage: string) => {
+    console.error('Payment error:', errorMessage);
+    setLoading(false);
   };
 
   return (
@@ -274,11 +258,7 @@ export default function PagarContent() {
                           justifyContent: 'center',
                         }}
                       >
-                        <Typography
-                          variant="h6"
-                          fontWeight={800}
-                          color="primary.main"
-                        >
+                        <Typography variant="h6" fontWeight={800} color="primary.main">
                           1
                         </Typography>
                       </Box>
@@ -346,9 +326,10 @@ export default function PagarContent() {
                                           top: -8,
                                           left: '50%',
                                           transform: 'translateX(-50%)',
-                                          bgcolor: theme.palette.mode === 'dark' 
-                                            ? theme.palette.primary.dark 
-                                            : 'primary.main',
+                                          bgcolor:
+                                            theme.palette.mode === 'dark'
+                                              ? theme.palette.primary.dark
+                                              : 'primary.main',
                                           color: 'white',
                                           px: { xs: 1.2, lg: 0.8 },
                                           py: { xs: 0.3, lg: 0.25 },
@@ -364,19 +345,24 @@ export default function PagarContent() {
                                           whiteSpace: 'nowrap',
                                         }}
                                       >
-                                        <StarIcon sx={{ fontSize: { xs: '0.75rem', lg: '0.7rem' } }} />
+                                        <StarIcon
+                                          sx={{ fontSize: { xs: '0.75rem', lg: '0.7rem' } }}
+                                        />
                                         Top
                                       </Box>
                                     )}
 
-                                    <CardContent sx={{ p: { xs: 2.5, lg: 1.5 }, pb: { xs: 2, lg: 1.5 }, textAlign: 'center' }}>
+                                    <CardContent
+                                      sx={{
+                                        p: { xs: 2.5, lg: 1.5 },
+                                        pb: { xs: 2, lg: 1.5 },
+                                        textAlign: 'center',
+                                      }}
+                                    >
                                       <FormControlLabel
                                         value={duration.months}
                                         control={
-                                          <Radio
-                                            checked={isSelected}
-                                            sx={{ display: 'none' }}
-                                          />
+                                          <Radio checked={isSelected} sx={{ display: 'none' }} />
                                         }
                                         label={
                                           <Box width="100%" sx={{ textAlign: 'center' }}>
@@ -384,7 +370,7 @@ export default function PagarContent() {
                                             <Typography
                                               variant="h6"
                                               fontWeight={700}
-                                              sx={{ 
+                                              sx={{
                                                 mb: { xs: 0.8, lg: 0.5 },
                                                 fontSize: { xs: '1.25rem', lg: '1.1rem' },
                                                 color: isSelected ? 'primary.main' : 'text.primary',
@@ -410,8 +396,10 @@ export default function PagarContent() {
                                                     <Typography
                                                       variant="h3"
                                                       fontWeight={800}
-                                                      color={isSelected ? 'primary.main' : 'text.primary'}
-                                                      sx={{ 
+                                                      color={
+                                                        isSelected ? 'primary.main' : 'text.primary'
+                                                      }
+                                                      sx={{
                                                         fontSize: { xs: '2rem', lg: '1.75rem' },
                                                         lineHeight: 1,
                                                       }}
@@ -434,7 +422,7 @@ export default function PagarContent() {
                                                     variant="caption"
                                                     color="text.secondary"
                                                     fontWeight={500}
-                                                    sx={{ 
+                                                    sx={{
                                                       fontSize: { xs: '0.875rem', lg: '0.75rem' },
                                                       display: 'block',
                                                       textAlign: 'center',
@@ -448,8 +436,10 @@ export default function PagarContent() {
                                                   <Typography
                                                     variant="h3"
                                                     fontWeight={800}
-                                                    color={isSelected ? 'primary.main' : 'text.primary'}
-                                                    sx={{ 
+                                                    color={
+                                                      isSelected ? 'primary.main' : 'text.primary'
+                                                    }
+                                                    sx={{
                                                       fontSize: { xs: '2rem', lg: '1.75rem' },
                                                       lineHeight: 1,
                                                       mb: { xs: 0.3, lg: 0.2 },
@@ -461,7 +451,10 @@ export default function PagarContent() {
                                                     variant="caption"
                                                     color="text.secondary"
                                                     fontWeight={500}
-                                                    sx={{ fontSize: { xs: '0.875rem', lg: '0.75rem' }, display: 'block' }}
+                                                    sx={{
+                                                      fontSize: { xs: '0.875rem', lg: '0.75rem' },
+                                                      display: 'block',
+                                                    }}
                                                   >
                                                     Total por {duration.months} mes
                                                   </Typography>
@@ -471,7 +464,13 @@ export default function PagarContent() {
 
                                             {/* Ahorro */}
                                             {duration.discount > 0 && (
-                                              <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                                              <Box
+                                                sx={{
+                                                  display: 'flex',
+                                                  justifyContent: 'center',
+                                                  width: '100%',
+                                                }}
+                                              >
                                                 <Box
                                                   sx={{
                                                     display: 'inline-flex',
@@ -481,7 +480,10 @@ export default function PagarContent() {
                                                     px: { xs: 1.5, lg: 1 },
                                                     py: { xs: 0.5, lg: 0.35 },
                                                     borderRadius: 1,
-                                                    bgcolor: alpha(theme.palette.success.main, 0.12),
+                                                    bgcolor: alpha(
+                                                      theme.palette.success.main,
+                                                      0.12
+                                                    ),
                                                     border: `1px solid ${alpha(
                                                       theme.palette.success.main,
                                                       0.25
@@ -489,13 +491,18 @@ export default function PagarContent() {
                                                   }}
                                                 >
                                                   <LocalOfferIcon
-                                                    sx={{ fontSize: { xs: 14, lg: 12 }, color: 'success.main' }}
+                                                    sx={{
+                                                      fontSize: { xs: 14, lg: 12 },
+                                                      color: 'success.main',
+                                                    }}
                                                   />
                                                   <Typography
                                                     variant="caption"
                                                     fontWeight={700}
                                                     color="success.main"
-                                                    sx={{ fontSize: { xs: '0.7rem', lg: '0.65rem' } }}
+                                                    sx={{
+                                                      fontSize: { xs: '0.7rem', lg: '0.65rem' },
+                                                    }}
                                                   >
                                                     {duration.discount}% OFF · ${savings.toFixed(2)}
                                                   </Typography>
@@ -507,8 +514,8 @@ export default function PagarContent() {
                                             <Typography
                                               variant="caption"
                                               color="text.secondary"
-                                              sx={{ 
-                                                display: 'block', 
+                                              sx={{
+                                                display: 'block',
                                                 mt: { xs: 1, lg: 0.6 },
                                                 fontSize: { xs: '0.75rem', lg: '0.7rem' },
                                               }}
@@ -517,8 +524,8 @@ export default function PagarContent() {
                                             </Typography>
                                           </Box>
                                         }
-                                        sx={{ 
-                                          width: '100%', 
+                                        sx={{
+                                          width: '100%',
                                           m: 0,
                                           display: 'flex',
                                           justifyContent: 'center',
@@ -592,11 +599,7 @@ export default function PagarContent() {
                           justifyContent: 'center',
                         }}
                       >
-                        <Typography
-                          variant="h6"
-                          fontWeight={800}
-                          color="primary.main"
-                        >
+                        <Typography variant="h6" fontWeight={800} color="primary.main">
                           2
                         </Typography>
                       </Box>
@@ -625,9 +628,7 @@ export default function PagarContent() {
                                       ? alpha(method.color, 0.4)
                                       : alpha(theme.palette.divider, 0.15)
                                   }`,
-                                  bgcolor: isSelected
-                                    ? alpha(method.color, 0.03)
-                                    : 'transparent',
+                                  bgcolor: isSelected ? alpha(method.color, 0.03) : 'transparent',
                                   borderRadius: 3,
                                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                   backdropFilter: 'blur(10px)',
@@ -670,11 +671,11 @@ export default function PagarContent() {
                                       }}
                                     />
                                   </Box>
-                                  <Typography 
-                                    variant="h6" 
-                                    fontWeight={700} 
+                                  <Typography
+                                    variant="h6"
+                                    fontWeight={700}
                                     gutterBottom
-                                    sx={{ 
+                                    sx={{
                                       fontSize: { xs: '1.1rem', lg: '1rem' },
                                       mb: 0.5,
                                     }}
@@ -684,18 +685,18 @@ export default function PagarContent() {
                                   <Typography
                                     variant="caption"
                                     color="text.secondary"
-                                    sx={{ 
-                                      display: 'block', 
+                                    sx={{
+                                      display: 'block',
                                       mb: 1.5,
                                       fontSize: { xs: '0.75rem', lg: '0.7rem' },
                                     }}
                                   >
                                     {method.description}
                                   </Typography>
-                                  <Stack 
-                                    direction="row" 
-                                    spacing={0.5} 
-                                    justifyContent="center" 
+                                  <Stack
+                                    direction="row"
+                                    spacing={0.5}
+                                    justifyContent="center"
                                     flexWrap="wrap"
                                     sx={{ gap: 0.5 }}
                                   >
@@ -754,88 +755,54 @@ export default function PagarContent() {
                       })}
                     </Grid>
 
-                    {/* Binance Crypto Selector */}
-                    {selectedMethod === 'binance' && (
+                    {/* Payment Form for Selected Method */}
+                    {selectedMethod && planDetails && (
                       <Fade in timeout={600}>
                         <Box sx={{ mt: 3 }}>
-                          <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
-                          <Typography 
-                            variant="subtitle2" 
-                            fontWeight={700} 
-                            gutterBottom
-                            sx={{ mb: 2 }}
-                          >
-                            Selecciona tu criptomoneda:
-                          </Typography>
-                          <FormControl component="fieldset" fullWidth>
-                            <RadioGroup
-                              value={selectedCrypto}
-                              onChange={(e) =>
-                                setSelectedCrypto(e.target.value as CryptoCurrency)
-                              }
-                            >
-                              <Grid container spacing={1.5}>
-                                {cryptoOptions.map((crypto) => (
-                                  <Grid size={{ xs: 6, sm: 4 }} key={crypto.value}>
-                                    <Card
-                                      sx={{
-                                        cursor: 'pointer',
-                                        border: `1px solid ${
-                                          selectedCrypto === crypto.value
-                                            ? alpha('#F3BA2F', 0.4)
-                                            : alpha(theme.palette.divider, 0.15)
-                                        }`,
-                                        bgcolor:
-                                          selectedCrypto === crypto.value
-                                            ? alpha('#F3BA2F', 0.03)
-                                            : 'transparent',
-                                        borderRadius: 2,
-                                        transition: 'all 0.2s',
-                                        '&:hover': {
-                                          borderColor: alpha('#F3BA2F', 0.5),
-                                          bgcolor: alpha('#F3BA2F', 0.02),
-                                        },
-                                      }}
-                                      onClick={() => setSelectedCrypto(crypto.value)}
-                                    >
-                                      <CardContent 
-                                        sx={{ 
-                                          p: 1.5, 
-                                          textAlign: 'center', 
-                                          '&:last-child': { pb: 1.5 } 
-                                        }}
-                                      >
-                                        <Typography 
-                                          variant="body2" 
-                                          fontWeight={700}
-                                          sx={{ mb: crypto.stable ? 0.5 : 0 }}
-                                        >
-                                          {crypto.value}
-                                        </Typography>
-                                        {crypto.stable && (
-                                          <Chip
-                                            label="Stable"
-                                            size="small"
-                                            sx={{
-                                              height: 18,
-                                              fontSize: '0.6rem',
-                                              bgcolor: alpha(theme.palette.success.main, 0.12),
-                                              color: theme.palette.success.main,
-                                              fontWeight: 700,
-                                              border: `1px solid ${alpha(
-                                                theme.palette.success.main,
-                                                0.25
-                                              )}`,
-                                            }}
-                                          />
-                                        )}
-                                      </CardContent>
-                                    </Card>
-                                  </Grid>
-                                ))}
-                              </Grid>
-                            </RadioGroup>
-                          </FormControl>
+                          {selectedMethod === 'stripe' && (
+                            <StripePaymentMethod
+                              planDetails={planDetails}
+                              onSuccess={handlePaymentSuccess}
+                              onError={handlePaymentError}
+                              loading={loading}
+                            />
+                          )}
+
+                          {selectedMethod === 'paypal' && (
+                            <PayPalPaymentMethod
+                              planDetails={planDetails}
+                              onSuccess={handlePaymentSuccess}
+                              onError={handlePaymentError}
+                              loading={loading}
+                            />
+                          )}
+
+                          {selectedMethod === 'bold' && (
+                            <BoldPaymentMethod
+                              planDetails={planDetails}
+                              onSuccess={handlePaymentSuccess}
+                              onError={handlePaymentError}
+                              loading={loading}
+                            />
+                          )}
+
+                          {selectedMethod === 'epayco' && (
+                            <EPaycoPaymentMethod
+                              planDetails={planDetails}
+                              onSuccess={handlePaymentSuccess}
+                              onError={handlePaymentError}
+                              loading={loading}
+                            />
+                          )}
+
+                          {selectedMethod === 'binance' && (
+                            <BinancePayPaymentMethod
+                              planDetails={planDetails}
+                              onSuccess={handlePaymentSuccess}
+                              onError={handlePaymentError}
+                              loading={loading}
+                            />
+                          )}
                         </Box>
                       </Fade>
                     )}
@@ -865,7 +832,13 @@ export default function PagarContent() {
 
                     {planDetails && (
                       <Stack spacing={2}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
                           <Typography variant="body2" color="text.secondary">
                             Plan Premium
                           </Typography>
@@ -899,81 +872,107 @@ export default function PagarContent() {
 
                         <Divider />
 
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
                           <Typography variant="h6" fontWeight={800}>
                             Total
                           </Typography>
-                          <Typography
-                            variant="h4"
-                            fontWeight={800}
-                            color="primary.main"
-                          >
+                          <Typography variant="h4" fontWeight={800} color="primary.main">
                             ${planDetails.total.toFixed(2)}
                           </Typography>
                         </Box>
 
-                        <Typography variant="caption" color="text.secondary" align="center" sx={{ pt: 1 }}>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          align="center"
+                          sx={{ pt: 1 }}
+                        >
                           USD • Pago único
                         </Typography>
 
-                        {error && (
-                          <Alert severity="error" sx={{ mt: 2 }}>
-                            {error}
-                          </Alert>
-                        )}
-
-                        <Button
-                          variant="contained"
-                          size="large"
-                          fullWidth
-                          onClick={handlePayment}
-                          disabled={loading}
-                          startIcon={!loading && <LockIcon />}
-                          sx={{
-                            mt: 2,
-                            py: 1.8,
-                            fontWeight: 700,
-                            fontSize: '1rem',
-                            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                            '&:hover': {
-                              background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
-                              boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                            },
-                            '&:disabled': {
-                              background: theme.palette.action.disabledBackground,
-                            },
-                          }}
-                        >
-                          {loading ? (
-                            <CircularProgress size={24} color="inherit" />
-                          ) : (
-                            `Pagar con ${paymentMethods.find((m) => m.id === selectedMethod)?.name}`
-                          )}
-                        </Button>
-
                         <Box
                           sx={{
-                            mt: 2,
-                            p: 2,
+                            mt: 3,
+                            p: 2.5,
                             borderRadius: 2,
                             bgcolor: alpha(theme.palette.success.main, 0.05),
                             border: `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
                           }}
                         >
-                          <Typography variant="caption" fontWeight={700} color="success.main" gutterBottom display="block">
-                            ✓ Incluye:
+                          <Typography
+                            variant="body2"
+                            fontWeight={700}
+                            color="success.main"
+                            gutterBottom
+                          >
+                            ✓ Todo lo que incluye:
                           </Typography>
-                          <Stack spacing={0.5}>
-                            {['Alertas ilimitadas', 'Sin anuncios', 'Soporte prioritario'].map(
-                              (feature) => (
-                                <Typography key={feature} variant="caption" color="text.secondary">
-                                  • {feature}
-                                </Typography>
-                              )
-                            )}
+                          <Stack spacing={1} sx={{ mt: 1.5 }}>
+                            {[
+                              {
+                                icon: NotificationsActiveIcon,
+                                text: 'Alertas de precio ilimitadas personalizables',
+                              },
+                              { icon: BlockOutlinedIcon, text: 'Experiencia sin publicidad' },
+                              { icon: FlashOnIcon, text: 'Datos de mercado en tiempo real' },
+                              {
+                                icon: ShowChartIcon,
+                                text: 'Análisis técnico avanzado y gráficos profesionales',
+                              },
+                              { icon: PhoneIphoneIcon, text: 'Notificaciones push prioritarias' },
+                              { icon: BookmarkIcon, text: 'Watchlists ilimitadas y sincronizadas' },
+                              {
+                                icon: SupportAgentIcon,
+                                text: 'Soporte prioritario 24/7 por chat y email',
+                              },
+                              {
+                                icon: TimelineIcon,
+                                text: 'Indicadores técnicos premium (RSI, MACD, Bollinger)',
+                              },
+                              {
+                                icon: ArticleIcon,
+                                text: 'Noticias financieras y análisis de mercado',
+                              },
+                              { icon: SaveAltIcon, text: 'Exportación de datos a CSV/Excel' },
+                              {
+                                icon: AccountBalanceWalletIcon,
+                                text: 'Seguimiento de portafolio multi-activo',
+                              },
+                              {
+                                icon: NewReleasesIcon,
+                                text: 'Acceso anticipado a nuevas funciones',
+                              },
+                            ].map((feature) => {
+                              const IconComponent = feature.icon;
+                              return (
+                                <Box
+                                  key={feature.text}
+                                  sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}
+                                >
+                                  <IconComponent
+                                    sx={{
+                                      fontSize: 18,
+                                      color: theme.palette.success.main,
+                                      opacity: 0.8,
+                                      mt: 0.2,
+                                    }}
+                                  />
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ flex: 1, pt: 0.3 }}
+                                  >
+                                    {feature.text}
+                                  </Typography>
+                                </Box>
+                              );
+                            })}
                           </Stack>
                         </Box>
 
@@ -981,7 +980,13 @@ export default function PagarContent() {
                           variant="caption"
                           color="text.secondary"
                           align="center"
-                          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, pt: 1 }}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 0.5,
+                            pt: 1,
+                          }}
                         >
                           <SecurityIcon sx={{ fontSize: 14 }} />
                           Protegido por encriptación SSL

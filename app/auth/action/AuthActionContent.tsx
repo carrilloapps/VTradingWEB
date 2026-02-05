@@ -3,11 +3,8 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { auth } from '@/lib/firebase';
-import { 
-  applyActionCode, 
-  checkActionCode, 
-  confirmPasswordReset
-} from 'firebase/auth';
+import { applyActionCode, checkActionCode, confirmPasswordReset } from 'firebase/auth';
+import type { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 
 // MUI Imports
@@ -23,7 +20,7 @@ import {
   useTheme,
   alpha,
   IconButton,
-  InputAdornment
+  InputAdornment,
 } from '@mui/material';
 import {
   Visibility,
@@ -33,7 +30,7 @@ import {
   LockReset as LockResetIcon,
   MarkEmailRead as MarkEmailReadIcon,
   ArrowBack as ArrowBackIcon,
-  Restore as RestoreIcon
+  Restore as RestoreIcon,
 } from '@mui/icons-material';
 
 // --- Styled Components ---
@@ -51,7 +48,7 @@ const GlassCard = ({ children, sx, ...props }: any) => {
         borderRadius: 4,
         overflow: 'hidden',
         boxShadow: `0 8px 32px 0 ${alpha(theme.palette.common.black, 0.1)}`,
-        ...sx
+        ...sx,
       }}
       {...props}
     >
@@ -72,7 +69,7 @@ function AuthActionContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'input'>('loading');
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
-  
+
   // Password Reset States
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -98,27 +95,26 @@ function AuthActionContent() {
         } else if (mode === 'recoverEmail') {
           setStatus('input'); // Show confirmation before reverting
         } else if (mode === 'verifyEmail') {
-          // Can auto-verify or ask user to click. Let's auto-verify for better UX, 
-          // or show a "Click to verify" button. 
+          // Can auto-verify or ask user to click. Let's auto-verify for better UX,
+          // or show a "Click to verify" button.
           // Auto-verify is common.
           await handleVerifyEmail(oobCode);
         } else {
           setStatus('error');
           setMessage('Modo de operación no soportado.');
         }
-      } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      } catch (error) {
         console.error('Action Code Error:', error);
         setStatus('error');
-        setMessage(getErrorMessage(error));
+        setMessage(getErrorMessage(error as FirebaseError));
       }
     };
 
     initAction();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, oobCode]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getErrorMessage = (error: any) => {
+  const getErrorMessage = (error: FirebaseError) => {
     switch (error.code) {
       case 'auth/expired-action-code':
         return 'El enlace ha expirado. Por favor solicita uno nuevo.';
@@ -140,9 +136,9 @@ function AuthActionContent() {
       await applyActionCode(auth, code);
       setStatus('success');
       setMessage('Tu correo electrónico ha sido verificado exitosamente.');
-    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       setStatus('error');
-      setMessage(getErrorMessage(error));
+      setMessage(getErrorMessage(error as FirebaseError));
     }
   };
 
@@ -161,10 +157,12 @@ function AuthActionContent() {
       if (oobCode) {
         await confirmPasswordReset(auth, oobCode, newPassword);
         setStatus('success');
-        setMessage('Tu contraseña ha sido restablecida correctamente. Ya puedes iniciar sesión con tu nueva contraseña.');
+        setMessage(
+          'Tu contraseña ha sido restablecida correctamente. Ya puedes iniciar sesión con tu nueva contraseña.'
+        );
       }
-    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-      setMessage(getErrorMessage(error));
+    } catch (error) {
+      setMessage(getErrorMessage(error as FirebaseError));
     } finally {
       setIsSubmitting(false);
     }
@@ -176,11 +174,13 @@ function AuthActionContent() {
       if (oobCode) {
         await applyActionCode(auth, oobCode);
         setStatus('success');
-        setMessage('Se ha restaurado tu dirección de correo electrónico anterior. Te hemos enviado un correo para restablecer tu contraseña por seguridad.');
+        setMessage(
+          'Se ha restaurado tu dirección de correo electrónico anterior. Te hemos enviado un correo para restablecer tu contraseña por seguridad.'
+        );
       }
-    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       setStatus('error');
-      setMessage(getErrorMessage(error));
+      setMessage(getErrorMessage(error as FirebaseError));
     } finally {
       setIsSubmitting(false);
     }
@@ -190,27 +190,44 @@ function AuthActionContent() {
 
   const renderIcon = () => {
     switch (mode) {
-      case 'resetPassword': return <LockResetIcon sx={{ fontSize: 60, color: theme.palette.primary.main }} />;
-      case 'verifyEmail': return <MarkEmailReadIcon sx={{ fontSize: 60, color: theme.palette.primary.main }} />;
-      case 'recoverEmail': return <RestoreIcon sx={{ fontSize: 60, color: theme.palette.warning.main }} />;
-      default: return <ErrorIcon sx={{ fontSize: 60, color: theme.palette.error.main }} />;
+      case 'resetPassword':
+        return <LockResetIcon sx={{ fontSize: 60, color: theme.palette.primary.main }} />;
+      case 'verifyEmail':
+        return <MarkEmailReadIcon sx={{ fontSize: 60, color: theme.palette.primary.main }} />;
+      case 'recoverEmail':
+        return <RestoreIcon sx={{ fontSize: 60, color: theme.palette.warning.main }} />;
+      default:
+        return <ErrorIcon sx={{ fontSize: 60, color: theme.palette.error.main }} />;
     }
   };
 
   const renderTitle = () => {
     if (status === 'loading') return 'Procesando...';
     if (status === 'error') return 'Error';
-    
+
     switch (mode) {
-      case 'resetPassword': return status === 'success' ? 'Contraseña Restablecida' : 'Restablecer Contraseña';
-      case 'verifyEmail': return status === 'success' ? 'Email Verificado' : 'Verificando Email';
-      case 'recoverEmail': return status === 'success' ? 'Email Restaurado' : 'Restaurar Email';
-      default: return 'Acción Desconocida';
+      case 'resetPassword':
+        return status === 'success' ? 'Contraseña Restablecida' : 'Restablecer Contraseña';
+      case 'verifyEmail':
+        return status === 'success' ? 'Email Verificado' : 'Verificando Email';
+      case 'recoverEmail':
+        return status === 'success' ? 'Email Restaurado' : 'Restaurar Email';
+      default:
+        return 'Acción Desconocida';
     }
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 8, minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Container
+      maxWidth="sm"
+      sx={{
+        py: 8,
+        minHeight: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <GlassCard sx={{ p: 4, width: '100%', textAlign: 'center' }}>
         <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
           {status === 'loading' ? (
@@ -235,19 +252,22 @@ function AuthActionContent() {
         )}
 
         {/* Message / Alert */}
-        {message && (status === 'error' || status === 'success' || (status === 'input' && message && mode === 'resetPassword')) && (
-          <Alert 
-            severity={status === 'error' ? 'error' : status === 'success' ? 'success' : 'info'}
-            sx={{ mb: 3, textAlign: 'left' }}
-          >
-            {message}
-          </Alert>
-        )}
+        {message &&
+          (status === 'error' ||
+            status === 'success' ||
+            (status === 'input' && message && mode === 'resetPassword')) && (
+            <Alert
+              severity={status === 'error' ? 'error' : status === 'success' ? 'success' : 'info'}
+              sx={{ mb: 3, textAlign: 'left' }}
+            >
+              {message}
+            </Alert>
+          )}
 
         {/* Reset Password Form */}
         {status === 'input' && mode === 'resetPassword' && (
           <Box component="form" sx={{ mt: 2, textAlign: 'left' }}>
-             <TextField
+            <TextField
               margin="normal"
               required
               fullWidth
@@ -320,9 +340,7 @@ function AuthActionContent() {
         {(status === 'success' || status === 'error') && (
           <Box sx={{ mt: 3 }}>
             <Link href="/" passHref style={{ textDecoration: 'none' }}>
-              <Button startIcon={<ArrowBackIcon />}>
-                Volver al Inicio
-              </Button>
+              <Button startIcon={<ArrowBackIcon />}>Volver al Inicio</Button>
             </Link>
             {status === 'success' && mode === 'resetPassword' && (
               <Link href="/cuenta" passHref style={{ textDecoration: 'none' }}>
@@ -340,11 +358,13 @@ function AuthActionContent() {
 
 export default function AuthActionPage() {
   return (
-    <Suspense fallback={
-      <Container maxWidth="sm" sx={{ py: 8, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Container>
-    }>
+    <Suspense
+      fallback={
+        <Container maxWidth="sm" sx={{ py: 8, display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Container>
+      }
+    >
       <AuthActionContent />
     </Suspense>
   );

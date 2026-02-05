@@ -21,7 +21,7 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
       const rawObj = rawHistory as any;
 
       // Look for any array property
-      const arrayProp = Object.values(rawObj).find(val => Array.isArray(val));
+      const arrayProp = Object.values(rawObj).find((val) => Array.isArray(val));
       if (arrayProp) {
         historyArray = arrayProp as any[];
       } else if (rawObj.data && Array.isArray(rawObj.data)) {
@@ -38,39 +38,44 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
     }
 
     // Process and normalize history data
-    return historyArray.map((entry: any) => {
-      // API might return price directly or inside a rate object
-      let rawPrice = 0;
+    return historyArray
+      .map((entry: any) => {
+        // API might return price directly or inside a rate object
+        let rawPrice = 0;
 
-      if (typeof entry === 'number') {
-        rawPrice = entry;
-      } else if (typeof entry === 'object' && entry !== null) {
-        if (entry.rate && typeof entry.rate === 'object') {
-          rawPrice = entry.rate.average || entry.rate.buy || entry.rate.sell || 0;
-        } else if (entry.rate && (typeof entry.rate === 'number' || typeof entry.rate === 'string')) {
-          rawPrice = Number(entry.rate);
-        } else if (entry.average) {
-          rawPrice = Number(entry.average);
-        } else if (entry.price) {
-          rawPrice = Number(entry.price);
-        } else if (entry.rate_average) {
-          rawPrice = Number(entry.rate_average);
-        } else if (entry.value) {
-          rawPrice = Number(entry.value);
+        if (typeof entry === 'number') {
+          rawPrice = entry;
+        } else if (typeof entry === 'object' && entry !== null) {
+          if (entry.rate && typeof entry.rate === 'object') {
+            rawPrice = entry.rate.average || entry.rate.buy || entry.rate.sell || 0;
+          } else if (
+            entry.rate &&
+            (typeof entry.rate === 'number' || typeof entry.rate === 'string')
+          ) {
+            rawPrice = Number(entry.rate);
+          } else if (entry.average) {
+            rawPrice = Number(entry.average);
+          } else if (entry.price) {
+            rawPrice = Number(entry.price);
+          } else if (entry.rate_average) {
+            rawPrice = Number(entry.rate_average);
+          } else if (entry.value) {
+            rawPrice = Number(entry.value);
+          }
         }
-      }
 
-      const price = Number(rawPrice) || 0;
-      const buy = Number(entry.rate?.buy || entry.buy || 0) || 0;
-      const sell = Number(entry.rate?.sell || entry.sell || 0) || 0;
+        const price = Number(rawPrice) || 0;
+        const buy = Number(entry.rate?.buy || entry.buy || 0) || 0;
+        const sell = Number(entry.rate?.sell || entry.sell || 0) || 0;
 
-      return {
-        date: entry.createdAt || entry.date || entry.timestamp || new Date().toISOString(),
-        price,
-        buy,
-        sell
-      };
-    }).filter((entry: any) => entry.price > 0) // Filter out invalid entries
+        return {
+          date: entry.createdAt || entry.date || entry.timestamp || new Date().toISOString(),
+          price,
+          buy,
+          sell,
+        };
+      })
+      .filter((entry: any) => entry.price > 0) // Filter out invalid entries
       .reverse(); // Reverse to have chronological order (oldest to newest)
   } catch (error) {
     console.error('Error in getMarketHistoryAction:', error);
@@ -88,15 +93,23 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
   // Extract arrays safely
   const ratesArr: CurrencyRate[] = Array.isArray(data.rates)
     ? data.rates
-    : (Array.isArray(data.rates?.rates) ? data.rates.rates : (Array.isArray(data.rates?.data) ? data.rates.data : []));
+    : Array.isArray(data.rates?.rates)
+      ? data.rates.rates
+      : Array.isArray(data.rates?.data)
+        ? data.rates.data
+        : [];
 
   const banksArr: CurrencyRate[] = Array.isArray(data.rates?.banks)
     ? data.rates.banks
-    : (Array.isArray(data.banks) ? data.banks : []);
+    : Array.isArray(data.banks)
+      ? data.banks
+      : [];
 
   const borderArr: CurrencyRate[] = Array.isArray(data.rates?.border)
     ? data.rates.border
-    : (Array.isArray(data.border) ? data.border : []);
+    : Array.isArray(data.border)
+      ? data.border
+      : [];
 
   // Extract crypto safely from multiple possible locations
   const cryptoData = data.crypto;
@@ -116,7 +129,7 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
     } else if (typeof source === 'object') {
       // Priority: Check nested arrays first (from different API versions/endpoints)
       const dataSources = [source.crypto, source.rates, source.data];
-      const foundArray = dataSources.find(ds => Array.isArray(ds));
+      const foundArray = dataSources.find((ds) => Array.isArray(ds));
 
       if (foundArray) {
         foundArray.forEach((item: any) => {
@@ -191,7 +204,7 @@ export async function normalizeMarketData(data: any): Promise<RatesResponse | nu
     bvc: bvcNormalized,
     // bvcMeta: bvcMeta,
     // Prefer the top-level status which contains the request timestamp from fetchMarketData
-    status: data.status || data.rates?.status || null
+    status: data.status || data.rates?.status || null,
   };
 }
 

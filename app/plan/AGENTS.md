@@ -1,9 +1,11 @@
 # Directorio: app/plan/
 
 ## Propósito
+
 Esta carpeta contiene la página de **Planes y Precios** de VTrading, donde los usuarios pueden comparar y seleccionar entre el Plan Free y el Plan Premium.
 
 ## Estructura
+
 ```
 plan/
 ├── page.tsx           # Metadata y export del componente principal
@@ -14,6 +16,7 @@ plan/
 ## Componentes
 
 ### `page.tsx`
+
 - **Tipo:** Server Component (Next.js 16 App Router)
 - **Responsabilidades:**
   - Exportar metadata SEO (title, description, canonical, OpenGraph)
@@ -21,6 +24,7 @@ plan/
 - **Nota:** No modificar estructura. Mantener consistencia con otras páginas del proyecto.
 
 ### `PlanContent.tsx`
+
 - **Tipo:** Client Component (`'use client'`)
 - **Responsabilidades:**
   - Diseño completo de la página de planes
@@ -36,6 +40,7 @@ plan/
 ## Planes Definidos
 
 ### Plan Free
+
 - **Precio:** Gratis para siempre
 - **Características:**
   - Acceso completo a la app móvil
@@ -45,6 +50,7 @@ plan/
   - Programa de referidos (1 mes premium por cada referido premium)
 
 ### Plan Premium
+
 - **Precio:** $4.99/mes
 - **Características:**
   - Acceso completo a app y web
@@ -56,6 +62,7 @@ plan/
   - Programa de referidos (1 mes premium por cada referido premium)
 
 ## Sistema de Diseño
+
 - **Layout:** Navbar → Hero Section → Pricing Cards → Payment Methods Carousel → Referral Program (Full-Width) → Footer
 - **Estilo:** Consistente con el resto de la aplicación
   - Hero con badge, título grande y descripción
@@ -68,14 +75,16 @@ plan/
   - **SIN emojis** en ningún componente
 
 ## Acciones de Usuario
+
 - **Plan Free**: Muestra botones de descarga para Android (Google Play) e iOS (App Store) usando el componente `StoreButtons`
 - **handlePremiumPlanAction()**: Se ejecuta al seleccionar el Plan Premium
-- **Implementación Actual:** 
+- **Implementación Actual:**
   - Plan Free: Botones de descarga directa de las tiendas
   - Plan Premium: Console.log (placeholder para futura integración)
 - **Próximos Pasos:** Integrar sistema de autenticación y pasarela de pago para Premium
 
 ## Reglas para IAs
+
 1. **NO modificar** la estructura de precios sin autorización expresa.
 2. **Mantener consistencia** de diseño con otras páginas (`/nosotros`, `/contacto`, etc.).
 3. **Tipado estricto**: TypeScript con interfaces definidas (`PlanFeature`, `PlanCardProps`).
@@ -84,12 +93,14 @@ plan/
 6. **Accesibilidad:** Mantener semántica HTML correcta y contraste de colores.
 
 ## Testing (Pendiente)
+
 - [ ] Unit tests para `PlanCard` component
 - [ ] Integration tests para acciones de CTA
 - [ ] Visual regression tests para hover states
 - [ ] Responsive testing en múltiples breakpoints
 
 ## Próximas Mejoras
+
 - Integración con sistema de pagos (Stripe/PayPal)
 - Toggle anual/mensual con descuento
 - Testimonios de usuarios Premium

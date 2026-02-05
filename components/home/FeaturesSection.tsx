@@ -15,19 +15,30 @@ const FeaturesSection = () => {
     <Box id="caracteristicas" sx={{ py: 20, bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
       <Container maxWidth="lg">
         <Box sx={{ mb: 10 }}>
-          <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', mb: 2, display: 'block' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'primary.main',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: '0.3em',
+              mb: 2,
+              display: 'block',
+            }}
+          >
             Arquitectura de Datos
           </Typography>
           <Typography variant="h3" fontWeight="800" sx={{ mb: 3 }}>
             Omnipresencia de Mercado
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600 }}>
-            Infraestructura conectada a las fuentes más críticas para garantizar transparencia y velocidad en cada decimal.
+            Infraestructura conectada a las fuentes más críticas para garantizar transparencia y
+            velocidad en cada decimal.
           </Typography>
         </Box>
 
         <Grid container spacing={4}>
-          <FeatureCard 
+          <FeatureCard
             xs={12}
             md={8}
             icon={AnalyticsIcon}
@@ -35,7 +46,7 @@ const FeaturesSection = () => {
             description="Acceso directo a la API de la Bolsa. Monitorización de acciones, bonos de deuda privada y el Índice Bursátil Caracas (IBC) actualizado cada sesión con datos oficiales y análisis técnico integrado."
             color={theme.palette.trendUp}
           />
-          <FeatureCard 
+          <FeatureCard
             xs={12}
             md={4}
             icon={AccountBalanceIcon}
@@ -43,7 +54,7 @@ const FeaturesSection = () => {
             description="Tasas oficiales y mesas de cambio de las principales entidades bancarias nacionales con actualización instantánea."
             color={theme.palette.primary.main}
           />
-          <FeatureCard 
+          <FeatureCard
             xs={12}
             sm={6}
             md={6}
@@ -52,7 +63,7 @@ const FeaturesSection = () => {
             description="Cálculo en tiempo real de Tether (USDT) vs VES basado en el volumen real de transacciones P2P de los exchanges más importantes."
             color={theme.palette.trendUp}
           />
-          <FeatureCard 
+          <FeatureCard
             xs={12}
             sm={6}
             md={6}

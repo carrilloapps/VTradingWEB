@@ -1,9 +1,11 @@
 # /app/plan/success - Página de Confirmación de Pago
 
 ## Propósito
+
 Página de confirmación mostrada después de completar un pago exitoso. Verifica el estado del pago y muestra un mensaje de éxito al usuario.
 
 ## Estructura
+
 ```
 app/plan/success/
 ├── page.tsx              # Server Component con metadata
@@ -26,6 +28,7 @@ app/plan/success/
 ## Estado de Verificación
 
 ### Actual (MVP)
+
 ```typescript
 // Simulación de verificación con timeout
 await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -33,6 +36,7 @@ setVerifying(false);
 ```
 
 ### Producción (TODO)
+
 ```typescript
 // Verificación real con backend
 const result = await verifyPaymentStatus(method, sessionId);
@@ -57,6 +61,7 @@ if (result.success && result.status === 'completed') {
 ## Manejo de Errores
 
 Si la verificación falla:
+
 - Muestra Alert con error
 - Botón para contactar soporte
 - No muestra estado de éxito
@@ -82,6 +87,7 @@ export const metadata: Metadata = {
 ## Acciones Post-Pago (TODO)
 
 Cuando se confirma el pago, se debe:
+
 1. Actualizar `premiumUntil` en Firestore/usuario
 2. Establecer `premiumActive: true`
 3. Enviar email de confirmación

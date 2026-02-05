@@ -21,6 +21,7 @@ VTRADING_API_KEY=tu_api_key_aqui
 Todas las funciones son asíncronas y devuelven promesas tipadas. Se pueden importar individualmente o a través del objeto `vtradingApi`.
 
 ### 1. Obtener Tasas de Cambio (`getRates`)
+
 Obtiene las tasas actuales del BCV, divisas fronterizas y un resumen del mercado cripto.
 
 ```typescript
@@ -31,6 +32,7 @@ console.log(rates.rates); // Array de tasas (USD, EUR, etc.)
 ```
 
 ### 2. Estado del Mercado (`getMarketStatus`)
+
 Verifica si el mercado cambiario está abierto o cerrado y la fecha de actualización.
 
 ```typescript
@@ -41,6 +43,7 @@ console.log(status.state); // "ABIERTO" | "CERRADO"
 ```
 
 ### 3. Criptomonedas P2P (`getCrypto`)
+
 Obtiene ofertas P2P (Binance, etc.) con soporte de paginación y filtros.
 
 ```typescript
@@ -51,6 +54,7 @@ const crypto = await getCrypto('USDT', 'VES', 'SELL', 1, 10);
 ```
 
 ### 4. Bolsa de Valores de Caracas (`getBVCMarket`)
+
 Información del mercado bursátil venezolano.
 
 ```typescript
@@ -61,6 +65,7 @@ console.log(bvc.quotes); // Lista de acciones
 ```
 
 ### 5. Tasas Bancarias (`getBankRates`)
+
 Lista detallada de tasas de cambio por entidad bancaria.
 
 ```typescript
@@ -70,6 +75,7 @@ const banks = await getBankRates(1, 30); // Página 1, 30 items
 ```
 
 ### 6. Histórico de Activos (`getAssetHistory`)
+
 Obtiene el histórico de precios para cualquier símbolo (fiat o cripto).
 
 ```typescript
@@ -79,6 +85,7 @@ const history = await getAssetHistory('USD', 1, 30);
 ```
 
 ### 7. Histórico Bancario (`getBankHistory`)
+
 Histórico de tasas para un banco específico.
 
 ```typescript
@@ -88,6 +95,7 @@ const history = await getBankHistory('Banco Mercantil', 1, 30);
 ```
 
 ### 8. Notificaciones (`sendNotification`)
+
 Envío de notificaciones push vía Firebase Cloud Messaging (requiere permisos).
 
 ```typescript
@@ -96,11 +104,12 @@ import { sendNotification } from '@/lib/vtrading-api';
 await sendNotification({
   title: 'Alerta de Precio',
   body: 'El dólar ha subido',
-  topic: 'rates'
+  topic: 'rates',
 });
 ```
 
 ### 9. Carga de Datos Agregados (`fetchMarketData`)
+
 Función de conveniencia para cargar tasas, cripto y bolsa en una sola llamada (útil para `page.tsx`).
 
 ```typescript

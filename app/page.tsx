@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'VTrading - El monitor financiero que Venezuela necesitaba',
-  description: 'Accede a datos de mercado en tiempo real, gráficos interactivos y herramientas de análisis técnico para criptomonedas, forex y acciones.',
+  description:
+    'Accede a datos de mercado en tiempo real, gráficos interactivos y herramientas de análisis técnico para criptomonedas, forex y acciones.',
   alternates: {
     canonical: 'https://vtrading.app',
   },

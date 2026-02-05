@@ -49,8 +49,18 @@ const paymentMethods = [
   { name: 'PayPal', iconPath: '/assets/icons/paypal.svg', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
   { name: 'Bold', iconPath: '/assets/icons/bold.png', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
   { name: 'ePayco', iconPath: '/assets/icons/epayco.png', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
-  { name: 'Binance Pay', iconPath: '/assets/icons/binance.svg', iconBg: '#E8E8E8', hoverBg: '#F3BA2F' },
-  { name: 'Mastercard', iconPath: '/assets/icons/mastercard.svg', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
+  {
+    name: 'Binance Pay',
+    iconPath: '/assets/icons/binance.svg',
+    iconBg: '#E8E8E8',
+    hoverBg: '#F3BA2F',
+  },
+  {
+    name: 'Mastercard',
+    iconPath: '/assets/icons/mastercard.svg',
+    iconBg: '#E8E8E8',
+    hoverBg: '#FFFFFF',
+  },
   { name: 'Visa', iconPath: '/assets/icons/visa.svg', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
 ];
 
@@ -106,8 +116,10 @@ const PlanCard: React.FC<PlanCardProps> = ({
             position: 'absolute',
             top: -12,
             right: 20,
-            bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'primary.main',
-            color: (theme) => theme.palette.mode === 'dark' ? theme.palette.common.white : 'white',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'primary.main',
+            color: (theme) =>
+              theme.palette.mode === 'dark' ? theme.palette.common.white : 'white',
             px: 2,
             py: 0.5,
             borderRadius: 2,
@@ -399,11 +411,13 @@ export default function PlanContent() {
                 },
                 '&::before': {
                   left: 0,
-                  background: (theme) => `linear-gradient(to right, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.9)} 50%, transparent 100%)`,
+                  background: (theme) =>
+                    `linear-gradient(to right, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.9)} 50%, transparent 100%)`,
                 },
                 '&::after': {
                   right: 0,
-                  background: (theme) => `linear-gradient(to left, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.9)} 50%, transparent 100%)`,
+                  background: (theme) =>
+                    `linear-gradient(to left, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.9)} 50%, transparent 100%)`,
                 },
               }}
             >
@@ -426,51 +440,49 @@ export default function PlanContent() {
                 }}
               >
                 {/* Duplicamos el array para el efecto de loop infinito */}
-                {paymentMethods
-                  .concat(paymentMethods)
-                  .map((method, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        flex: '0 0 auto',
-                        width: { xs: '70px', md: '80px' },
-                        height: { xs: '70px', md: '80px' },
-                        borderRadius: 2.5,
-                        bgcolor: method.iconBg,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.08)}`,
+                {paymentMethods.concat(paymentMethods).map((method, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      flex: '0 0 auto',
+                      width: { xs: '70px', md: '80px' },
+                      height: { xs: '70px', md: '80px' },
+                      borderRadius: 2.5,
+                      bgcolor: method.iconBg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.08)}`,
+                      '& img': {
+                        filter: 'grayscale(1)',
+                        transition: 'filter 0.3s ease',
+                      },
+                      '&:hover': {
+                        transform: 'translateY(-4px) scale(1.08)',
+                        boxShadow: `0 8px 20px ${alpha(theme.palette.common.black, 0.15)}`,
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
+                        bgcolor: method.hoverBg,
                         '& img': {
-                          filter: 'grayscale(1)',
-                          transition: 'filter 0.3s ease',
+                          filter: 'grayscale(0)',
                         },
-                        '&:hover': {
-                          transform: 'translateY(-4px) scale(1.08)',
-                          boxShadow: `0 8px 20px ${alpha(theme.palette.common.black, 0.15)}`,
-                          borderColor: alpha(theme.palette.primary.main, 0.3),
-                          bgcolor: method.hoverBg,
-                          '& img': {
-                            filter: 'grayscale(0)',
-                          },
-                        },
+                      },
+                    }}
+                  >
+                    <Image
+                      src={method.iconPath}
+                      alt={method.name}
+                      width={56}
+                      height={56}
+                      style={{
+                        objectFit: 'contain',
+                        maxWidth: '80%',
+                        maxHeight: '80%',
                       }}
-                    >
-                      <Image
-                        src={method.iconPath}
-                        alt={method.name}
-                        width={56}
-                        height={56}
-                        style={{
-                          objectFit: 'contain',
-                          maxWidth: '80%',
-                          maxHeight: '80%',
-                        }}
-                      />
-                    </Box>
-                  ))}
+                    />
+                  </Box>
+                ))}
               </Box>
             </Box>
           </Box>
@@ -541,7 +553,8 @@ export default function PlanContent() {
               color="text.secondary"
               sx={{ maxWidth: 700, mx: 'auto', fontWeight: 400, lineHeight: 1.7, mb: 2 }}
             >
-              Cada amigo que se suscriba a Premium usando tu enlace o código, te regala un mes gratis completo gratis de Plan Premium.
+              Cada amigo que se suscriba a Premium usando tu enlace o código, te regala un mes
+              gratis completo gratis de Plan Premium.
             </Typography>
             <Typography
               variant="body1"
@@ -594,7 +607,10 @@ export default function PlanContent() {
                       <ShareIcon sx={{ color: 'primary.main', fontSize: '2rem' }} />
                     </Box>
                     <Box>
-                      <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 700 }}>
+                      <Typography
+                        variant="overline"
+                        sx={{ color: 'primary.main', fontWeight: 700 }}
+                      >
                         Opción 1
                       </Typography>
                       <Typography variant="h5" fontWeight="700">
@@ -653,11 +669,7 @@ export default function PlanContent() {
                             fontWeight: 700,
                           }}
                         >
-                          {step.highlight ? (
-                            <step.icon sx={{ fontSize: '1.2rem' }} />
-                          ) : (
-                            index + 1
-                          )}
+                          {step.highlight ? <step.icon sx={{ fontSize: '1.2rem' }} /> : index + 1}
                         </Box>
                         <Box>
                           <Typography
@@ -712,7 +724,10 @@ export default function PlanContent() {
                       <PersonAddIcon sx={{ color: 'secondary.main', fontSize: '2rem' }} />
                     </Box>
                     <Box>
-                      <Typography variant="overline" sx={{ color: 'secondary.main', fontWeight: 700 }}>
+                      <Typography
+                        variant="overline"
+                        sx={{ color: 'secondary.main', fontWeight: 700 }}
+                      >
                         Opción 2
                       </Typography>
                       <Typography variant="h5" fontWeight="700">
@@ -772,11 +787,7 @@ export default function PlanContent() {
                             fontWeight: 700,
                           }}
                         >
-                          {step.highlight ? (
-                            <step.icon sx={{ fontSize: '1.2rem' }} />
-                          ) : (
-                            index + 1
-                          )}
+                          {step.highlight ? <step.icon sx={{ fontSize: '1.2rem' }} /> : index + 1}
                         </Box>
                         <Box sx={{ flex: 1 }}>
                           <Typography
@@ -789,7 +800,11 @@ export default function PlanContent() {
                           >
                             {step.title}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: step.chips ? 1 : 0 }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: step.chips ? 1 : 0 }}
+                          >
                             {step.desc}
                           </Typography>
                           {step.chips && (

@@ -5,12 +5,14 @@ VTrading es una plataforma web para seguimiento de tasas de cambio, alertas de d
 ## Características Principales
 
 ### Plan Free
+
 - ✅ 5 alertas de divisas
 - ✅ 2 divisas en calculadora
 - ✅ Programa de referidos
 - ⚠️ Incluye publicidad
 
 ### Plan Premium ($1 USD/mes)
+
 - ✅ Alertas ilimitadas
 - ✅ Sin publicidad
 - ✅ Divisas ilimitadas en calculadora
@@ -41,6 +43,7 @@ npm install
 ### 2. Configurar Variables de Entorno
 
 Copia el archivo de ejemplo:
+
 ```bash
 cp .env.example .env.local
 ```
@@ -147,6 +150,7 @@ Ver [PAYMENT_SETUP.md](./docs/PAYMENT_SETUP.md#testing-en-desarrollo) para tarje
 ## Documentación para Agentes IA
 
 Cada directorio importante tiene un archivo `AGENTS.md` con:
+
 - Propósito y contexto del directorio
 - Reglas específicas de desarrollo
 - Ejemplos y patrones recomendados
@@ -167,18 +171,21 @@ Ver [documentación de deployment](https://nextjs.org/docs/app/building-your-app
 ### Variables de Entorno en Producción
 
 Asegúrate de configurar en tu plataforma:
+
 - `NEXT_PUBLIC_*` - Variables públicas (Firebase, URLs)
 - `STRIPE_SECRET_KEY`, etc. - Variables privadas (nunca expongas en frontend)
 
 ## Integración con Firebase
 
 ### Authentication
+
 ```typescript
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 ```
 
 ### Firestore (Pendiente)
+
 ```typescript
 // TODO: Implementar activación de Premium en Firestore
 await updateDoc(doc(db, 'users', userId), {
@@ -190,6 +197,7 @@ await updateDoc(doc(db, 'users', userId), {
 ## Roadmap
 
 ### Implementado
+
 - ✅ Sistema de planes (Free/Premium)
 - ✅ Página de checkout con 4 métodos de pago
 - ✅ Integración con Firebase Auth
@@ -197,6 +205,7 @@ await updateDoc(doc(db, 'users', userId), {
 - ✅ Sistema de temas (light/dark)
 
 ### Pendiente
+
 - ⏳ Webhooks para confirmación de pagos
 - ⏳ Activación automática de Premium en Firestore
 - ⏳ Sistema de referidos funcional

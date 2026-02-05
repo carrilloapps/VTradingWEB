@@ -35,7 +35,8 @@ export default function SuccessContent() {
       try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setVerifying(false);
-      } catch (_err) {
+      } catch (err) {
+        console.error('Payment verification error:', err);
         setError('Error al verificar el pago');
         setVerifying(false);
       }
@@ -83,12 +84,7 @@ export default function SuccessContent() {
             ) : error ? (
               <Stack spacing={3}>
                 <Alert severity="error">{error}</Alert>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  href="/soporte"
-                  size="large"
-                >
+                <Button variant="contained" color="primary" href="/soporte" size="large">
                   Contactar Soporte
                 </Button>
               </Stack>
@@ -113,12 +109,7 @@ export default function SuccessContent() {
                   />
                 </Box>
 
-                <Typography
-                  variant="h4"
-                  fontWeight={800}
-                  color="success.main"
-                  gutterBottom
-                >
+                <Typography variant="h4" fontWeight={800} color="success.main" gutterBottom>
                   ¡Pago Exitoso!
                 </Typography>
 

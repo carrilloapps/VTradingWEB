@@ -6,9 +6,9 @@ Este documento describe cómo configurar y manejar las acciones de correo electr
 
 Hemos creado una página dedicada en `app/auth/action/page.tsx` que maneja los siguientes modos de acción (`mode`):
 
-*   **`resetPassword`**: Permite al usuario ingresar una nueva contraseña.
-*   **`verifyEmail`**: Verifica automáticamente el correo electrónico al cargar la página.
-*   **`recoverEmail`**: Permite revertir un cambio de correo electrónico no autorizado.
+- **`resetPassword`**: Permite al usuario ingresar una nueva contraseña.
+- **`verifyEmail`**: Verifica automáticamente el correo electrónico al cargar la página.
+- **`recoverEmail`**: Permite revertir un cambio de correo electrónico no autorizado.
 
 La página utiliza `firebase/auth` en el cliente para verificar los códigos de acción (`oobCode`) y ejecutar las operaciones.
 
@@ -23,9 +23,8 @@ Para que los correos electrónicos enviados por Firebase dirijan a los usuarios 
 5.  Selecciona **Restablecer contraseña** (Password reset).
 6.  Haz clic en el icono de edición (lápiz) o en "Personalizar URL de acción".
 7.  En el campo "URL de acción personalizada" (Custom action URL), ingresa la URL completa de tu página de acción:
-
-    *   **Desarrollo:** `http://localhost:3000/auth/action`
-    *   **Producción:** `https://vtrading.app/auth/action` (o tu dominio final)
+    - **Desarrollo:** `http://localhost:3000/auth/action`
+    - **Producción:** `https://vtrading.app/auth/action` (o tu dominio final)
 
 8.  Guarda los cambios.
 9.  Repite los pasos 6-8 para la plantilla **Verificación de dirección de correo electrónico**.

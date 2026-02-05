@@ -22,6 +22,7 @@ npm install stripe
 ```
 
 **Variables de entorno necesarias:**
+
 ```env
 STRIPE_SECRET_KEY=sk_test_xxx  # o sk_live_xxx para producción
 STRIPE_PUBLIC_KEY=pk_test_xxx  # (opcional, solo si usas Stripe.js en frontend)
@@ -34,6 +35,7 @@ STRIPE_PUBLIC_KEY=pk_test_xxx  # (opcional, solo si usas Stripe.js en frontend)
 No requiere SDK npm. Usa API RESTful directamente con `fetch`.
 
 **Variables de entorno necesarias:**
+
 ```env
 BOLD_API_KEY=tu_api_key
 BOLD_API_URL=https://sandbox.bold.co/v1  # o https://api.bold.co/v1 para producción
@@ -48,6 +50,7 @@ npm install epayco-sdk-node
 ```
 
 **Variables de entorno necesarias:**
+
 ```env
 EPAYCO_PUBLIC_KEY=tu_public_key
 EPAYCO_PRIVATE_KEY=tu_private_key
@@ -61,6 +64,7 @@ EPAYCO_TEST_MODE=true  # o false para producción
 No requiere SDK npm. Usa API RESTful directamente con `fetch`.
 
 **Variables de entorno necesarias:**
+
 ```env
 BINANCE_PAY_API_KEY=tu_api_key
 BINANCE_PAY_SECRET_KEY=tu_secret_key
@@ -82,11 +86,13 @@ npm install stripe epayco-sdk-node
 ## Configuración de Variables de Entorno
 
 1. Copia el archivo `.env.example` a `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
 
 2. Completa las variables de entorno para los métodos que vayas a usar:
+
    ```env
    # Ejemplo para solo Stripe
    NEXT_PUBLIC_PREMIUM_PLAN_PRICE_USD=1.00
@@ -112,6 +118,7 @@ Si todo está correcto, no deberían aparecer errores relacionados con los módu
 ### Stripe
 
 Usa las claves de prueba (con prefijo `test_`):
+
 - **Tarjeta de éxito:** 4242 4242 4242 4242
 - **CVV:** Cualquier 3 dígitos
 - **Fecha:** Cualquier fecha futura
@@ -133,6 +140,7 @@ Usa credenciales de testnet si están disponibles.
 ### Error: "Cannot find module 'stripe'"
 
 **Solución:** Instala el SDK:
+
 ```bash
 npm install stripe
 ```
@@ -144,6 +152,7 @@ npm install stripe
 ### Error: "epayco-sdk-node package not installed"
 
 **Solución:** Instala el SDK:
+
 ```bash
 npm install epayco-sdk-node
 ```

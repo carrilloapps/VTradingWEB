@@ -5,7 +5,7 @@ import {
   BVCMarketData,
   HistoryResponse,
   NotificationRequest,
-  MarketStatus
+  MarketStatus,
 } from './vtrading-types';
 
 const API_URL = process.env.VTRADING_API_URL;
@@ -116,7 +116,9 @@ export const getBankRates = (page = 1, limit = 30) =>
  * Get Historical Data for a specific symbol (Fiat or Crypto)
  */
 export const getAssetHistory = (symbol: string, page = 1, limit = 30) =>
-  fetchVTrading<HistoryResponse>(`/api/rates/history/${symbol}?page=${page}&limit=${limit}`, { next: { revalidate: 0 } });
+  fetchVTrading<HistoryResponse>(`/api/rates/history/${symbol}?page=${page}&limit=${limit}`, {
+    next: { revalidate: 0 },
+  });
 
 /**
  * Get Historical Data for USD/VES (Legacy compatibility)
@@ -127,7 +129,9 @@ export const getRatesHistory = (page = 1, limit = 30) => getAssetHistory('usd', 
  * Get Historical Data for a specific Bank
  */
 export const getBankHistory = (bankName: string, page = 1, limit = 30) =>
-  fetchVTrading<HistoryResponse>(`/api/rates/banks/history/${encodeURIComponent(bankName)}?page=${page}&limit=${limit}`);
+  fetchVTrading<HistoryResponse>(
+    `/api/rates/banks/history/${encodeURIComponent(bankName)}?page=${page}&limit=${limit}`
+  );
 
 /**
  * Send Firebase Cloud Messaging Notification
@@ -136,7 +140,7 @@ export const sendNotification = (payload: NotificationRequest) =>
   fetchVTrading<void>('/api/notifications/send', {
     method: 'POST',
     body: JSON.stringify(payload),
-    next: { revalidate: 0 }
+    next: { revalidate: 0 },
   });
 
 /**
@@ -149,7 +153,7 @@ export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
   const [rates, crypto, bvc] = await Promise.all([
     getRates(),
     getCrypto('', 'VES', 'BUY', 1, 10), // Default to first page of crypto
-    getBVCMarket('', bvcPage, bvcLimit)
+    getBVCMarket('', bvcPage, bvcLimit),
   ]);
 
   return {
@@ -157,10 +161,12 @@ export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
     crypto,
     bvc,
     // Use the request timestamp as the lastUpdate time
-    status: rates?.status ? {
-      ...rates.status,
-      lastUpdate: requestTimestamp
-    } : null
+    status: rates?.status
+      ? {
+          ...rates.status,
+          lastUpdate: requestTimestamp,
+        }
+      : null,
   };
 }
 
@@ -174,5 +180,5 @@ export const vtradingApi = {
   getAssetHistory,
   getBankHistory,
   sendNotification,
-  fetchMarketData
+  fetchMarketData,
 };

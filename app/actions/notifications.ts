@@ -6,7 +6,7 @@ import { adminMessaging } from '@/lib/firebase-admin';
 
 /**
  * Subscribes a registration token to a topic.
- * 
+ *
  * @param token The registration token to subscribe.
  * @param topic The topic to subscribe to.
  */
@@ -26,7 +26,7 @@ export async function subscribeToTopicAction(token: string, topic: string) {
 
 /**
  * Unsubscribes a registration token from a topic.
- * 
+ *
  * @param token The registration token to unsubscribe.
  * @param topic The topic to unsubscribe from.
  */

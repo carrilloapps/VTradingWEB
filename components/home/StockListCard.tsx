@@ -39,85 +39,153 @@ const StockListCard = ({ items }: StockListCardProps) => {
 
   // If no items are provided, show empty state or nothing
   if (!items || items.length === 0) {
-      return null;
+    return null;
   }
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return <TrendingUpIcon sx={{ fontSize: 12, mr: 0.5 }} />;
-      case 'down': return <TrendingDownIcon sx={{ fontSize: 12, mr: 0.5 }} />;
-      default: return <TrendingFlatIcon sx={{ fontSize: 12, mr: 0.5 }} />;
+      case 'up':
+        return <TrendingUpIcon sx={{ fontSize: 12, mr: 0.5 }} />;
+      case 'down':
+        return <TrendingDownIcon sx={{ fontSize: 12, mr: 0.5 }} />;
+      default:
+        return <TrendingFlatIcon sx={{ fontSize: 12, mr: 0.5 }} />;
     }
   };
 
   return (
     <Box sx={{ mt: 2.5 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, px: 1 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: colors.text, fontSize: '0.9rem', letterSpacing: '0.02em' }}>Mercado Bursátil</Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 1.5,
+          px: 1,
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          sx={{ fontWeight: 800, color: colors.text, fontSize: '0.9rem', letterSpacing: '0.02em' }}
+        >
+          Mercado Bursátil
+        </Typography>
         <Link href="/cuenta" passHref style={{ textDecoration: 'none' }}>
-            <Typography variant="caption" sx={{ color: colors.trendUp, fontWeight: 700, cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.05em' }}>
-              VER TODO
-            </Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              color: colors.trendUp,
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontSize: '0.65rem',
+              letterSpacing: '0.05em',
+            }}
+          >
+            VER TODO
+          </Typography>
         </Link>
       </Box>
 
       {items.map((item, index) => (
-        <Paper 
+        <Paper
           key={index}
           elevation={0}
-          sx={{ 
-            p: 1.5, 
-            mb: 1, 
-            borderRadius: 3, 
-            bgcolor: colors.cardBg, 
-            display: 'flex', 
+          sx={{
+            p: 1.5,
+            mb: 1,
+            borderRadius: 3,
+            bgcolor: colors.cardBg,
+            display: 'flex',
             alignItems: 'center',
             border: `1px solid ${colors.cardBorder}`,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           }}
         >
-          <Avatar 
-            sx={{ 
-              width: 34, 
-              height: 34, 
-              mr: 1.5, 
-              bgcolor: 'background.paper', 
+          <Avatar
+            sx={{
+              width: 34,
+              height: 34,
+              mr: 1.5,
+              bgcolor: 'background.paper',
               color: 'text.primary',
               fontSize: '0.75rem',
-              fontWeight: 800
+              fontWeight: 800,
             }}
             src={item.logo}
           >
             {!item.logo && item.symbol.substring(0, 2)}
           </Avatar>
-          
+
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 800, color: colors.text, lineHeight: 1.2, fontSize: '0.85rem', letterSpacing: '0.02em' }}>{item.symbol}</Typography>
-            <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase' }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 800,
+                color: colors.text,
+                lineHeight: 1.2,
+                fontSize: '0.85rem',
+                letterSpacing: '0.02em',
+              }}
+            >
+              {item.symbol}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: colors.textSecondary,
+                fontSize: '0.6rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+              }}
+            >
               {item.name}
             </Typography>
           </Box>
 
           <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: colors.text, lineHeight: 1.2, fontSize: '0.85rem' }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 700, color: colors.text, lineHeight: 1.2, fontSize: '0.85rem' }}
+            >
               {item.price}
             </Typography>
-            <Box sx={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              bgcolor: item.trend === 'down' ? colors.trendDownBg : item.trend === 'up' ? colors.trendUpBg : colors.neutralBg,
-              px: 0.8,
-              py: 0.2,
-              borderRadius: 1,
-              mt: 0.3
-            }}>
-              <Box sx={{ color: item.trend === 'down' ? colors.trendDown : item.trend === 'up' ? colors.trendUp : colors.textSecondary, display: 'flex', alignItems: 'center' }}>
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                bgcolor:
+                  item.trend === 'down'
+                    ? colors.trendDownBg
+                    : item.trend === 'up'
+                      ? colors.trendUpBg
+                      : colors.neutralBg,
+                px: 0.8,
+                py: 0.2,
+                borderRadius: 1,
+                mt: 0.3,
+              }}
+            >
+              <Box
+                sx={{
+                  color:
+                    item.trend === 'down'
+                      ? colors.trendDown
+                      : item.trend === 'up'
+                        ? colors.trendUp
+                        : colors.textSecondary,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
                 {getTrendIcon(item.trend)}
-                <Typography variant="caption" sx={{ 
-                  color: 'inherit',
-                  fontWeight: 700, 
-                  fontSize: '0.6rem' 
-                }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'inherit',
+                    fontWeight: 700,
+                    fontSize: '0.6rem',
+                  }}
+                >
                   {item.change}
                 </Typography>
               </Box>

@@ -17,6 +17,7 @@ This is a **Next.js** project bootstrapped with `create-next-app`. The applicati
 ## Key Workflows
 
 ### Development
+
 To start the development server, use one of the following commands:
 
 ```bash
@@ -32,6 +33,7 @@ bun dev
 The app will be available at [http://localhost:3000](http://localhost:3000). Changes to files in the `app/` directory will trigger hot-reloading.
 
 ### Building for Production
+
 To build the project for production, run:
 
 ```bash
@@ -41,6 +43,7 @@ npm run build
 The output will be located in the `.next/` directory.
 
 ### Linting and Formatting
+
 This project uses ESLint for linting and PostCSS for styling. To run linting:
 
 ```bash
@@ -48,9 +51,11 @@ npm run lint
 ```
 
 ### Firebase Integration
+
 The project integrates with Firebase for backend services. The configuration is managed in `lib/firebase.ts`. Ensure you have the correct Firebase credentials and configuration in `firebase.json`.
 
 ### TypeScript
+
 This project uses TypeScript for type safety. Type definitions are located in `lib/vtrading-types.ts`.
 
 ## Project-Specific Conventions
@@ -75,11 +80,13 @@ This project uses TypeScript for type safety. Type definitions are located in `l
 - **PostCSS**: For CSS transformations.
 
 ## Testing
+
 - Add unit tests for all components and utility functions.
 - Place test files next to the code they test, using the `.test.tsx` or `.test.ts` naming convention.
 - Use Jest and React Testing Library for testing.
 
 ## Deployment
+
 The project is designed to be deployed on [Vercel](https://vercel.com). Follow the [Next.js deployment guide](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## Key Files and Directories
@@ -95,6 +102,7 @@ The project is designed to be deployed on [Vercel](https://vercel.com). Follow t
 - `postcss.config.mjs`: PostCSS configuration.
 
 ## Notes for AI Agents
+
 - Always follow the existing file and folder naming conventions.
 - Use the `lib/` directory for utility functions and external integrations.
 - Ensure all new components are strongly typed and include comprehensive tests.

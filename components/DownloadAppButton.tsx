@@ -42,7 +42,7 @@ export default function DownloadAppButton({ sx, ...props }: DownloadAppButtonPro
           transform: 'translateY(0)',
           boxShadow: `0 2px 10px 0 ${alpha(theme.palette.primary.main, 0.3)}`,
         },
-        ...sx
+        ...sx,
       }}
       {...props}
     >

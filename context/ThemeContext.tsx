@@ -1,7 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
-import { createTheme, ThemeProvider, useMediaQuery, PaletteColor, PaletteColorOptions } from '@mui/material';
+import {
+  createTheme,
+  ThemeProvider,
+  useMediaQuery,
+  PaletteColor,
+  PaletteColorOptions,
+} from '@mui/material';
 
 // --- Tipado extendido para MUI ---
 declare module '@mui/material/styles' {
@@ -194,7 +200,7 @@ type ColorModeContextType = {
 };
 
 const ColorModeContext = createContext<ColorModeContextType>({
-  toggleColorMode: () => { },
+  toggleColorMode: () => {},
   mode: 'light',
 });
 
@@ -202,22 +208,24 @@ export const useColorMode = () => useContext(ColorModeContext);
 
 export const ColorModeProvider = ({ children }: { children: React.ReactNode }) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [mode, setMode] = useState<'light' | 'dark'>('light');
+
+  // Initialize mode with lazy initialization to avoid setState in effect
+  const [mode, setMode] = useState<'light' | 'dark'>(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return 'light';
+
+    const savedMode = localStorage.getItem('themeMode') as 'light' | 'dark' | null;
+    if (savedMode) return savedMode;
+    return prefersDarkMode ? 'dark' : 'light';
+  });
+
   const [mounted, setMounted] = useState(false);
 
+  // Set mounted flag after first render (required for SSR hydration)
   useEffect(() => {
-    // 1. Check persistence
-    const savedMode = localStorage.getItem('themeMode') as 'light' | 'dark' | null;
-
-    // 2. Set initial mode based on priority: Saved > System > Default (light)
-    if (savedMode) {
-      setMode(savedMode);
-    } else if (prefersDarkMode) {
-      setMode('dark');
-    }
-
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-  }, [prefersDarkMode]);
+  }, []);
 
   const colorMode = useMemo(
     () => ({
@@ -240,94 +248,94 @@ export const ColorModeProvider = ({ children }: { children: React.ReactNode }) =
           mode,
           ...(mode === 'light'
             ? {
-              // Configuración modo claro
-              primary: {
-                main: lightColors.primary,
-                contrastText: lightColors.onPrimary,
-              },
-              secondary: {
-                main: lightColors.secondary,
-                contrastText: lightColors.onSecondary,
-              },
-              tertiary: {
-                main: lightColors.tertiary,
-                contrastText: lightColors.onTertiary,
-              },
-              error: {
-                main: lightColors.error,
-                contrastText: lightColors.onError,
-              },
-              background: {
-                default: lightColors.background,
-                paper: lightColors.elevation.level1,
-              },
-              text: {
-                primary: lightColors.onBackground,
-                secondary: lightColors.onSurfaceVariant,
-              },
-              // Custom & Semantic
-              ...semanticColors,
-              trendUp: '#168953', // Darker green for accessibility (WCAG AA)
-              trendDown: '#D32F2F',
-              warning: { main: '#F57C00' },
-              skeleton: '#E1E9EE',
-              skeletonHighlight: '#F2F8FC',
-              buttonBorder: lightColors.buttonBorder,
-              exchangeCardBorder: 'rgba(255, 255, 255, 0.05)',
-              surface: lightColors.surface,
-              onSurface: lightColors.onSurface,
-              surfaceVariant: lightColors.surfaceVariant,
-              onSurfaceVariant: lightColors.onSurfaceVariant,
-              elevation: lightColors.elevation,
-            }
+                // Configuración modo claro
+                primary: {
+                  main: lightColors.primary,
+                  contrastText: lightColors.onPrimary,
+                },
+                secondary: {
+                  main: lightColors.secondary,
+                  contrastText: lightColors.onSecondary,
+                },
+                tertiary: {
+                  main: lightColors.tertiary,
+                  contrastText: lightColors.onTertiary,
+                },
+                error: {
+                  main: lightColors.error,
+                  contrastText: lightColors.onError,
+                },
+                background: {
+                  default: lightColors.background,
+                  paper: lightColors.elevation.level1,
+                },
+                text: {
+                  primary: lightColors.onBackground,
+                  secondary: lightColors.onSurfaceVariant,
+                },
+                // Custom & Semantic
+                ...semanticColors,
+                trendUp: '#168953', // Darker green for accessibility (WCAG AA)
+                trendDown: '#D32F2F',
+                warning: { main: '#F57C00' },
+                skeleton: '#E1E9EE',
+                skeletonHighlight: '#F2F8FC',
+                buttonBorder: lightColors.buttonBorder,
+                exchangeCardBorder: 'rgba(255, 255, 255, 0.05)',
+                surface: lightColors.surface,
+                onSurface: lightColors.onSurface,
+                surfaceVariant: lightColors.surfaceVariant,
+                onSurfaceVariant: lightColors.onSurfaceVariant,
+                elevation: lightColors.elevation,
+              }
             : {
-              // Configuración modo oscuro
-              primary: {
-                main: darkColors.primary,
-                contrastText: darkColors.onPrimary,
-              },
-              secondary: {
-                main: darkColors.secondary,
-                contrastText: darkColors.onSecondary,
-              },
-              tertiary: {
-                main: darkColors.tertiary,
-                contrastText: darkColors.onTertiary,
-              },
-              error: {
-                main: darkColors.error,
-                contrastText: darkColors.onError,
-              },
-              background: {
-                default: darkColors.background,
-                paper: darkColors.elevation.level1,
-              },
-              text: {
-                primary: darkColors.onBackground,
-                secondary: darkColors.onSurfaceVariant,
-              },
-              // Custom & Semantic
-              ...semanticColors,
-              trendUp: '#00FF94',
-              trendDown: '#FF4D4D',
-              success: { main: darkColors.primary },
-              successContainer: '#005138',
-              info: { main: darkColors.tertiary },
-              infoContainer: '#254B5B',
-              neutral: darkColors.secondary,
-              neutralContainer: '#354B41',
-              danger: darkColors.error,
-              warning: { main: '#FFCC80' },
-              skeleton: '#2C312E',
-              skeletonHighlight: '#303532',
-              buttonBorder: darkColors.buttonBorder,
-              exchangeCardBorder: 'rgba(255, 255, 255, 0.15)',
-              surface: darkColors.surface,
-              onSurface: darkColors.onSurface,
-              surfaceVariant: darkColors.surfaceVariant,
-              onSurfaceVariant: darkColors.onSurfaceVariant,
-              elevation: darkColors.elevation,
-            }),
+                // Configuración modo oscuro
+                primary: {
+                  main: darkColors.primary,
+                  contrastText: darkColors.onPrimary,
+                },
+                secondary: {
+                  main: darkColors.secondary,
+                  contrastText: darkColors.onSecondary,
+                },
+                tertiary: {
+                  main: darkColors.tertiary,
+                  contrastText: darkColors.onTertiary,
+                },
+                error: {
+                  main: darkColors.error,
+                  contrastText: darkColors.onError,
+                },
+                background: {
+                  default: darkColors.background,
+                  paper: darkColors.elevation.level1,
+                },
+                text: {
+                  primary: darkColors.onBackground,
+                  secondary: darkColors.onSurfaceVariant,
+                },
+                // Custom & Semantic
+                ...semanticColors,
+                trendUp: '#00FF94',
+                trendDown: '#FF4D4D',
+                success: { main: darkColors.primary },
+                successContainer: '#005138',
+                info: { main: darkColors.tertiary },
+                infoContainer: '#254B5B',
+                neutral: darkColors.secondary,
+                neutralContainer: '#354B41',
+                danger: darkColors.error,
+                warning: { main: '#FFCC80' },
+                skeleton: '#2C312E',
+                skeletonHighlight: '#303532',
+                buttonBorder: darkColors.buttonBorder,
+                exchangeCardBorder: 'rgba(255, 255, 255, 0.15)',
+                surface: darkColors.surface,
+                onSurface: darkColors.onSurface,
+                surfaceVariant: darkColors.surfaceVariant,
+                onSurfaceVariant: darkColors.onSurfaceVariant,
+                elevation: darkColors.elevation,
+              }),
         },
         appSpacing: spacing,
         typography: {
@@ -348,13 +356,19 @@ export const ColorModeProvider = ({ children }: { children: React.ReactNode }) =
                 backgroundImage: 'none',
                 // Mapeo dinámico de elevaciones de Material You
                 backgroundColor:
-                  ownerState.elevation === 0 ? theme.palette.elevation.level0 :
-                    ownerState.elevation === 1 ? theme.palette.elevation.level1 :
-                      ownerState.elevation === 2 ? theme.palette.elevation.level2 :
-                        ownerState.elevation === 3 ? theme.palette.elevation.level3 :
-                          ownerState.elevation === 4 ? theme.palette.elevation.level4 :
-                            ownerState.elevation === 5 ? theme.palette.elevation.level5 :
-                              theme.palette.elevation.level1, // Default
+                  ownerState.elevation === 0
+                    ? theme.palette.elevation.level0
+                    : ownerState.elevation === 1
+                      ? theme.palette.elevation.level1
+                      : ownerState.elevation === 2
+                        ? theme.palette.elevation.level2
+                        : ownerState.elevation === 3
+                          ? theme.palette.elevation.level3
+                          : ownerState.elevation === 4
+                            ? theme.palette.elevation.level4
+                            : ownerState.elevation === 5
+                              ? theme.palette.elevation.level5
+                              : theme.palette.elevation.level1, // Default
               }),
             },
           },
@@ -370,9 +384,7 @@ export const ColorModeProvider = ({ children }: { children: React.ReactNode }) =
 
   return (
     <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        {children}
-      </ThemeProvider>
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
     </ColorModeContext.Provider>
   );
 };

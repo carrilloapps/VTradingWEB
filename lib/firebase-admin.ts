@@ -9,8 +9,11 @@ if (!admin.apps.length) {
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       }),
     });
-  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-    console.error('Firebase Admin initialization error:', error.stack);
+  } catch (error) {
+    console.error(
+      'Firebase Admin initialization error:',
+      error instanceof Error ? error.stack : error
+    );
   }
 }
 

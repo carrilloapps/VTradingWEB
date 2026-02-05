@@ -1,4 +1,3 @@
-
 export interface Pagination {
   page: number;
   limit: number;
@@ -135,6 +134,25 @@ export interface PaymentPlan {
   discount?: number;
 }
 
+/**
+ * Customer billing information for payments
+ */
+export interface CustomerInfo {
+  name: string;
+  email: string;
+  phone?: string;
+  documentType?: 'CC' | 'NIT' | 'CE' | 'Passport';
+  documentNumber?: string;
+  address?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+}
+
 export interface PaymentRequest {
   method: PaymentMethod;
   months: number;
@@ -142,6 +160,7 @@ export interface PaymentRequest {
   currency: 'USD';
   userId?: string;
   email?: string;
+  customerInfo?: CustomerInfo;
   cryptoCurrency?: CryptoCurrency; // For Binance Pay
 }
 

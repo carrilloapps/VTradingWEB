@@ -11,8 +11,8 @@ export default function ThemeToggle() {
 
   return (
     <Tooltip title={`Cambiar a modo ${theme.palette.mode === 'dark' ? 'claro' : 'oscuro'}`}>
-      <IconButton 
-        onClick={colorMode.toggleColorMode} 
+      <IconButton
+        onClick={colorMode.toggleColorMode}
         color="inherit"
         sx={{
           bgcolor: 'background.default',
@@ -21,8 +21,8 @@ export default function ThemeToggle() {
           border: '1px solid',
           borderColor: 'divider',
           '&:hover': {
-             bgcolor: 'action.hover',
-          }
+            bgcolor: 'action.hover',
+          },
         }}
       >
         {theme.palette.mode === 'dark' ? <LightIcon /> : <DarkIcon />}

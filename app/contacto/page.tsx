@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Contáctanos',
-  description: 'Ponte en contacto con nuestro equipo de soporte y ventas. Estamos aquí para ayudarte con tus necesidades financieras.',
+  description:
+    'Ponte en contacto con nuestro equipo de soporte y ventas. Estamos aquí para ayudarte con tus necesidades financieras.',
   alternates: {
     canonical: 'https://vtrading.app/contacto',
   },

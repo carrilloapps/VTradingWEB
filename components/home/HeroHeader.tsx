@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Button, 
-  useTheme, 
-  alpha, 
+import {
+  Box,
+  Button,
+  useTheme,
+  alpha,
   Menu,
   MenuItem,
   ListItemIcon,
@@ -18,7 +18,7 @@ import {
   ListItemButton,
   Stack,
   IconButton,
-  Typography
+  Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -87,7 +87,7 @@ export default function HeroHeader() {
     setCountryAnchorEl(null);
   };
 
-  const handleCountrySelect = (country: typeof countries[0]) => {
+  const handleCountrySelect = (country: (typeof countries)[0]) => {
     if (country.available) {
       setSelectedCountry(country);
     }
@@ -116,56 +116,62 @@ export default function HeroHeader() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        width: '100%', 
-        minHeight: { xs: 64, md: 90 },
-        py: { xs: 1, md: 2 }
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          minHeight: { xs: 64, md: 90 },
+          py: { xs: 1, md: 2 },
+        }}
+      >
         {/* 1. Left: Logo */}
-        <Box 
-          component={Link} 
-          href="/" 
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+        <Box
+          component={Link}
+          href="/"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
             textDecoration: 'none',
             transition: 'transform 0.2s',
             '&:hover': { transform: 'scale(1.02)' },
-            mr: 4
+            mr: 4,
           }}
         >
-          <Box sx={{ 
-            position: 'relative', 
-            width: { xs: 110, md: 150 }, 
-            height: { xs: 28, md: 40 },
-            filter: theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'none',
-            transition: 'filter 0.3s ease'
-          }}>
-            <Image
-              src={logo}
-              alt="V-Trading Logo"
-              fill
-              style={{ objectFit: 'contain' }}
-              priority
-            />
+          <Box
+            sx={{
+              position: 'relative',
+              width: { xs: 110, md: 150 },
+              height: { xs: 28, md: 40 },
+              filter: theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'none',
+              transition: 'filter 0.3s ease',
+            }}
+          >
+            <Image src={logo} alt="V-Trading Logo" fill style={{ objectFit: 'contain' }} priority />
           </Box>
         </Box>
 
         {/* 2. Center: Nav Items (Visible on lg+) */}
-        <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 4, alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}>
+        <Box
+          sx={{
+            display: { xs: 'none', lg: 'flex' },
+            gap: 4,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexGrow: 1,
+          }}
+        >
           {navItems.map((item) => (
             <Button
               key={item.label}
               href={item.href}
-              sx={{ 
-                color: 'text.secondary', 
-                fontSize: '0.7rem', 
+              sx={{
+                color: 'text.secondary',
+                fontSize: '0.7rem',
                 fontWeight: 700,
                 letterSpacing: '0.1em',
-                '&:hover': { color: 'text.primary', bgcolor: 'transparent' }
+                '&:hover': { color: 'text.primary', bgcolor: 'transparent' },
               }}
             >
               {item.label}
@@ -174,8 +180,9 @@ export default function HeroHeader() {
         </Box>
 
         {/* 3. Right: Tools (User, Settings, Flag, Button) - Visible on lg+ */}
-        <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 1, alignItems: 'center', flexShrink: 0 }}>
-          
+        <Box
+          sx={{ display: { xs: 'none', lg: 'flex' }, gap: 1, alignItems: 'center', flexShrink: 0 }}
+        >
           {/* User Profile / Login */}
           {user ? (
             <>
@@ -188,18 +195,18 @@ export default function HeroHeader() {
                   border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                   '&:hover': {
                     borderColor: theme.palette.primary.main,
-                    bgcolor: alpha(theme.palette.primary.main, 0.05)
-                  }
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                  },
                 }}
               >
-                <Avatar 
+                <Avatar
                   src={user.photoURL || (user.email ? getGravatarUrl(user.email) : '')}
-                  sx={{ 
-                    width: 32, 
+                  sx={{
+                    width: 32,
                     height: 32,
                     bgcolor: 'primary.main',
                     fontSize: '0.9rem',
-                    fontWeight: 700
+                    fontWeight: 700,
                   }}
                 >
                   {user.displayName?.charAt(0) || user.email?.charAt(0)}
@@ -214,13 +221,13 @@ export default function HeroHeader() {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 PaperProps={{
-                  sx: { 
-                    mt: 1.5, 
+                  sx: {
+                    mt: 1.5,
                     minWidth: 200,
                     borderRadius: 3,
                     border: `1px solid ${theme.palette.divider}`,
-                    bgcolor: 'background.paper'
-                  }
+                    bgcolor: 'background.paper',
+                  },
                 }}
               >
                 <MenuItem component={Link} href="/cuenta?tab=profile" onClick={handleCloseUserMenu}>
@@ -229,19 +236,31 @@ export default function HeroHeader() {
                   </ListItemIcon>
                   Mi Perfil
                 </MenuItem>
-                <MenuItem component={Link} href="/cuenta?tab=security" onClick={handleCloseUserMenu}>
+                <MenuItem
+                  component={Link}
+                  href="/cuenta?tab=security"
+                  onClick={handleCloseUserMenu}
+                >
                   <ListItemIcon>
                     <SecurityIcon fontSize="small" />
                   </ListItemIcon>
                   Seguridad
                 </MenuItem>
-                <MenuItem component={Link} href="/cuenta?tab=activity" onClick={handleCloseUserMenu}>
+                <MenuItem
+                  component={Link}
+                  href="/cuenta?tab=activity"
+                  onClick={handleCloseUserMenu}
+                >
                   <ListItemIcon>
                     <HistoryIcon fontSize="small" />
                   </ListItemIcon>
                   Actividad
                 </MenuItem>
-                <MenuItem component={Link} href="/cuenta?tab=settings" onClick={handleCloseUserMenu}>
+                <MenuItem
+                  component={Link}
+                  href="/cuenta?tab=settings"
+                  onClick={handleCloseUserMenu}
+                >
                   <ListItemIcon>
                     <SettingsIcon fontSize="small" />
                   </ListItemIcon>
@@ -271,8 +290,8 @@ export default function HeroHeader() {
                 color: 'text.primary',
                 '&:hover': {
                   borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.05)
-                }
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                },
               }}
             >
               Ingresar
@@ -281,37 +300,43 @@ export default function HeroHeader() {
 
           {/* Theme Toggle */}
           <ThemeToggle />
-          
+
           {/* Country Selector */}
           <Button
             onClick={handleCountryOpen}
-            endIcon={<KeyboardArrowDownIcon sx={{ 
-              transition: 'transform 0.2s',
-              transform: countryAnchorEl ? 'rotate(180deg)' : 'none',
-              fontSize: '1rem'
-            }} />}
-            sx={{ 
+            endIcon={
+              <KeyboardArrowDownIcon
+                sx={{
+                  transition: 'transform 0.2s',
+                  transform: countryAnchorEl ? 'rotate(180deg)' : 'none',
+                  fontSize: '1rem',
+                }}
+              />
+            }
+            sx={{
               color: 'text.primary',
               px: 1,
               minWidth: 'auto',
               borderRadius: 2,
-              '&:hover': { bgcolor: alpha(theme.palette.text.primary, 0.05) }
+              '&:hover': { bgcolor: alpha(theme.palette.text.primary, 0.05) },
             }}
           >
-            <Box sx={{ 
-              width: 24, 
-              height: 24, 
-              position: 'relative',
-              borderRadius: '50%',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
-            }}>
-              <Image 
-                src={selectedCountry.flag} 
+            <Box
+              sx={{
+                width: 24,
+                height: 24,
+                position: 'relative',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              }}
+            >
+              <Image
+                src={selectedCountry.flag}
                 alt={selectedCountry.label}
                 width={24}
                 height={24}
@@ -347,61 +372,63 @@ export default function HeroHeader() {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           PaperProps={{
-            sx: { 
-              mt: 1.5, 
+            sx: {
+              mt: 1.5,
               minWidth: 160,
               borderRadius: 3,
               border: `1px solid ${theme.palette.divider}`,
-              bgcolor: 'background.paper'
-            }
+              bgcolor: 'background.paper',
+            },
           }}
         >
           {countries.map((country) => (
-            <MenuItem 
-              key={country.id} 
+            <MenuItem
+              key={country.id}
               onClick={() => handleCountrySelect(country)}
               disabled={!country.available}
-              sx={{ 
-                py: 1.5, 
+              sx={{
+                py: 1.5,
                 px: 2,
                 gap: 2,
                 borderRadius: 1.5,
                 mx: 1,
                 my: 0.5,
                 '&.Mui-disabled': {
-                  opacity: 0.6
-                }
+                  opacity: 0.6,
+                },
               }}
             >
-              <Box sx={{ 
-                width: 24, 
-                height: 24, 
-                position: 'relative',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                flexShrink: 0,
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
-              }}>
-                <Image 
-                  src={country.flag} 
+              <Box
+                sx={{
+                  width: 24,
+                  height: 24,
+                  position: 'relative',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                }}
+              >
+                <Image
+                  src={country.flag}
                   alt={country.label}
                   width={24}
                   height={24}
                   style={{ objectFit: 'cover' }}
                 />
               </Box>
-              <ListItemText 
-                primary={country.label} 
-                secondary={!country.available ? "Próximamente" : null}
-                primaryTypographyProps={{ 
+              <ListItemText
+                primary={country.label}
+                secondary={!country.available ? 'Próximamente' : null}
+                primaryTypographyProps={{
                   fontWeight: selectedCountry.id === country.id ? 800 : 500,
-                  fontSize: '0.9rem'
+                  fontSize: '0.9rem',
                 }}
                 secondaryTypographyProps={{
                   fontSize: '0.7rem',
                   fontWeight: 700,
-                  color: 'primary.main'
+                  color: 'primary.main',
                 }}
               />
               {selectedCountry.id === country.id && (
@@ -413,10 +440,7 @@ export default function HeroHeader() {
           ))}
         </Menu>
 
-        <AuthModal 
-          open={authModalOpen} 
-          onClose={() => setAuthModalOpen(false)} 
-        />
+        <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
       </Box>
 
       {/* Mobile Drawer */}
@@ -425,18 +449,29 @@ export default function HeroHeader() {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         PaperProps={{
-          sx: { width: 300, bgcolor: 'background.default' }
+          sx: { width: 300, bgcolor: 'background.default' },
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Drawer Header */}
-          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${theme.palette.divider}` }}>
+          <Box
+            sx={{
+              p: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: `1px solid ${theme.palette.divider}`,
+            }}
+          >
             <Box sx={{ position: 'relative', width: 100, height: 30 }}>
               <Image
                 src={logo}
                 alt="V-Trading"
                 fill
-                style={{ objectFit: 'contain', filter: theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'none' }}
+                style={{
+                  objectFit: 'contain',
+                  filter: theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'none',
+                }}
               />
             </Box>
             <IconButton onClick={handleDrawerToggle}>
@@ -448,7 +483,7 @@ export default function HeroHeader() {
           <Box sx={{ p: 3, bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
             {user ? (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar 
+                <Avatar
                   src={user.photoURL || (user.email ? getGravatarUrl(user.email) : '')}
                   sx={{ width: 48, height: 48, bgcolor: 'primary.main' }}
                 >
@@ -461,10 +496,10 @@ export default function HeroHeader() {
                   <Typography variant="caption" color="text.secondary" noWrap display="block">
                     {user.email}
                   </Typography>
-                  <Button 
-                    component={Link} 
+                  <Button
+                    component={Link}
                     href="/cuenta?tab=profile"
-                    size="small" 
+                    size="small"
                     sx={{ mt: 0.5, p: 0, minWidth: 'auto', textTransform: 'none' }}
                     onClick={handleDrawerToggle}
                   >
@@ -490,51 +525,82 @@ export default function HeroHeader() {
 
           {/* Navigation Links */}
           <List sx={{ flexGrow: 1, px: 2, py: 2 }}>
-            <Typography variant="overline" color="text.secondary" sx={{ px: 2, mb: 1, display: 'block' }}>
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              sx={{ px: 2, mb: 1, display: 'block' }}
+            >
               Menú Principal
             </Typography>
             {navItems.map((item) => (
               <ListItem key={item.label} disablePadding>
-                <ListItemButton 
-                  href={item.href} 
+                <ListItemButton
+                  href={item.href}
                   onClick={handleDrawerToggle}
                   sx={{ borderRadius: 2, mb: 0.5 }}
                 >
-                  <ListItemText 
-                    primary={item.label} 
-                    primaryTypographyProps={{ fontWeight: 600 }} 
-                  />
+                  <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 600 }} />
                 </ListItemButton>
               </ListItem>
             ))}
-            
+
             {user && (
               <>
                 <Divider sx={{ my: 2 }} />
-                <Typography variant="overline" color="text.secondary" sx={{ px: 2, mb: 1, display: 'block' }}>
+                <Typography
+                  variant="overline"
+                  color="text.secondary"
+                  sx={{ px: 2, mb: 1, display: 'block' }}
+                >
                   Mi Cuenta
                 </Typography>
                 <ListItem disablePadding>
-                  <ListItemButton component={Link} href="/cuenta?tab=security" onClick={handleDrawerToggle} sx={{ borderRadius: 2 }}>
-                    <ListItemIcon sx={{ minWidth: 40 }}><SecurityIcon fontSize="small" /></ListItemIcon>
+                  <ListItemButton
+                    component={Link}
+                    href="/cuenta?tab=security"
+                    onClick={handleDrawerToggle}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <SecurityIcon fontSize="small" />
+                    </ListItemIcon>
                     <ListItemText primary="Seguridad" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton component={Link} href="/cuenta?tab=activity" onClick={handleDrawerToggle} sx={{ borderRadius: 2 }}>
-                    <ListItemIcon sx={{ minWidth: 40 }}><HistoryIcon fontSize="small" /></ListItemIcon>
+                  <ListItemButton
+                    component={Link}
+                    href="/cuenta?tab=activity"
+                    onClick={handleDrawerToggle}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <HistoryIcon fontSize="small" />
+                    </ListItemIcon>
                     <ListItemText primary="Actividad" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton component={Link} href="/cuenta?tab=settings" onClick={handleDrawerToggle} sx={{ borderRadius: 2 }}>
-                    <ListItemIcon sx={{ minWidth: 40 }}><SettingsIcon fontSize="small" /></ListItemIcon>
+                  <ListItemButton
+                    component={Link}
+                    href="/cuenta?tab=settings"
+                    onClick={handleDrawerToggle}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <SettingsIcon fontSize="small" />
+                    </ListItemIcon>
                     <ListItemText primary="Ajustes" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, color: 'error.main' }}>
-                    <ListItemIcon sx={{ minWidth: 40 }}><LogoutIcon fontSize="small" color="error" /></ListItemIcon>
+                  <ListItemButton
+                    onClick={handleLogout}
+                    sx={{ borderRadius: 2, color: 'error.main' }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <LogoutIcon fontSize="small" color="error" />
+                    </ListItemIcon>
                     <ListItemText primary="Cerrar Sesión" />
                   </ListItemButton>
                 </ListItem>
@@ -545,22 +611,42 @@ export default function HeroHeader() {
           {/* Footer / Socials */}
           <Box sx={{ p: 3, borderTop: `1px solid ${theme.palette.divider}` }}>
             <DownloadAppButton fullWidth sx={{ mb: 3 }} />
-            
+
             <Stack direction="row" justifyContent="center" spacing={2} sx={{ mb: 2 }}>
-              <IconButton component="a" href="https://x.com/VTradingAPP" target="_blank" size="small">
+              <IconButton
+                component="a"
+                href="https://x.com/VTradingAPP"
+                target="_blank"
+                size="small"
+              >
                 <XIcon fontSize="small" />
               </IconButton>
-              <IconButton component="a" href="https://www.linkedin.com/company/vtradingapp" target="_blank" size="small">
+              <IconButton
+                component="a"
+                href="https://www.linkedin.com/company/vtradingapp"
+                target="_blank"
+                size="small"
+              >
                 <LinkedInIcon fontSize="small" />
               </IconButton>
-              <IconButton component="a" href="https://www.facebook.com/vtradingapp" target="_blank" size="small">
+              <IconButton
+                component="a"
+                href="https://www.facebook.com/vtradingapp"
+                target="_blank"
+                size="small"
+              >
                 <FacebookIcon fontSize="small" />
               </IconButton>
-              <IconButton component="a" href="https://www.instagram.com/vtradingapp/" target="_blank" size="small">
+              <IconButton
+                component="a"
+                href="https://www.instagram.com/vtradingapp/"
+                target="_blank"
+                size="small"
+              >
                 <InstagramIcon fontSize="small" />
               </IconButton>
             </Stack>
-            
+
             <Typography variant="caption" align="center" display="block" color="text.secondary">
               © {new Date().getFullYear()} VTrading
             </Typography>
@@ -570,11 +656,7 @@ export default function HeroHeader() {
 
       {/* Market Ticker */}
       {!isTickerHidden && (
-        <MarketTicker 
-          hide={isTickerHidden} 
-          onClose={() => setIsTickerHidden(true)}
-          fadeEdges 
-        />
+        <MarketTicker hide={isTickerHidden} onClose={() => setIsTickerHidden(true)} fadeEdges />
       )}
     </Box>
   );

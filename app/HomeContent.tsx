@@ -30,11 +30,7 @@ export default function HomeContent() {
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
       <Navbar />
 
-      <HeroSection 
-        marketData={marketData} 
-        loading={loading} 
-        onDownload={handleDownloadClick} 
-      />
+      <HeroSection marketData={marketData} loading={loading} onDownload={handleDownloadClick} />
 
       <FeaturesSection />
 
@@ -44,9 +40,18 @@ export default function HomeContent() {
 
       <style jsx global>{`
         @keyframes pulse {
-          0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 148, 0.7); }
-          70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 148, 0); }
-          100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 148, 0); }
+          0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(0, 255, 148, 0.7);
+          }
+          70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(0, 255, 148, 0);
+          }
+          100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(0, 255, 148, 0);
+          }
         }
       `}</style>
     </Box>

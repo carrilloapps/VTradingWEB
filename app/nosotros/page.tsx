@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Sobre Nosotros',
-  description: 'Conoce nuestra misión de democratizar el acceso a la información financiera en Venezuela.',
+  description:
+    'Conoce nuestra misión de democratizar el acceso a la información financiera en Venezuela.',
   alternates: {
     canonical: 'https://vtrading.app/nosotros',
   },

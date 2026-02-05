@@ -24,13 +24,15 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children, initia
   const refreshData = async () => {
     try {
       const data = await getMarketDataAction();
-      
+
       // Validate data before updating state to prevent UI blanking
       // We check if rates exist and is a non-empty array
-      if (data && data.rates && (Array.isArray(data.rates) && data.rates.length > 0)) {
+      if (data && data.rates && Array.isArray(data.rates) && data.rates.length > 0) {
         setMarketData(data);
       } else {
-        console.warn('Global MarketContext: Received empty or invalid market data during refresh, keeping previous data.');
+        console.warn(
+          'Global MarketContext: Received empty or invalid market data during refresh, keeping previous data.'
+        );
       }
     } catch (error) {
       console.error('Global MarketContext: Error refreshing market data:', error);

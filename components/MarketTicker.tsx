@@ -18,26 +18,32 @@ interface TickerItemProps {
 
 const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
   const theme = useTheme();
-  
+
   const getIcon = () => {
-    if (trend === 'down') return <ArrowDropDownIcon fontSize="small" sx={{ color: theme.palette.trendDown }} />;
-    if (trend === 'up') return <ArrowDropUpIcon fontSize="small" sx={{ color: theme.palette.trendUp }} />;
-    return <RemoveIcon fontSize="small" sx={{ color: 'text.secondary', transform: 'scale(0.7)' }} />;
+    if (trend === 'down')
+      return <ArrowDropDownIcon fontSize="small" sx={{ color: theme.palette.trendDown }} />;
+    if (trend === 'up')
+      return <ArrowDropUpIcon fontSize="small" sx={{ color: theme.palette.trendUp }} />;
+    return (
+      <RemoveIcon fontSize="small" sx={{ color: 'text.secondary', transform: 'scale(0.7)' }} />
+    );
   };
 
   const getBadgeColor = () => {
     // Accessible Blue for BUY
-    if (type === 'COMPRA') return { 
-      bg: alpha('#1976D2', 0.1), 
-      color: theme.palette.mode === 'dark' ? '#64B5F6' : '#1565C0', 
-      border: theme.palette.mode === 'dark' ? '#64B5F6' : '#1565C0' 
-    };
+    if (type === 'COMPRA')
+      return {
+        bg: alpha('#1976D2', 0.1),
+        color: theme.palette.mode === 'dark' ? '#64B5F6' : '#1565C0',
+        border: theme.palette.mode === 'dark' ? '#64B5F6' : '#1565C0',
+      };
     // Accessible Orange for SELL
-    if (type === 'VENTA') return { 
-      bg: alpha('#ED6C02', 0.1), 
-      color: theme.palette.mode === 'dark' ? '#FFB74D' : '#E65100', 
-      border: theme.palette.mode === 'dark' ? '#FFB74D' : '#E65100' 
-    };
+    if (type === 'VENTA')
+      return {
+        bg: alpha('#ED6C02', 0.1),
+        color: theme.palette.mode === 'dark' ? '#FFB74D' : '#E65100',
+        border: theme.palette.mode === 'dark' ? '#FFB74D' : '#E65100',
+      };
     return { bg: 'transparent', color: 'text.secondary', border: 'transparent' };
   };
 
@@ -45,14 +51,14 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, whiteSpace: 'nowrap' }}>
-      <Typography 
-        variant="caption" 
-        sx={{ 
-          fontFamily: 'monospace', 
+      <Typography
+        variant="caption"
+        sx={{
+          fontFamily: 'monospace',
           color: 'text.primary', // Improved contrast
           fontWeight: 'bold',
           fontSize: '0.9rem', // Increased size
-          textTransform: 'uppercase'
+          textTransform: 'uppercase',
         }}
       >
         {symbol}
@@ -62,7 +68,7 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
         <Chip
           label={type}
           size="small"
-          sx={{ 
+          sx={{
             height: 22, // Slightly taller
             fontSize: '0.75rem', // Increased size
             fontWeight: 'bold',
@@ -70,20 +76,25 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
             bgcolor: badgeStyle.bg,
             color: badgeStyle.color,
             border: `1px solid ${alpha(badgeStyle.border, 0.3)}`,
-            '& .MuiChip-label': { px: 1 }
+            '& .MuiChip-label': { px: 1 },
           }}
         />
       )}
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            fontFamily: 'monospace', 
-            color: trend === 'down' ? theme.palette.trendDown : (trend === 'up' ? theme.palette.trendUp : 'text.primary'),
+        <Typography
+          variant="caption"
+          sx={{
+            fontFamily: 'monospace',
+            color:
+              trend === 'down'
+                ? theme.palette.trendDown
+                : trend === 'up'
+                  ? theme.palette.trendUp
+                  : 'text.primary',
             fontWeight: 'bold',
             fontSize: '0.9rem', // Increased size
-            mr: 0.5
+            mr: 0.5,
           }}
         >
           {value}
@@ -94,7 +105,17 @@ const TickerItem = ({ symbol, type, value, trend }: TickerItemProps) => {
   );
 };
 
-export default function MarketTicker({ items, hide, onClose, fadeEdges }: { items?: TickerItemProps[], hide?: boolean, onClose?: () => void, fadeEdges?: boolean }) {
+export default function MarketTicker({
+  items,
+  hide,
+  onClose,
+  fadeEdges,
+}: {
+  items?: TickerItemProps[];
+  hide?: boolean;
+  onClose?: () => void;
+  fadeEdges?: boolean;
+}) {
   const theme = useTheme();
   const { marketData } = useMarketData();
   const [offset, setOffset] = useState(0);
@@ -113,7 +134,7 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
   // Derive ticker items if not provided
   const getTickerItems = (data: RatesResponse | null) => {
     if (!data) return null;
-    
+
     // Support both raw (nested) and normalized (flat) structures
     // The type definition says rates is CurrencyRate[], but runtime might be different if not careful.
     // Assuming data follows RatesResponse interface:
@@ -122,7 +143,10 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
     const crypto = data.crypto || [];
 
     const formatCurrency = (val: number | undefined) => {
-      return (val || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return (val || 0)
+        .toFixed(2)
+        .replace('.', ',')
+        .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     };
 
     const getTrend = (direction: string | undefined) => {
@@ -131,19 +155,24 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
       return 'stable';
     };
 
-    const generatedItems: { symbol: string; type?: 'COMPRA' | 'VENTA'; value: string; trend: 'up' | 'down' | 'stable' }[] = [
-      ...rates.map((r) => {
+    const generatedItems: {
+      symbol: string;
+      type?: 'COMPRA' | 'VENTA';
+      value: string;
+      trend: 'up' | 'down' | 'stable';
+    }[] = [
+      ...(rates.map((r) => {
         // Handle potentially different structures if API is inconsistent, but try to stick to types
         const rateVal = typeof r.rate === 'number' ? r.rate : r.rate?.average;
         const changeDir = typeof r.change === 'number' ? undefined : r.change?.average?.direction;
-        
+
         return {
           symbol: `${r.currency}/VES`,
           value: formatCurrency(rateVal),
-          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable',
         };
-      }) || [],
-      ...border.map((r) => {
+      }) || []),
+      ...(border.map((r) => {
         const rateBuy = typeof r.rate === 'number' ? r.rate : r.rate?.buy;
         const changeDir = typeof r.change === 'number' ? undefined : r.change?.buy?.direction;
 
@@ -151,10 +180,10 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
           symbol: `${r.currency}/VES`,
           type: 'COMPRA' as const,
           value: formatCurrency(rateBuy),
-          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable',
         };
-      }) || [],
-      ...border.map((r) => {
+      }) || []),
+      ...(border.map((r) => {
         const rateSell = typeof r.rate === 'number' ? r.rate : r.rate?.sell;
         const changeDir = typeof r.change === 'number' ? undefined : r.change?.sell?.direction;
 
@@ -162,46 +191,46 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
           symbol: `${r.currency}/VES`,
           type: 'VENTA' as const,
           value: formatCurrency(rateSell),
-          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable',
         };
-      }) || [],
-      ...crypto.map((r) => {
+      }) || []),
+      ...(crypto.map((r) => {
         const rateBuy = typeof r.rate === 'number' ? r.rate : r.rate?.buy;
         const changeDir = typeof r.change === 'number' ? undefined : r.change?.buy?.direction;
 
         return {
           symbol: `${r.currency}/VES`,
           type: 'COMPRA' as const,
-          value: formatCurrency(rateBuy),  
-          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
+          value: formatCurrency(rateBuy),
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable',
         };
-      }) || [],
-      ...crypto.map((r) => {
+      }) || []),
+      ...(crypto.map((r) => {
         const rateSell = typeof r.rate === 'number' ? r.rate : r.rate?.sell;
         const changeDir = typeof r.change === 'number' ? undefined : r.change?.sell?.direction;
 
         return {
           symbol: `${r.currency}/VES`,
           type: 'VENTA' as const,
-          value: formatCurrency(rateSell),  
-          trend: getTrend(changeDir) as 'up' | 'down' | 'stable'
+          value: formatCurrency(rateSell),
+          trend: getTrend(changeDir) as 'up' | 'down' | 'stable',
         };
-      }) || []
+      }) || []),
     ];
-    
+
     return generatedItems.length > 0 ? generatedItems : null;
   };
-  
+
   const displayItems = items || getTickerItems(marketData) || [];
 
   useEffect(() => {
     const animate = () => {
       if (!isDraggingRef.current && contentRef.current) {
-        setOffset(prev => {
+        setOffset((prev) => {
           const contentWidth = contentRef.current?.offsetWidth || 0;
           const halfWidth = contentWidth / 2;
           let newOffset = prev - speedRef.current;
-          
+
           // Reset when first set moves out of view
           if (Math.abs(newOffset) >= halfWidth) {
             newOffset = 0;
@@ -224,20 +253,20 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
 
   const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
-    
+
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const delta = clientX - lastXRef.current;
     lastXRef.current = clientX;
 
-    setOffset(prev => {
+    setOffset((prev) => {
       const contentWidth = contentRef.current?.offsetWidth || 0;
       const halfWidth = contentWidth / 2;
       let newOffset = prev + delta;
-      
+
       // Allow dragging back and forth seamlessly
       if (newOffset > 0) newOffset = -halfWidth;
       if (Math.abs(newOffset) >= halfWidth) newOffset = 0;
-      
+
       return newOffset;
     });
   };
@@ -249,7 +278,7 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
   if (hide || displayItems.length === 0) return null;
 
   return (
-    <Box 
+    <Box
       ref={containerRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -258,8 +287,8 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
       onTouchStart={handleMouseDown}
       onTouchMove={handleMouseMove}
       onTouchEnd={handleMouseUp}
-      sx={{ 
-        width: '100%', 
+      sx={{
+        width: '100%',
         bgcolor: alpha(theme.palette.background.default, 0.9),
         backdropFilter: 'blur(12px)',
         borderBottom: `1px solid ${theme.palette.divider}`,
@@ -269,21 +298,25 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
         position: 'relative',
         zIndex: 90,
         cursor: isDragging ? 'grabbing' : 'grab',
-        userSelect: 'none'
+        userSelect: 'none',
       }}
     >
-      <Box sx={{
-        width: '100%',
-        overflow: 'hidden',
-        ...(fadeEdges && {
-          maskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
-        })
-      }}>
-        <Box 
+      <Box
+        sx={{
+          width: '100%',
+          overflow: 'hidden',
+          ...(fadeEdges && {
+            maskImage:
+              'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
+            WebkitMaskImage:
+              'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
+          }),
+        }}
+      >
+        <Box
           ref={contentRef}
-          sx={{ 
-            display: 'flex', 
+          sx={{
+            display: 'flex',
             width: 'fit-content',
             transform: `translateX(${offset}px)`,
             willChange: 'transform',
@@ -292,11 +325,11 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
           {/* Render twice for seamless loop */}
           {[...displayItems, ...displayItems].map((item, index) => (
             <Box key={index} sx={{ px: 4, display: 'inline-block' }}>
-              <TickerItem 
-                symbol={item.symbol} 
-                type={item.type} 
-                value={item.value} 
-                trend={item.trend as 'up' | 'down' | 'stable'} 
+              <TickerItem
+                symbol={item.symbol}
+                type={item.type}
+                value={item.value}
+                trend={item.trend as 'up' | 'down' | 'stable'}
               />
             </Box>
           ))}
@@ -304,30 +337,33 @@ export default function MarketTicker({ items, hide, onClose, fadeEdges }: { item
       </Box>
 
       {onClose && (
-        <Box 
+        <Box
           onMouseDown={(e) => e.stopPropagation()}
-          sx={{ 
-            position: 'absolute', 
-            right: 0, 
-            top: 0, 
-            bottom: 0, 
-            display: 'flex', 
-            alignItems: 'center', 
-            pr: 1, 
-            pl: 4, 
-            background: `linear-gradient(to right, transparent, ${theme.palette.background.default} 30%)`, 
-            zIndex: 100 
+          sx={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            pr: 1,
+            pl: 4,
+            background: `linear-gradient(to right, transparent, ${theme.palette.background.default} 30%)`,
+            zIndex: 100,
           }}
         >
-          <IconButton 
-            size="small" 
-            onClick={(e) => { e.stopPropagation(); onClose(); }} 
-            sx={{ 
-              color: 'text.secondary', 
-              '&:hover': { 
-                color: 'text.primary', 
-                bgcolor: alpha(theme.palette.text.primary, 0.05) 
-              } 
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            sx={{
+              color: 'text.secondary',
+              '&:hover': {
+                color: 'text.primary',
+                bgcolor: alpha(theme.palette.text.primary, 0.05),
+              },
             }}
           >
             <CloseIcon fontSize="small" />

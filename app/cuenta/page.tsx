@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function CuentaPage() {
   return (
-    <Suspense 
+    <Suspense
       fallback={
         <Box display="flex" minHeight="100vh" alignItems="center" justifyContent="center">
           <CircularProgress size={40} thickness={4} />
