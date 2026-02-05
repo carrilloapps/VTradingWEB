@@ -362,23 +362,27 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
 
     console.log('Bold API Response:', data);
 
-    // Store order info in Firestore for webhook processing
-    try {
-      await adminDb
-        .collection('orders')
-        .doc(orderId)
-        .set({
-          userId: request.userId || 'guest',
-          months: request.months,
-          amount: totalAmount,
-          currency: 'USD',
-          gateway: 'bold',
-          status: 'pending',
-          createdAt: new Date().toISOString(),
-          boldLinkId: data.payload.payment_link,
-        });
-    } catch (error) {
-      console.error('Error storing order:', error);
+    // Store order info in Firestore for webhook processing (optional in development)
+    const isProduction = baseUrl.startsWith('https://');
+    if (isProduction) {
+      try {
+        await adminDb
+          .collection('orders')
+          .doc(orderId)
+          .set({
+            userId: request.userId || 'guest',
+            months: request.months,
+            amount: totalAmount,
+            currency: 'USD',
+            gateway: 'bold',
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+            boldLinkId: data.payload.payment_link,
+          });
+      } catch (error) {
+        console.warn('Firestore not available (development mode):', error);
+        // Continue anyway - webhook will handle persistence in production
+      }
     }
 
     // Bold API returns URL in payload.url where customer can complete payment
@@ -401,12 +405,13 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
 
 /**
  * ePayco Integration (Latin America)
- * Documentation: https://api.epayco.co/
- * Requires: npm install epayco-sdk-node
+ * Documentation: https://docs.epayco.com/ & https://api.epayco.co/
+ * Uses ePayco REST API directly to create payment link
  */
 async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentResponse> {
   const epaycoPublicKey = process.env.EPAYCO_PUBLIC_KEY;
   const epaycoPrivateKey = process.env.EPAYCO_PRIVATE_KEY;
+  const epaycoTestMode = process.env.EPAYCO_TEST_MODE === 'true';
 
   if (!epaycoPublicKey || !epaycoPrivateKey) {
     return {
@@ -416,26 +421,28 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
   }
 
   try {
-    // Import ePayco SDK
-    const { default: epaycoSDK } = await import('epayco-sdk-node').catch(() => {
-      throw new Error('epayco-sdk-node package not installed');
-    });
-
-    const epayco = epaycoSDK({
-      apiKey: epaycoPublicKey,
-      privateKey: epaycoPrivateKey,
-      lang: 'ES',
-      test: process.env.EPAYCO_TEST_MODE === 'true',
-    });
-
-    // Create payment link
     const baseUrl = getBaseUrl();
     const webhookUrl = getWebhookUrl('epayco', baseUrl);
+    const orderId = `VT-${Date.now()}`;
 
+    console.log('ePayco payment request:', {
+      orderId,
+      amount: request.totalAmount,
+      test: epaycoTestMode,
+      email: request.customerInfo?.email || 'test@test.com',
+    });
+
+    // ePayco API endpoint for creating payment links
+    const apiUrl = epaycoTestMode
+      ? 'https://secure.epayco.co/validation/v1/reference/create'
+      : 'https://secure.epayco.co/validation/v1/reference/create';
+
+    // ePayco payment data
     const paymentData = {
+      public_key: epaycoPublicKey,
       name: 'VTrading Premium',
       description: `Suscripción por ${request.months} ${request.months === 1 ? 'mes' : 'meses'}`,
-      invoice: `VT${Date.now()}`,
+      invoice: orderId,
       currency: 'usd',
       amount: request.totalAmount.toString(),
       tax_base: '0',
@@ -443,33 +450,96 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
       country: 'co',
       lang: 'es',
       external: 'false',
-      response: `${baseUrl}/plan/success`,
-      confirmation: webhookUrl || `${baseUrl}/api/webhooks/epayco`,
       extra1: request.months.toString(),
       extra2: request.userId || 'guest',
+      response: `${baseUrl}/plan/success`,
+      confirmation: webhookUrl || `${baseUrl}/api/webhooks/epayco`,
+      method_confirmation: 'POST',
+      // Customer information (required by ePayco)
+      email_billing: request.customerInfo?.email || 'test@test.com',
+      name_billing: request.customerInfo?.name || 'Cliente',
+      address_billing: 'Dirección',
+      type_doc_billing: 'CC',
+      mobilephone_billing: request.customerInfo?.phone || '3000000000',
+      number_doc_billing: request.customerInfo?.documentNumber || '1000000000',
     };
 
-    const payment = await epayco.charge.create(paymentData);
+    // Create authentication header
+    const authString = Buffer.from(`${epaycoPublicKey}:${epaycoPrivateKey}`).toString('base64');
 
-    const urlPayment = payment.data?.urlPayment as string | undefined;
-    const paymentUrl = payment.data?.paymentUrl as string | undefined;
-    const refPayco = payment.data?.ref_payco as string | undefined;
-    const transactionId = payment.data?.transactionId as string | undefined;
+    // Create payment link using ePayco REST API
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${authString}`,
+      },
+      body: JSON.stringify(paymentData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('ePayco API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+      });
+      throw new Error(`ePayco API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('ePayco API response:', JSON.stringify(data, null, 2));
+
+    // Extract payment URL from response
+    const checkoutUrl = data.data?.url || data.url || data.data?.url_payment;
+    const refPayco = data.data?.ref_payco || data.ref_payco || orderId;
+
+    console.log('Extracted values:', {
+      checkoutUrl,
+      refPayco,
+      dataKeys: Object.keys(data),
+      dataDataKeys: data.data ? Object.keys(data.data) : 'no data.data',
+    });
+
+    if (!checkoutUrl || typeof checkoutUrl !== 'string') {
+      console.error('No checkout URL in response. Full response:', JSON.stringify(data, null, 2));
+      throw new Error('No se recibió URL de pago válida de ePayco');
+    }
+
+    // Store order info in Firestore for webhook processing (optional in development)
+    const isProduction = baseUrl.startsWith('https://');
+    if (isProduction) {
+      try {
+        await adminDb
+          .collection('orders')
+          .doc(orderId)
+          .set({
+            userId: request.userId || 'guest',
+            months: request.months,
+            amount: request.totalAmount,
+            currency: 'USD',
+            gateway: 'epayco',
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+            customerInfo: request.customerInfo || null,
+            refPayco: refPayco,
+          });
+      } catch (error) {
+        console.warn('Firestore not available (development mode):', error);
+        // Continue anyway - webhook will handle persistence in production
+      }
+    }
 
     return {
       success: true,
-      checkoutUrl: urlPayment || paymentUrl,
-      orderId: refPayco || transactionId,
+      checkoutUrl: checkoutUrl,
+      orderId: orderId,
+      metadata: {
+        refPayco: refPayco,
+      },
     };
   } catch (error: unknown) {
     console.error('ePayco error:', error);
-
-    if (error instanceof Error && error.message === 'epayco-sdk-node package not installed') {
-      return {
-        success: false,
-        error: 'ePayco SDK no está instalado. Ejecuta: npm install epayco-sdk-node',
-      };
-    }
 
     return {
       success: false,
