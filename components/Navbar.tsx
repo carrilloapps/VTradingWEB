@@ -55,7 +55,7 @@ import md5 from 'md5';
 const navItems = [
   { label: 'Aplicación', href: '/' },
   { label: 'Características', href: '/#caracteristicas' },
-  { label: 'Desarrollador', href: '/#desarrollador' },
+  { label: 'Planes de servicio', href: '/plan' },
 ];
 
 const countries = [

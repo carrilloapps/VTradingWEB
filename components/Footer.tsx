@@ -22,23 +22,24 @@ import StoreButtons from './StoreButtons';
 
 const footerLinks = {
   product: [
-    { label: 'Aplicación', href: '/' },
-    { label: 'Características', href: '/#caracteristicas' },
-    { label: 'API de servicios', href: '#' }, // TODO: Update with real link
-    { label: 'Estado del sistema', href: '/estado' },
+    { label: "Aplicación", href: "/" },
+    { label: "Planes de servicio", href: "/plan" },
+    { label: "Características", href: "/#caracteristicas" },
+    { label: "API de servicios", href: "#" }, // TODO: Update with real link
+    { label: "Estado del sistema", href: "/estado" },
   ],
   company: [
-    { label: 'Sobre nosotros', href: '/nosotros' },
-    { label: 'Blog', href: '#' },
-    { label: 'Carreras', href: '#' },
-    { label: 'Contacto', href: '/contacto' },
+    { label: "Sobre nosotros", href: "/nosotros" },
+    { label: "Blog", href: "#" },
+    { label: "Carreras", href: "#" },
+    { label: "Contacto", href: "/contacto" },
   ],
   legal: [
-    { label: 'Privacidad', href: '/privacidad' },
-    { label: 'Términos', href: '/terminos' },
-    { label: 'Cookies', href: '/cookies' },
-    { label: 'Licencias', href: '/licencias' },
-  ]
+    { label: "Privacidad", href: "/privacidad" },
+    { label: "Términos", href: "/terminos" },
+    { label: "Cookies", href: "/cookies" },
+    { label: "Licencias", href: "/licencias" },
+  ],
 };
 
 const socialLinks = [

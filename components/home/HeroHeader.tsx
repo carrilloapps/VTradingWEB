@@ -51,7 +51,7 @@ import DownloadAppButton from '../DownloadAppButton';
 const navItems = [
   { label: 'Aplicación', href: '/' },
   { label: 'Características', href: '/#caracteristicas' },
-  { label: 'Desarrollador', href: '/#desarrollador' },
+  { label: 'Planes de servicio', href: '/plan' },
 ];
 
 const countries = [
