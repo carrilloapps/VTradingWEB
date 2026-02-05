@@ -30,6 +30,7 @@ import StarIcon from '@mui/icons-material/Star';
 import LockIcon from '@mui/icons-material/Lock';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import { PaymentMethod } from '@/lib/vtrading-types';
+import { logger } from '@/lib/logger';
 import {
   StripePaymentMethod,
   PayPalPaymentMethod,
@@ -139,7 +140,7 @@ export default function PagarContent() {
 
   // Handle payment error
   const handlePaymentError = (errorMessage: string) => {
-    console.error('Payment error:', errorMessage);
+    logger.error('Payment error', new Error(errorMessage));
     setLoading(false);
   };
 
@@ -430,11 +431,10 @@ export default function PagarContent() {
                                       display: 'flex',
                                       flexDirection: 'column',
                                       justifyContent: 'center',
-                                      border: `1px solid ${
-                                        isSelected
+                                      border: `1px solid ${isSelected
                                           ? theme.palette.primary.main
                                           : alpha(theme.palette.divider, 0.15)
-                                      }`,
+                                        }`,
                                       bgcolor: isSelected
                                         ? alpha(theme.palette.primary.main, 0.03)
                                         : 'transparent',
@@ -781,11 +781,10 @@ export default function PagarContent() {
                                   sx={{
                                     cursor: 'pointer',
                                     height: '100%',
-                                    border: `1px solid ${
-                                      isSelected
+                                    border: `1px solid ${isSelected
                                         ? alpha(method.color, 0.4)
                                         : alpha(theme.palette.divider, 0.15)
-                                    }`,
+                                      }`,
                                     bgcolor: isSelected ? alpha(method.color, 0.03) : 'transparent',
                                     borderRadius: 3,
                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

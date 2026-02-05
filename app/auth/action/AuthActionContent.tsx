@@ -6,6 +6,7 @@ import { auth } from '@/lib/firebase';
 import { applyActionCode, checkActionCode, confirmPasswordReset } from 'firebase/auth';
 import type { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 // MUI Imports
 import {
@@ -104,7 +105,7 @@ function AuthActionContent() {
           setMessage('Modo de operación no soportado.');
         }
       } catch (error) {
-        console.error('Action Code Error:', error);
+        logger.error('Firebase Auth Action Code Error', error);
         setStatus('error');
         setMessage(getErrorMessage(error as FirebaseError));
       }

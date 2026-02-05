@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
+import { logger } from '@/lib/logger';
 
 /**
  * Bold Payment Webhook Handler
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
     // Parse webhook payload
     const payload = await request.json();
 
-    console.log('Bold webhook received:', {
+    logger.info('Bold webhook received', {
       status: payload.status,
       reference: payload.reference,
       transactionId: payload.transaction_id,
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     // Validate webhook payload
     if (!payload.reference || !payload.status) {
-      console.error('Invalid Bold webhook payload:', payload);
+      logger.error('Invalid Bold webhook payload', null, { payload });
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
         months = orderData?.months || 1;
       }
     } catch (error) {
-      console.error('Error fetching order data:', error);
+      logger.error('Error fetching order data in Bold webhook', error, { orderId });
     }
 
     // Process payment based on status
@@ -73,14 +74,14 @@ export async function POST(request: NextRequest) {
             updatedAt: now.toISOString(),
           });
 
-          console.log('Bold premium activated for user:', {
+          logger.info('Bold premium activated for user', {
             userId,
             months,
             premiumUntil: premiumUntil.toISOString(),
             transactionId,
           });
         } catch (error) {
-          console.error('Error updating user premium status:', error);
+          logger.error('Error updating user premium status in Bold webhook', error, { userId, orderId });
           // Don't return error - payment was successful even if DB update failed
         }
       }
@@ -100,11 +101,11 @@ export async function POST(request: NextRequest) {
           webhookPayload: payload,
         });
       } catch (error) {
-        console.error('Error storing transaction record:', error);
+        logger.error('Error storing transaction record in Bold webhook', error, { orderId });
       }
     } else if (paymentStatus === 'FAILED' || paymentStatus === 'REJECTED') {
       // Payment failed
-      console.log('Bold payment failed:', {
+      logger.warn('Bold payment failed', {
         orderId,
         transactionId,
         status: paymentStatus,
@@ -125,11 +126,11 @@ export async function POST(request: NextRequest) {
           webhookPayload: payload,
         });
       } catch (error) {
-        console.error('Error storing failed transaction:', error);
+        logger.error('Error storing failed transaction in Bold webhook', error, { orderId });
       }
     } else if (paymentStatus === 'PENDING') {
       // Payment pending (waiting for user action)
-      console.log('Bold payment pending:', {
+      logger.info('Bold payment pending', {
         orderId,
         transactionId,
       });
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Bold webhook error:', error);
+    logger.error('Bold webhook processing error', error);
 
     // Return 200 even on error to prevent Bold from retrying
     // (we log the error for debugging but don't want Bold to keep sending webhooks)

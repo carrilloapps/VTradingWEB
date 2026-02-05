@@ -1,3 +1,4 @@
+import { logger } from './logger';
 import * as admin from 'firebase-admin';
 
 if (!admin.apps.length) {
@@ -10,10 +11,7 @@ if (!admin.apps.length) {
       }),
     });
   } catch (error) {
-    console.error(
-      'Firebase Admin initialization error:',
-      error instanceof Error ? error.stack : error
-    );
+    logger.error('Firebase Admin initialization error', error);
   }
 }
 

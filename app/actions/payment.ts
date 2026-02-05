@@ -2,6 +2,7 @@
 
 import { PaymentRequest, PaymentResponse, PaymentMethod } from '@/lib/vtrading-types';
 import { adminDb } from '@/lib/firebase-admin';
+import { logger } from '@/lib/logger';
 
 /**
  * Helper function to get webhook URL for payment methods
@@ -57,7 +58,7 @@ export async function createPaymentCheckout(request: PaymentRequest): Promise<Pa
         };
     }
   } catch (error) {
-    console.error('Payment checkout error:', error);
+    logger.error('Payment checkout error', error, { request });
     return {
       success: false,
       error: 'Error al procesar el pago. Por favor, intenta de nuevo.',
@@ -133,7 +134,7 @@ async function createStripeCheckout(request: PaymentRequest): Promise<PaymentRes
       orderId: session.id,
     };
   } catch (error: unknown) {
-    console.error('Stripe error:', error);
+    logger.error('Stripe error', error);
 
     if (error instanceof Error && error.message === 'stripe package not installed') {
       return {
@@ -248,7 +249,7 @@ async function createPaypalCheckout(request: PaymentRequest): Promise<PaymentRes
       orderId: orderData.id,
     };
   } catch (error: unknown) {
-    console.error('PayPal error:', error);
+    logger.error('PayPal error', error);
     return {
       success: false,
       error: 'Error al crear pago con PayPal',
@@ -287,7 +288,7 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
     const totalAmount = request.totalAmount; // Use decimal: 1.5, 2.0, etc.
 
     // Step 1: Get available payment methods from Bold
-    console.log('Fetching Bold payment methods...');
+    logger.info('Fetching Bold payment methods');
     const paymentMethodsResponse = await fetch(`${boldApiUrl}/online/link/v1/payment_methods`, {
       method: 'GET',
       headers: {
@@ -296,7 +297,7 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
     });
 
     if (!paymentMethodsResponse.ok) {
-      console.error('Error fetching payment methods:', {
+      logger.error('Error fetching payment methods', null, {
         status: paymentMethodsResponse.status,
         statusText: paymentMethodsResponse.statusText,
       });
@@ -307,7 +308,7 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
       ? await paymentMethodsResponse.json()
       : null;
 
-    console.log('Bold payment methods received:', paymentMethodsData);
+    logger.debug('Bold payment methods received', paymentMethodsData);
 
     // Extract payment method codes from response
     // Response format: { payload: { payment_methods: { CREDIT_CARD: {...}, PSE: {...} } } }
@@ -338,9 +339,9 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
         : {}),
     };
 
-    console.log('Bold API Request:', {
+    logger.debug('Bold API Request', {
       url: `${boldApiUrl}/online/link/v1`,
-      body: requestBody,
+      // requestBody contains doc number, which is OK for Sentry but we use debug for dev only
     });
 
     const response = await fetch(`${boldApiUrl}/online/link/v1`, {
@@ -354,18 +355,17 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Bold API error:', {
+      logger.error('Bold API error', new Error(`Bold API error: ${response.status}`), {
         status: response.status,
         statusText: response.statusText,
-        body: errorText,
-        requestBody,
+        errorText,
       });
       throw new Error(`Bold API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
 
-    console.log('Bold API Response:', data);
+    logger.info('Bold payment link created', { orderId });
 
     // Store order info in Firestore for webhook processing (optional in development)
     const isProduction = baseUrl.startsWith('https://');
@@ -385,7 +385,7 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
             boldLinkId: data.payload.payment_link,
           });
       } catch (error) {
-        console.warn('Firestore not available (development mode):', error);
+        logger.warn('Firestore not available (development mode)', error);
         // Continue anyway - webhook will handle persistence in production
       }
     }
@@ -400,7 +400,7 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
       },
     };
   } catch (error) {
-    console.error('Bold error:', error);
+    logger.error('Bold error', error);
     return {
       success: false,
       error: 'Error al crear pago con Bold',
@@ -430,11 +430,10 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
     const webhookUrl = getWebhookUrl('epayco', baseUrl);
     const orderId = `VT-${Date.now()}`;
 
-    console.log('ePayco payment request:', {
+    logger.info('ePayco payment request', {
       orderId,
       amount: request.totalAmount,
       test: epaycoTestMode,
-      email: request.customerInfo?.email || 'test@test.com',
     });
 
     // ePayco API endpoint for creating payment links
@@ -485,7 +484,7 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('ePayco API error:', {
+      logger.error('ePayco API error', new Error(`ePayco API error: ${response.status}`), {
         status: response.status,
         statusText: response.statusText,
         body: errorText,
@@ -494,21 +493,19 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
     }
 
     const data = await response.json();
-    console.log('ePayco API response:', JSON.stringify(data, null, 2));
+    logger.debug('ePayco API response received');
 
     // Extract payment URL from response
     const checkoutUrl = data.data?.url || data.url || data.data?.url_payment;
     const refPayco = data.data?.ref_payco || data.ref_payco || orderId;
 
-    console.log('Extracted values:', {
-      checkoutUrl,
+    logger.info('ePayco values extracted', {
+      checkoutUrl: !!checkoutUrl,
       refPayco,
-      dataKeys: Object.keys(data),
-      dataDataKeys: data.data ? Object.keys(data.data) : 'no data.data',
     });
 
     if (!checkoutUrl || typeof checkoutUrl !== 'string') {
-      console.error('No checkout URL in response. Full response:', JSON.stringify(data, null, 2));
+      logger.error('No checkout URL in ePayco response');
       throw new Error('No se recibió URL de pago válida de ePayco');
     }
 
@@ -531,7 +528,7 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
             refPayco: refPayco,
           });
       } catch (error) {
-        console.warn('Firestore not available (development mode):', error);
+        logger.warn('Firestore not available (development mode)', error);
         // Continue anyway - webhook will handle persistence in production
       }
     }
@@ -545,7 +542,7 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
       },
     };
   } catch (error: unknown) {
-    console.error('ePayco error:', error);
+    logger.error('ePayco error', error);
 
     return {
       success: false,
@@ -623,14 +620,9 @@ async function createBinanceCheckout(request: PaymentRequest): Promise<PaymentRe
       .toUpperCase();
 
     // Log request details for debugging
-    console.log('Binance Pay request:', {
-      url: `${binanceApiUrl}/binancepay/openapi/v2/order`,
+    logger.debug('Binance Pay request initialized', {
       timestamp,
-      nonce,
-      nonceLength: nonce.length,
-      apiKey: binanceApiKey.substring(0, 10) + '...',
-      signatureLength: signature.length,
-      payloadLength: payload.length,
+      orderId: orderData.merchantTradeNo,
     });
 
     // Create order
@@ -648,11 +640,10 @@ async function createBinanceCheckout(request: PaymentRequest): Promise<PaymentRe
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Binance Pay API error response:', {
+      logger.error('Binance Pay API error', new Error(`Binance Pay API error: ${response.status}`), {
         status: response.status,
         statusText: response.statusText,
         body: errorText,
-        headers: Object.fromEntries(response.headers.entries()),
       });
       throw new Error(
         `Binance Pay API error: ${response.status} ${response.statusText} - ${errorText}`
@@ -660,7 +651,7 @@ async function createBinanceCheckout(request: PaymentRequest): Promise<PaymentRe
     }
 
     const data = await response.json();
-    console.log('Binance Pay response:', data);
+    logger.info('Binance Pay response received', { orderId: orderData.merchantTradeNo });
 
     if (data.status !== 'SUCCESS') {
       throw new Error(data.errorMessage || 'Binance Pay error');
@@ -672,7 +663,7 @@ async function createBinanceCheckout(request: PaymentRequest): Promise<PaymentRe
       orderId: data.data?.prepayId,
     };
   } catch (error) {
-    console.error('Binance Pay error:', error);
+    logger.error('Binance Pay error', error);
     return {
       success: false,
       error: 'Error al crear pago con Binance Pay',
@@ -690,7 +681,7 @@ export async function verifyPaymentStatus(
 ): Promise<{ success: boolean; status: string }> {
   // Implementation depends on each payment provider's verification API
   // This is a placeholder for the actual implementation
-  console.log(`Verifying payment status for ${method} - Order: ${orderId}`);
+  logger.info('Verifying payment status', { method, orderId });
   return {
     success: true,
     status: 'pending',

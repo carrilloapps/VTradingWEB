@@ -24,6 +24,7 @@ import {
 import { messaging } from '@/lib/firebase';
 import { getToken } from 'firebase/messaging';
 import { subscribeToTopicAction, unsubscribeFromTopicAction } from '@/app/actions/notifications';
+import { logger } from '@/lib/logger';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -366,7 +367,7 @@ export default function CuentaPage() {
         setNewsletterEnabled(false);
         showMessage('Suscripción al newsletter cancelada', 'success');
       } catch (error) {
-        console.error('Error unsubscribing:', error);
+        logger.error('Error unsubscribing:', error);
         // Even if server action fails, we update UI? Better to warn.
         // But for UX we might just disable it locally.
         setNewsletterEnabled(false);
@@ -396,7 +397,7 @@ export default function CuentaPage() {
           showMessage('Permiso de notificaciones denegado', 'warning');
         }
       } catch (error: any) {
-        console.error('Error subscribing:', error);
+        logger.error('Error subscribing:', error);
         showMessage('Error al suscribir: ' + error.message, 'error');
       }
     }
@@ -420,7 +421,7 @@ export default function CuentaPage() {
           showMessage('Permiso de notificaciones denegado', 'warning');
         }
       } catch (error: any) {
-        console.error('Error push:', error);
+        logger.error('Push notifications activation error', error);
         showMessage('Error al activar notificaciones', 'error');
       }
     } else {
@@ -463,7 +464,7 @@ export default function CuentaPage() {
               size: 'invisible',
             });
           } catch (e) {
-            console.error('Recaptcha init error:', e);
+            logger.error('Recaptcha initialization error', e);
           }
         }
       }, 500);
@@ -488,7 +489,7 @@ export default function CuentaPage() {
       setOpen2FAVerifyDialog(true);
       showMessage('Código enviado a su teléfono', 'success');
     } catch (error: any) {
-      console.error('Error enviando código:', error);
+      logger.error('Error sending 2FA phone code', error);
       showMessage('Error enviando código: ' + error.message, 'error');
       // Reset recaptcha
       if (recaptchaVerifierRef.current) {
@@ -558,7 +559,7 @@ export default function CuentaPage() {
       await auth.signOut();
       showMessage('Sesión cerrada', 'info');
     } catch (error: any) {
-      console.error(error);
+      logger.error('Sign out error', error);
       showMessage('Error al cerrar sesión', 'error');
     }
   };

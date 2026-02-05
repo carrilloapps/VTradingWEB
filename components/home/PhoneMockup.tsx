@@ -12,6 +12,7 @@ import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import RateCard from './RateCard';
 import StockListCard from './StockListCard';
 import { CurrencyRate, BVCQuote, RateValue, RateChange, RatesResponse } from '@/lib/vtrading-types';
+import { logger } from '@/lib/logger';
 
 interface PhoneMockupProps {
   marketData: RatesResponse | null;
@@ -36,7 +37,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
         hour12: true,
       }).format(date);
     } catch (e) {
-      console.error('Date formatting error:', e);
+      logger.error('Date formatting error in PhoneMockup', e);
       return dateStr || '...';
     }
   };
@@ -104,29 +105,29 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
 
   const bcvData = bcvRate
     ? {
-        general: getGeneralData(bcvRate),
-        buy: {
-          price: fmt((bcvRate.rate as RateValue)?.buy),
-          change: fmtPct((bcvRate.change as RateChange)?.buy?.percent ?? 0),
-          trend: ((bcvRate.change as RateChange)?.buy?.direction || 'stable') as
-            | 'up'
-            | 'down'
-            | 'stable',
-        },
-        sell: {
-          price: fmt((bcvRate.rate as RateValue)?.sell),
-          change: fmtPct((bcvRate.change as RateChange)?.sell?.percent ?? 0),
-          trend: ((bcvRate.change as RateChange)?.sell?.direction || 'stable') as
-            | 'up'
-            | 'down'
-            | 'stable',
-        },
-      }
+      general: getGeneralData(bcvRate),
+      buy: {
+        price: fmt((bcvRate.rate as RateValue)?.buy),
+        change: fmtPct((bcvRate.change as RateChange)?.buy?.percent ?? 0),
+        trend: ((bcvRate.change as RateChange)?.buy?.direction || 'stable') as
+          | 'up'
+          | 'down'
+          | 'stable',
+      },
+      sell: {
+        price: fmt((bcvRate.rate as RateValue)?.sell),
+        change: fmtPct((bcvRate.change as RateChange)?.sell?.percent ?? 0),
+        trend: ((bcvRate.change as RateChange)?.sell?.direction || 'stable') as
+          | 'up'
+          | 'down'
+          | 'stable',
+      },
+    }
     : {
-        general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-        buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-        sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-      };
+      general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+    };
 
   const cryptoList = (Array.isArray(marketData?.crypto) ? marketData.crypto : []) || [];
   // Find first crypto with valid rate structure (summary) or fallback to first item
@@ -139,29 +140,29 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
 
   const cryptoData = firstCrypto
     ? {
-        general: getGeneralData(firstCrypto),
-        buy: {
-          price: fmt((firstCrypto.rate as RateValue)?.buy),
-          change: fmtPct((firstCrypto.change as RateChange)?.buy?.percent ?? 0),
-          trend: ((firstCrypto.change as RateChange)?.buy?.direction || 'stable') as
-            | 'up'
-            | 'down'
-            | 'stable',
-        },
-        sell: {
-          price: fmt((firstCrypto.rate as RateValue)?.sell),
-          change: fmtPct((firstCrypto.change as RateChange)?.sell?.percent ?? 0),
-          trend: ((firstCrypto.change as RateChange)?.sell?.direction || 'stable') as
-            | 'up'
-            | 'down'
-            | 'stable',
-        },
-      }
+      general: getGeneralData(firstCrypto),
+      buy: {
+        price: fmt((firstCrypto.rate as RateValue)?.buy),
+        change: fmtPct((firstCrypto.change as RateChange)?.buy?.percent ?? 0),
+        trend: ((firstCrypto.change as RateChange)?.buy?.direction || 'stable') as
+          | 'up'
+          | 'down'
+          | 'stable',
+      },
+      sell: {
+        price: fmt((firstCrypto.rate as RateValue)?.sell),
+        change: fmtPct((firstCrypto.change as RateChange)?.sell?.percent ?? 0),
+        trend: ((firstCrypto.change as RateChange)?.sell?.direction || 'stable') as
+          | 'up'
+          | 'down'
+          | 'stable',
+      },
+    }
     : {
-        general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-        buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-        sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-      };
+      general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+    };
 
   const bvcQuotes = Array.isArray(marketData?.bvc) ? marketData.bvc : [];
   // Take first 3 items for the mockup
@@ -406,7 +407,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
                 title="USD/VES • BCV"
                 icon={<AttachMoneyIcon />}
                 data={bcvData}
-                // Gradient is now handled internally by RateCard to match code.txt
+              // Gradient is now handled internally by RateCard to match code.txt
               />
             </Box>
             <Box sx={{ mb: 3 }}>
@@ -416,7 +417,7 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
                 }
                 icon={<ShowChartIcon />}
                 data={cryptoData}
-                // Gradient is now handled internally by RateCard to match code.txt
+              // Gradient is now handled internally by RateCard to match code.txt
               />
             </Box>
 

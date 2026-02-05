@@ -24,6 +24,7 @@ import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import { PaymentMethodComponentProps, CustomerInfo } from './types';
 import { createPaymentCheckout } from '@/app/actions/payment';
 import { CryptoCurrency } from '@/lib/vtrading-types';
+import { logger } from '@/lib/logger';
 
 // Cryptocurrency options for Binance Pay
 const cryptoOptions: { value: CryptoCurrency; label: string; stable: boolean }[] = [
@@ -110,7 +111,7 @@ export default function BinancePayPaymentMethod({
       const errorMessage = 'Error al conectar con Binance Pay. Por favor, intenta más tarde.';
       setError(errorMessage);
       onError(errorMessage);
-      console.error('Binance Pay payment error:', err);
+      logger.error('Binance Pay payment error', err);
     } finally {
       setLoading(false);
     }
@@ -157,11 +158,10 @@ export default function BinancePayPaymentMethod({
                 sx={{
                   cursor: 'pointer',
                   p: 1.5,
-                  border: `1px solid ${
-                    selectedCrypto === crypto.value
+                  border: `1px solid ${selectedCrypto === crypto.value
                       ? alpha('#F3BA2F', 0.4)
                       : alpha(theme.palette.divider, 0.15)
-                  }`,
+                    }`,
                   bgcolor: selectedCrypto === crypto.value ? alpha('#F3BA2F', 0.05) : 'transparent',
                   transition: 'all 0.3s',
                   '&:hover': {

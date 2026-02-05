@@ -4,6 +4,7 @@ import './globals.css';
 import MUIProvider from '@/components/MUIProvider';
 import { MarketProvider } from '@/context/MarketContext';
 import { getMarketDataAction } from '@/app/actions/market';
+import { logger } from '@/lib/logger';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -102,7 +103,7 @@ export default async function RootLayout({
   try {
     initialMarketData = await getMarketDataAction();
   } catch (error) {
-    console.error('Failed to fetch initial market data in RootLayout:', error);
+    logger.error('Failed to fetch initial market data in RootLayout', error);
   }
 
   return (

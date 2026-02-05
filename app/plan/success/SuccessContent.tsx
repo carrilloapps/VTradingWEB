@@ -40,6 +40,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WarningIcon from '@mui/icons-material/Warning';
 import { useSearchParams } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 type PaymentStatus = 'verifying' | 'success' | 'failed' | 'cancelled' | 'pending';
 
@@ -104,7 +105,7 @@ export default function SuccessContent() {
           setStatus('success');
         }
       } catch (err) {
-        console.error('Payment verification error:', err);
+        logger.error('Payment verification error', err);
         setStatus('failed');
         setErrorMessage('Error al verificar el estado del pago');
       }
@@ -205,9 +206,9 @@ export default function SuccessContent() {
                           : alpha(theme.palette.background.paper, 0.9),
                       backdropFilter: 'blur(20px)',
                       border: `1px solid ${status === 'success' ? alpha(theme.palette.success.main, 0.3) :
-                          status === 'failed' ? alpha(theme.palette.error.main, 0.3) :
-                            status === 'cancelled' ? alpha(theme.palette.warning.main, 0.3) :
-                              alpha(theme.palette.info.main, 0.3)
+                        status === 'failed' ? alpha(theme.palette.error.main, 0.3) :
+                          status === 'cancelled' ? alpha(theme.palette.warning.main, 0.3) :
+                            alpha(theme.palette.info.main, 0.3)
                         }`,
                       borderRadius: 3,
                       position: 'relative',
@@ -220,9 +221,9 @@ export default function SuccessContent() {
                         right: 0,
                         height: '4px',
                         background: `linear-gradient(90deg, ${status === 'success' ? theme.palette.success.main :
-                            status === 'failed' ? theme.palette.error.main :
-                              status === 'cancelled' ? theme.palette.warning.main :
-                                theme.palette.info.main
+                          status === 'failed' ? theme.palette.error.main :
+                            status === 'cancelled' ? theme.palette.warning.main :
+                              theme.palette.info.main
                           }, ${theme.palette.primary.main})`,
                       },
                     }}
@@ -235,9 +236,9 @@ export default function SuccessContent() {
                           height: { xs: 100, md: 120, lg: 140 },
                           borderRadius: '50%',
                           background: (theme) => `linear-gradient(135deg, ${status === 'success' ? alpha(theme.palette.success.main, 0.2) :
-                              status === 'failed' ? alpha(theme.palette.error.main, 0.2) :
-                                status === 'cancelled' ? alpha(theme.palette.warning.main, 0.2) :
-                                  alpha(theme.palette.info.main, 0.2)
+                            status === 'failed' ? alpha(theme.palette.error.main, 0.2) :
+                              status === 'cancelled' ? alpha(theme.palette.warning.main, 0.2) :
+                                alpha(theme.palette.info.main, 0.2)
                             } 0%, ${status === 'success' ? alpha(theme.palette.success.light, 0.1) :
                               status === 'failed' ? alpha(theme.palette.error.light, 0.1) :
                                 status === 'cancelled' ? alpha(theme.palette.warning.light, 0.1) :
@@ -253,9 +254,9 @@ export default function SuccessContent() {
                             inset: -8,
                             borderRadius: '50%',
                             background: (theme) => `linear-gradient(135deg, ${status === 'success' ? alpha(theme.palette.success.main, 0.1) :
-                                status === 'failed' ? alpha(theme.palette.error.main, 0.1) :
-                                  status === 'cancelled' ? alpha(theme.palette.warning.main, 0.1) :
-                                    alpha(theme.palette.info.main, 0.1)
+                              status === 'failed' ? alpha(theme.palette.error.main, 0.1) :
+                                status === 'cancelled' ? alpha(theme.palette.warning.main, 0.1) :
+                                  alpha(theme.palette.info.main, 0.1)
                               }, transparent)`,
                             animation: 'pulse 2s ease-in-out infinite',
                           },
@@ -278,9 +279,9 @@ export default function SuccessContent() {
                           fontWeight={800}
                           sx={{
                             background: (theme) => `linear-gradient(135deg, ${status === 'success' ? theme.palette.success.main :
-                                status === 'failed' ? theme.palette.error.main :
-                                  status === 'cancelled' ? theme.palette.warning.main :
-                                    theme.palette.info.main
+                              status === 'failed' ? theme.palette.error.main :
+                                status === 'cancelled' ? theme.palette.warning.main :
+                                  theme.palette.info.main
                               } 0%, ${status === 'success' ? theme.palette.success.dark :
                                 status === 'failed' ? theme.palette.error.dark :
                                   status === 'cancelled' ? theme.palette.warning.dark :

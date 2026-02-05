@@ -24,6 +24,7 @@ import {
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { logger } from '@/lib/logger';
 
 // Componente para el Gauge de Integridad
 const IntegrityGauge = ({ value }: { value: number }) => {
@@ -246,7 +247,7 @@ export default function StatusPage() {
         const data = await getMarketDataAction();
         setMarketData(data as RatesResponse);
       } catch (error) {
-        console.error('Error fetching market status:', error);
+        logger.error('Error fetching market status in StatusPage', error);
       }
     };
 

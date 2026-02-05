@@ -24,7 +24,9 @@ import {
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
-import { PaymentMethodComponentProps, CustomerInfo } from './types';
+import { PaymentMethodComponentProps } from './types';
+import { CustomerInfo, PaymentRequest } from '@/lib/vtrading-types';
+import { logger } from '@/lib/logger';
 import { createPaymentCheckout } from '@/app/actions/payment';
 import CountryPhoneInput, { ALL_COUNTRIES, Country } from './CountryPhoneInput';
 
@@ -147,7 +149,7 @@ export default function EPaycoPaymentMethod({
       const errorMessage = 'Error al conectar con ePayco. Por favor, intenta más tarde.';
       setError(errorMessage);
       onError(errorMessage);
-      console.error('ePayco payment error:', err);
+      logger.error('ePayco payment error', err);
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@
 
 import { fetchMarketData, getRatesHistory } from '@/lib/vtrading-api';
 import { RatesResponse, CurrencyRate, BVCQuote } from '@/lib/vtrading-types';
+import { logger } from '@/lib/logger';
 
 /**
  * Server Action to fetch historical market data.
@@ -78,7 +79,7 @@ export async function getMarketHistoryAction(page = 1, limit = 30) {
       .filter((entry: any) => entry.price > 0) // Filter out invalid entries
       .reverse(); // Reverse to have chronological order (oldest to newest)
   } catch (error) {
-    console.error('Error in getMarketHistoryAction:', error);
+    logger.error('Error in getMarketHistoryAction', error);
     return [];
   }
 }
@@ -225,7 +226,7 @@ export async function getMarketDataAction(bvcPage = 1, bvcLimit = 30) {
 
     return data;
   } catch (error) {
-    console.error('Error in getMarketDataAction:', error);
+    logger.error('Error in getMarketDataAction', error);
     throw new Error('Failed to fetch market data');
   }
 }

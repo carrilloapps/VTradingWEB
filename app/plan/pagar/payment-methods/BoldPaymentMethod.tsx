@@ -24,8 +24,10 @@ import {
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import PublicIcon from '@mui/icons-material/Public';
-import { PaymentMethodComponentProps, CustomerInfo } from './types';
+import { PaymentMethodComponentProps } from './types';
+import { CustomerInfo, PaymentRequest } from '@/lib/vtrading-types';
 import { createPaymentCheckout } from '@/app/actions/payment';
+import { logger } from '@/lib/logger';
 import CountryPhoneInput, { ALL_COUNTRIES } from './CountryPhoneInput';
 
 /**
@@ -147,7 +149,7 @@ export default function BoldPaymentMethod({
       const errorMessage = 'Error al conectar con Bold. Por favor, intenta más tarde.';
       setError(errorMessage);
       onError(errorMessage);
-      console.error('Bold payment error:', err);
+      logger.error('Bold payment error', err);
     } finally {
       setLoading(false);
     }

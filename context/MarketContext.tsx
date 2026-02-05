@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { getMarketDataAction } from '@/app/actions/market';
 import { RatesResponse } from '@/lib/vtrading-types';
+import { logger } from '@/lib/logger';
 
 interface MarketContextType {
   marketData: RatesResponse | null;
@@ -30,12 +31,10 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children, initia
       if (data && data.rates && Array.isArray(data.rates) && data.rates.length > 0) {
         setMarketData(data);
       } else {
-        console.warn(
-          'Global MarketContext: Received empty or invalid market data during refresh, keeping previous data.'
-        );
+        logger.warn('MarketContext: Received empty or invalid market data during refresh');
       }
     } catch (error) {
-      console.error('Global MarketContext: Error refreshing market data:', error);
+      logger.error('MarketContext error refreshing market data', error);
     } finally {
       setLoading(false);
     }

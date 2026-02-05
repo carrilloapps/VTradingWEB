@@ -7,6 +7,7 @@ import {
   NotificationRequest,
   MarketStatus,
 } from './vtrading-types';
+import { logger } from './logger';
 
 const API_URL = process.env.VTRADING_API_URL;
 const API_KEY = process.env.VTRADING_API_KEY;
@@ -37,14 +38,14 @@ async function fetchVTrading<T>(endpoint: string, options: RequestInit = {}): Pr
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`VTrading API Error: ${response.status} ${response.statusText}`, errorText);
+      logger.error(`VTrading API Error: ${response.status} ${response.statusText}`, new Error(errorText), { endpoint });
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
     return response.json();
   } catch (error) {
     if (error instanceof Error) {
-      console.error(`Fetch error in ${endpoint}:`, error.message);
+      logger.error(`Fetch error in ${endpoint}`, error);
     }
     throw error;
   }
@@ -74,7 +75,7 @@ export async function getMarketStatus(): Promise<MarketStatus> {
 
     return { state, date, lastUpdate };
   } catch (error) {
-    console.error('Error fetching market status:', error);
+    logger.error('Error fetching market status', error);
     throw error;
   }
 }
@@ -163,9 +164,9 @@ export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
     // Use the request timestamp as the lastUpdate time
     status: rates?.status
       ? {
-          ...rates.status,
-          lastUpdate: requestTimestamp,
-        }
+        ...rates.status,
+        lastUpdate: requestTimestamp,
+      }
       : null,
   };
 }

@@ -16,8 +16,10 @@ import {
   alpha,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
-import { PaymentMethodComponentProps, CustomerInfo } from './types';
+import { PaymentMethodComponentProps } from './types';
+import { CustomerInfo, PaymentRequest } from '@/lib/vtrading-types';
 import { createPaymentCheckout } from '@/app/actions/payment';
+import { logger } from '@/lib/logger';
 import CountryPhoneInput, { ALL_COUNTRIES, Country } from './CountryPhoneInput';
 
 // Lista de países para Stripe (US primero)
@@ -103,7 +105,7 @@ export default function StripePaymentMethod({
       const errorMessage = 'Error al conectar con Stripe. Por favor, intenta más tarde.';
       setError(errorMessage);
       onError(errorMessage);
-      console.error('Stripe payment error:', err);
+      logger.error('Stripe payment error', err);
     } finally {
       setLoading(false);
     }

@@ -11,6 +11,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { logger } from '@/lib/logger';
 import Image from 'next/image';
 import logo from '../app/assets/logotipo.png';
 
@@ -96,7 +97,7 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
       onSuccess?.();
       handleClose();
     } catch (err: unknown) {
-      console.error('Auth Error:', err);
+      logger.error('Google Auth Error', err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -129,7 +130,7 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
       onSuccess?.();
       handleClose();
     } catch (err: unknown) {
-      console.error('Auth Error:', err);
+      logger.error('Email Auth Error', err, { mode: authMode });
       if (err instanceof Error) {
         setError(err.message);
       } else {

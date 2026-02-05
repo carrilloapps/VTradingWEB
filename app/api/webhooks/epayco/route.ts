@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
+import { logger } from '@/lib/logger';
 
 /**
  * ePayco Payment Webhook Handler
@@ -34,16 +35,15 @@ export async function POST(request: NextRequest) {
       payload = Object.fromEntries(formData.entries()) as Record<string, string>;
     }
 
-    console.log('ePayco webhook received:', {
+    logger.info('ePayco webhook received', {
       invoice: payload.x_id_invoice,
       transactionId: payload.x_transaction_id,
       state: payload.x_transaction_state,
-      amount: payload.x_amount,
     });
 
     // Validate webhook payload
     if (!payload.x_id_invoice || !payload.x_transaction_state) {
-      console.error('Invalid ePayco webhook payload:', payload);
+      logger.error('Invalid ePayco webhook payload', null, { payload });
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       const expectedSignature = crypto.createHash('sha256').update(signatureString).digest('hex');
 
       if (!epaycoTestMode && payload.x_signature !== expectedSignature) {
-        console.error('Invalid ePayco signature:', {
+        logger.error('Invalid ePayco signature', null, {
           received: payload.x_signature,
           expected: expectedSignature,
         });
@@ -104,17 +104,14 @@ export async function POST(request: NextRequest) {
             updatedAt: now.toISOString(),
           });
 
-          console.log('ePayco premium activated for user:', {
+          logger.info('ePayco premium activated for user', {
             userId,
             months,
             premiumUntil: premiumUntil.toISOString(),
             transactionId,
-            refPayco,
           });
         } catch (error) {
-          console.warn('Firestore not available or user update failed:', error);
-          // Don't return error - payment was successful even if DB update failed
-          // In production with proper Firebase setup, this should work
+          logger.warn('Firestore user update failed during ePayco success', error);
         }
       }
 
@@ -127,7 +124,7 @@ export async function POST(request: NextRequest) {
           completedAt: new Date().toISOString(),
         });
       } catch (error) {
-        console.warn('Order update skipped (Firestore not available):', error);
+        logger.warn('Order status update skipped (Firestore unavailable) - epayco success', error);
       }
 
       // Store transaction record (optional in development)
@@ -146,11 +143,11 @@ export async function POST(request: NextRequest) {
           webhookPayload: payload,
         });
       } catch (error) {
-        console.warn('Transaction record skipped (Firestore not available):', error);
+        logger.warn('Transaction record skipped (Firestore unavailable) - epayco success', error);
       }
     } else if (paymentState === 'Rechazada' || paymentState === 'Fallida') {
       // Payment failed
-      console.log('ePayco payment failed:', {
+      logger.info('ePayco payment failed', {
         orderId,
         transactionId,
         state: paymentState,
@@ -167,7 +164,7 @@ export async function POST(request: NextRequest) {
           failedAt: new Date().toISOString(),
         });
       } catch (error) {
-        console.warn('Order update skipped (Firestore not available):', error);
+        logger.warn('Order status update skipped (Firestore unavailable) - epayco fail', error);
       }
 
       // Store failed transaction (optional in development)
@@ -187,11 +184,11 @@ export async function POST(request: NextRequest) {
           webhookPayload: payload,
         });
       } catch (error) {
-        console.warn('Transaction record skipped (Firestore not available):', error);
+        logger.warn('Transaction record skipped (Firestore unavailable) - epayco fail', error);
       }
     } else if (paymentState === 'Pendiente') {
       // Payment pending (waiting for confirmation)
-      console.log('ePayco payment pending:', {
+      logger.info('ePayco payment pending', {
         orderId,
         transactionId,
       });
@@ -204,7 +201,7 @@ export async function POST(request: NextRequest) {
           refPayco,
         });
       } catch (error) {
-        console.warn('Order update skipped (Firestore not available):', error);
+        logger.warn('Order status update skipped (Firestore unavailable) - epayco pending', error);
       }
     }
 
@@ -219,7 +216,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('ePayco webhook error:', error);
+    logger.error('ePayco webhook error', error);
 
     // Return 200 even on error to prevent ePayco from retrying
     // (we log the error for debugging but don't want ePayco to keep sending webhooks)
@@ -249,7 +246,7 @@ export async function GET(request: NextRequest) {
 
     // If there are ePayco parameters, process as webhook
     if (payload.x_id_invoice && payload.x_transaction_state) {
-      console.log('ePayco webhook received via GET:', {
+      logger.info('ePayco webhook received via GET', {
         invoice: payload.x_id_invoice,
         transactionId: payload.x_transaction_id,
         state: payload.x_transaction_state,
@@ -277,7 +274,7 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('ePayco webhook GET error:', error);
+    logger.error('ePayco webhook GET error', error);
     return NextResponse.json(
       {
         received: true,

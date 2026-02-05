@@ -20,6 +20,7 @@ import {
 import LockIcon from '@mui/icons-material/Lock';
 import { PaymentMethodComponentProps, CustomerInfo } from './types';
 import { createPaymentCheckout } from '@/app/actions/payment';
+import { logger } from '@/lib/logger';
 
 /**
  * PayPal Payment Form Component
@@ -93,7 +94,7 @@ export default function PayPalPaymentMethod({
       const errorMessage = 'Error al conectar con PayPal. Por favor, intenta más tarde.';
       setError(errorMessage);
       onError(errorMessage);
-      console.error('PayPal payment error:', err);
+      logger.error('PayPal payment error', err);
     } finally {
       setLoading(false);
     }

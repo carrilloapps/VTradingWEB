@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { adminMessaging } from '@/lib/firebase-admin';
+import { logger } from '@/lib/logger';
 
 /**
  * Subscribes a registration token to a topic.
@@ -19,7 +20,7 @@ export async function subscribeToTopicAction(token: string, topic: string) {
     await adminMessaging.subscribeToTopic(token, topic);
     return { success: true };
   } catch (error: any) {
-    console.error('Error subscribing to topic:', error);
+    logger.error('Error subscribing to topic', error, { topic });
     return { success: false, error: error.message };
   }
 }
@@ -39,7 +40,7 @@ export async function unsubscribeFromTopicAction(token: string, topic: string) {
     await adminMessaging.unsubscribeFromTopic(token, topic);
     return { success: true };
   } catch (error: any) {
-    console.error('Error unsubscribing from topic:', error);
+    logger.error('Error unsubscribing from topic', error, { topic });
     return { success: false, error: error.message };
   }
 }
