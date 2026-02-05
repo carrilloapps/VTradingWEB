@@ -332,6 +332,7 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
       ...(webhookUrl && {
         callback_url: webhookUrl,
       }),
+      redirection_url: `${baseUrl}/plan/success`,
     };
 
     console.log('Bold API Request:', {
