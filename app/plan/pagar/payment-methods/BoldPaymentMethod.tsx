@@ -223,6 +223,7 @@ export default function BoldPaymentMethod({
             >
               <MenuItem value="CC">Cédula de Ciudadanía</MenuItem>
               <MenuItem value="CE">Cédula de Extranjería</MenuItem>
+              <MenuItem value="CC">Cédula Venezolana</MenuItem>
               <MenuItem value="NIT">NIT</MenuItem>
               <MenuItem value="Passport">Pasaporte</MenuItem>
             </Select>
@@ -322,17 +323,26 @@ export default function BoldPaymentMethod({
                 },
                 '& .PhoneInputCountry': {
                   marginRight: '12px',
+                  paddingRight: '8px',
+                  borderRight: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
                   display: 'flex',
                   alignItems: 'center',
                   position: 'relative',
+                  cursor: 'pointer',
+                  minWidth: '60px',
+                  '&:hover': {
+                    '& .PhoneInputCountryIcon': {
+                      transform: 'scale(1.05)',
+                    },
+                  },
                 },
                 '& .PhoneInputCountryIcon': {
-                  width: '32px',
-                  height: '24px',
-                  marginRight: '8px',
-                  borderRadius: '4px',
-                  boxShadow: `0 1px 3px ${alpha('#000', 0.15)}`,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  width: '24px',
+                  height: '18px',
+                  borderRadius: '2px',
+                  boxShadow: `0 1px 3px ${alpha('#000', 0.12)}`,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                  transition: 'transform 0.2s ease',
                 },
                 '& .PhoneInputCountrySelect': {
                   position: 'absolute',
@@ -342,17 +352,22 @@ export default function BoldPaymentMethod({
                   height: '100%',
                   opacity: 0,
                   cursor: 'pointer',
-                  fontSize: '1rem',
+                  fontSize: '16px',
                 },
                 '& .PhoneInputCountrySelectArrow': {
-                  display: 'none',
+                  display: 'block',
+                  width: '0',
+                  height: '0',
+                  marginLeft: '6px',
+                  borderLeft: '4px solid transparent',
+                  borderRight: '4px solid transparent',
+                  borderTop: `5px solid ${theme.palette.text.secondary}`,
+                  opacity: 0.7,
+                  transition: 'opacity 0.2s ease',
                 },
-                '& .PhoneInputCountry::after': {
-                  content: '"▼"',
-                  fontSize: '10px',
-                  color: theme.palette.text.secondary,
-                  marginLeft: '4px',
-                  pointerEvents: 'none',
+                '& .PhoneInputCountry:hover .PhoneInputCountrySelectArrow': {
+                  opacity: 1,
+                  borderTopColor: theme.palette.text.primary,
                 },
               }}
             >
@@ -407,11 +422,11 @@ export default function BoldPaymentMethod({
           )}
         </Button>
 
-        <Box 
-          sx={{ 
-            mt: 2, 
-            p: 1.5, 
-            borderRadius: 2, 
+        <Box
+          sx={{
+            mt: 2,
+            p: 1.5,
+            borderRadius: 2,
             bgcolor: alpha(theme.palette.info.main, 0.05),
             display: 'flex',
             alignItems: 'center',
