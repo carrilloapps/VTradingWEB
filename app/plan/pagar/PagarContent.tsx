@@ -21,6 +21,10 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  LinearProgress,
+  Stepper,
+  Step,
+  StepLabel,
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -40,6 +44,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import { PaymentMethod } from '@/lib/vtrading-types';
 import {
   StripePaymentMethod,
@@ -69,6 +74,7 @@ const paymentMethods = [
     features: ['PayPal', 'Tarjetas', 'Pago en 4'],
     color: '#0070BA',
     iconBg: '#FFFFFF',
+    hidden: true, // Temporarily hidden
   },
   {
     id: 'bold' as PaymentMethod,
@@ -87,6 +93,7 @@ const paymentMethods = [
     features: ['Tarjetas', 'Efectivo', 'Transferencias'],
     color: '#0DC041',
     iconBg: '#FFFFFF',
+    hidden: true, // Temporarily hidden
   },
   {
     id: 'binance' as PaymentMethod,
@@ -112,6 +119,7 @@ export default function PagarContent() {
   const [selectedDuration, setSelectedDuration] = useState<number>(6);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('stripe');
   const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0); // 0 = duration, 1 = payment method
 
   // Get price from environment variable
   const pricePerMonth = parseFloat(process.env.NEXT_PUBLIC_PREMIUM_PLAN_PRICE_USD || '1');
@@ -135,6 +143,11 @@ export default function PagarContent() {
     } as PaymentPlanDetails;
   }, [selectedDuration, pricePerMonth]);
 
+  // Update step cuando cambia la selección
+  React.useEffect(() => {
+    if (selectedDuration) setCurrentStep(1);
+  }, [selectedDuration]);
+
   // Handle payment success
   const handlePaymentSuccess = () => {
     // Redirect will be handled by the individual payment component
@@ -150,77 +163,160 @@ export default function PagarContent() {
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Progress Indicator */}
+      <Fade in timeout={800}>
+        <Box
+          sx={{
+            position: 'fixed',
+            top: { xs: 60, md: 70 },
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            bgcolor: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(20px)',
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.05)}`,
+          }}
+        >
+          <Container maxWidth="lg">
+            <Box sx={{ py: 2 }}>
+              <Grid container spacing={2} alignItems="center">
+                {[
+                  { label: 'Duración', completed: currentStep >= 0 },
+                  { label: 'Método de pago', completed: currentStep >= 1 },
+                  { label: 'Confirmación', completed: false },
+                ].map((step, index) => (
+                  <Grid size={{ xs: 4 }} key={index}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '50%',
+                          bgcolor: step.completed
+                            ? theme.palette.primary.main
+                            : alpha(theme.palette.divider, 0.15),
+                          color: step.completed ? 'white' : 'text.secondary',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 700,
+                          fontSize: '0.875rem',
+                          transition: 'all 0.3s',
+                        }}
+                      >
+                        {step.completed ? '✓' : index + 1}
+                      </Box>
+                      <Typography
+                        variant="caption"
+                        fontWeight={step.completed ? 700 : 500}
+                        color={step.completed ? 'primary.main' : 'text.secondary'}
+                        sx={{ display: { xs: 'none', sm: 'block' } }}
+                      >
+                        {step.label}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+              <LinearProgress
+                variant="determinate"
+                value={(currentStep / 2) * 100}
+                sx={{
+                  mt: 2,
+                  height: 4,
+                  borderRadius: 2,
+                  bgcolor: alpha(theme.palette.divider, 0.1),
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 2,
+                    bgcolor: theme.palette.primary.main,
+                  },
+                }}
+              />
+            </Box>
+          </Container>
+        </Box>
+      </Fade>
+
+      {/* Hero Section mejorado */}
       <Box
         sx={{
-          pt: { xs: 20, md: 25 },
+          pt: { xs: 24, md: 28 },
           pb: 6,
           position: 'relative',
           overflow: 'hidden',
         }}
       >
         <Container maxWidth="lg">
-          <Fade in timeout={800}>
-            <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Fade in timeout={1000}>
+            <Box sx={{ textAlign: 'center', mb: 5 }}>
+              {/* Trust Badge */}
               <Box
                 sx={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 1,
-                  px: 2,
-                  py: 0.8,
-                  borderRadius: 2,
+                  px: 2.5,
+                  py: 1,
+                  borderRadius: 50,
                   bgcolor: alpha(theme.palette.success.main, 0.1),
-                  border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
+                  border: `1px solid ${alpha(theme.palette.success.main, 0.25)}`,
                   mb: 3,
                 }}
               >
-                <LockIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                <LockIcon sx={{ fontSize: 18, color: 'success.main' }} />
                 <Typography
                   variant="caption"
                   sx={{
-                    fontWeight: 700,
+                    fontWeight: 800,
                     textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
+                    letterSpacing: '0.12em',
                     color: 'success.main',
                     fontSize: '0.7rem',
                   }}
                 >
-                  Pago 100% Seguro
+                  Pago 100% Seguro · SSL 256-bit
                 </Typography>
               </Box>
 
+              {/* Título principal */}
               <Typography
                 variant="h2"
-                fontWeight={800}
+                fontWeight={900}
                 sx={{
-                  fontSize: { xs: '2rem', md: '3.5rem' },
-                  letterSpacing: '-0.02em',
-                  mb: 2,
+                  fontSize: { xs: '2.25rem', md: '4rem' },
+                  letterSpacing: '-0.03em',
+                  mb: 2.5,
                   lineHeight: 1.1,
                 }}
               >
-                Finaliza tu{' '}
+                Activa tu{' '}
                 <Box
                   component="span"
                   sx={{
-                    background: (theme) =>
-                      `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                   }}
                 >
-                  suscripción
+                  Premium
                 </Box>
               </Typography>
 
+              {/* Subtítulo */}
               <Typography
                 variant="body1"
                 color="text.secondary"
-                sx={{ maxWidth: 500, mx: 'auto', fontSize: '1.1rem' }}
+                sx={{
+                  maxWidth: 550,
+                  mx: 'auto',
+                  fontSize: '1.1rem',
+                  fontWeight: 400,
+                  lineHeight: 1.7,
+                }}
               >
-                Solo dos pasos para desbloquear todas las funciones Premium
+                Completa tu orden en menos de 2 minutos y empieza a disfrutar todas las ventajas
               </Typography>
             </Box>
           </Fade>
@@ -614,7 +710,7 @@ export default function PagarContent() {
                     </Box>
 
                     <Grid container spacing={2}>
-                      {paymentMethods.map((method, index) => {
+                      {paymentMethods.filter((m) => !m.hidden).map((method, index) => {
                         const isSelected = selectedMethod === method.id;
                         return (
                           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={method.id}>
@@ -811,186 +907,222 @@ export default function PagarContent() {
               </Stack>
             </Grid>
 
-            {/* Right Column: Summary */}
+            {/* Right Column: Summary mejorado */}
             <Grid size={{ xs: 12, lg: 4 }}>
               <Fade in timeout={1400}>
-                <Box sx={{ position: 'sticky', top: 100 }}>
+                <Box sx={{ position: 'sticky', top: { xs: 100, lg: 120 } }}>
                   <Paper
-                    elevation={4}
+                    elevation={0}
                     sx={{
-                      p: 3,
-                      borderRadius: 4,
-                      border: `2px solid ${theme.palette.primary.main}`,
-                      bgcolor: alpha(theme.palette.background.paper, 0.95),
-                      backdropFilter: 'blur(20px)',
+                      p: 4,
+                      borderRadius: 5,
+                      border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                      bgcolor: alpha(theme.palette.background.paper, 0.8),
+                      backdropFilter: 'blur(30px)',
+                      boxShadow: `0 20px 60px ${alpha(theme.palette.common.black, 0.12)}`,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      },
                     }}
                   >
-                    <Typography variant="h6" fontWeight={800} gutterBottom>
-                      Resumen
-                    </Typography>
-                    <Divider sx={{ my: 2 }} />
+                    {/* Header del resumen */}
+                    <Box sx={{ mb: 3 }}>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 700,
+                          letterSpacing: '0.12em',
+                          fontSize: '0.7rem',
+                        }}
+                      >
+                        Tu Orden
+                      </Typography>
+                      <Typography variant="h5" fontWeight={900} sx={{ mt: 0.5 }}>
+                        Resumen de Pago
+                      </Typography>
+                    </Box>
+
+                    <Divider sx={{ my: 3 }} />
 
                     {planDetails && (
-                      <Stack spacing={2}>
+                      <Stack spacing={3}>
+                        {/* Plan seleccionado */}
                         <Box
                           sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
+                            p: 2.5,
+                            borderRadius: 3,
+                            bgcolor: alpha(theme.palette.primary.main, 0.05),
+                            border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
                           }}
                         >
-                          <Typography variant="body2" color="text.secondary">
-                            Plan Premium
-                          </Typography>
-                          <Chip
-                            label={`${planDetails.months} ${planDetails.months === 1 ? 'mes' : 'meses'}`}
-                            size="small"
-                            color="primary"
-                            sx={{ fontWeight: 700 }}
-                          />
-                        </Box>
-
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" color="text.secondary">
-                            Subtotal
-                          </Typography>
-                          <Typography variant="body2" fontWeight={600}>
-                            ${planDetails.subtotal.toFixed(2)}
-                          </Typography>
-                        </Box>
-
-                        {planDetails.discount > 0 && (
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="body2" color="success.main" fontWeight={600}>
-                              Descuento ({planDetails.discount}%)
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              mb: 1,
+                            }}
+                          >
+                            <Typography variant="body1" fontWeight={700}>
+                              VTrading Premium
                             </Typography>
-                            <Typography variant="body2" color="success.main" fontWeight={700}>
-                              -${planDetails.discountAmount.toFixed(2)}
+                            <Chip
+                              icon={<StarIcon sx={{ fontSize: 14 }} />}
+                              label={`${planDetails.months} ${planDetails.months === 1 ? 'mes' : 'meses'}`}
+                              size="small"
+                              sx={{
+                                bgcolor: theme.palette.primary.main,
+                                color: 'white',
+                                fontWeight: 800,
+                                fontSize: '0.75rem',
+                              }}
+                            />
+                          </Box>
+                          <Typography variant="caption" color="text.secondary">
+                            Acceso completo a todas las funciones premium
+                          </Typography>
+                        </Box>
+
+                        {/* Desglose de precios */}
+                        <Stack spacing={2}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Precio por mes
+                            </Typography>
+                            <Typography variant="body2" fontWeight={600}>
+                              ${planDetails.pricePerMonth.toFixed(2)}
                             </Typography>
                           </Box>
-                        )}
 
-                        <Divider />
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Subtotal ({planDetails.months}{' '}
+                              {planDetails.months === 1 ? 'mes' : 'meses'})
+                            </Typography>
+                            <Typography variant="body2" fontWeight={600}>
+                              ${planDetails.subtotal.toFixed(2)}
+                            </Typography>
+                          </Box>
 
+                          {planDetails.discount > 0 && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                p: 1.5,
+                                borderRadius: 2,
+                                bgcolor: alpha(theme.palette.success.main, 0.08),
+                                border: `1px solid ${alpha(theme.palette.success.main, 0.15)}`,
+                              }}
+                            >
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <LocalOfferIcon
+                                  sx={{ fontSize: 16, color: 'success.main' }}
+                                />
+                                <Typography
+                                  variant="body2"
+                                  color="success.main"
+                                  fontWeight={700}
+                                >
+                                  Descuento ({planDetails.discount}%)
+                                </Typography>
+                              </Box>
+                              <Typography
+                                variant="body2"
+                                color="success.main"
+                                fontWeight={800}
+                              >
+                                -${planDetails.discountAmount.toFixed(2)}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Stack>
+
+                        <Divider sx={{ my: 1 }} />
+
+                        {/* Total destacado */}
                         <Box
                           sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
+                            p: 3,
+                            borderRadius: 3,
+                            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.secondary.main, 0.08)})`,
+                            border: `2px solid ${alpha(theme.palette.primary.main, 0.15)}`,
                           }}
                         >
-                          <Typography variant="h6" fontWeight={800}>
-                            Total
-                          </Typography>
-                          <Typography variant="h4" fontWeight={800} color="primary.main">
-                            ${planDetails.total.toFixed(2)}
-                          </Typography>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Box>
+                              <Typography
+                                variant="overline"
+                                sx={{
+                                  fontWeight: 700,
+                                  fontSize: '0.7rem',
+                                  color: 'text.secondary',
+                                }}
+                              >
+                                Total a Pagar
+                              </Typography>
+                              <Typography variant="h3" fontWeight={900} color="primary.main">
+                                ${planDetails.total.toFixed(2)}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Pago único · Sin renovación automática
+                              </Typography>
+                            </Box>
+                          </Box>
                         </Box>
 
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          align="center"
-                          sx={{ pt: 1 }}
-                        >
-                          USD • Pago único
-                        </Typography>
-
+                        {/* Trust indicators */}
                         <Box
                           sx={{
-                            mt: 3,
-                            p: 2.5,
+                            mt: 2,
+                            p: 2,
                             borderRadius: 2,
                             bgcolor: alpha(theme.palette.success.main, 0.05),
                             border: `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
                           }}
                         >
-                          <Typography
-                            variant="body2"
-                            fontWeight={700}
-                            color="success.main"
-                            gutterBottom
-                          >
-                            ✓ Todo lo que incluye:
-                          </Typography>
-                          <Stack spacing={1} sx={{ mt: 1.5 }}>
+                          <Stack spacing={1.5}>
                             {[
-                              {
-                                icon: NotificationsActiveIcon,
-                                text: 'Alertas de precio ilimitadas personalizables',
-                              },
-                              { icon: BlockOutlinedIcon, text: 'Experiencia sin publicidad' },
-                              { icon: FlashOnIcon, text: 'Datos de mercado en tiempo real' },
-                              {
-                                icon: ShowChartIcon,
-                                text: 'Análisis técnico avanzado y gráficos profesionales',
-                              },
-                              { icon: PhoneIphoneIcon, text: 'Notificaciones push prioritarias' },
-                              { icon: BookmarkIcon, text: 'Watchlists ilimitadas y sincronizadas' },
-                              {
-                                icon: SupportAgentIcon,
-                                text: 'Soporte prioritario 24/7 por chat y email',
-                              },
-                              {
-                                icon: TimelineIcon,
-                                text: 'Indicadores técnicos premium (RSI, MACD, Bollinger)',
-                              },
-                              {
-                                icon: ArticleIcon,
-                                text: 'Noticias financieras y análisis de mercado',
-                              },
-                              { icon: SaveAltIcon, text: 'Exportación de datos a CSV/Excel' },
-                              {
-                                icon: AccountBalanceWalletIcon,
-                                text: 'Seguimiento de portafolio multi-activo',
-                              },
-                              {
-                                icon: NewReleasesIcon,
-                                text: 'Acceso anticipado a nuevas funciones',
-                              },
-                            ].map((feature) => {
-                              const IconComponent = feature.icon;
-                              return (
-                                <Box
-                                  key={feature.text}
-                                  sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}
+                              { icon: SecurityIcon, text: 'Encriptación SSL 256-bit' },
+                              { icon: LockIcon, text: 'Datos protegidos' },
+                              { icon: VerifiedUserIcon, text: 'Sin cargos ocultos' },
+                            ].map((item, index) => (
+                              <Box
+                                key={index}
+                                sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}
+                              >
+                                <item.icon
+                                  sx={{
+                                    fontSize: 18,
+                                    color: 'success.main',
+                                  }}
+                                />
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  fontWeight={600}
                                 >
-                                  <IconComponent
-                                    sx={{
-                                      fontSize: 18,
-                                      color: theme.palette.success.main,
-                                      opacity: 0.8,
-                                      mt: 0.2,
-                                    }}
-                                  />
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{ flex: 1, pt: 0.3 }}
-                                  >
-                                    {feature.text}
-                                  </Typography>
-                                </Box>
-                              );
-                            })}
+                                  {item.text}
+                                </Typography>
+                              </Box>
+                            ))}
                           </Stack>
                         </Box>
-
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          align="center"
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 0.5,
-                            pt: 1,
-                          }}
-                        >
-                          <SecurityIcon sx={{ fontSize: 14 }} />
-                          Protegido por encriptación SSL
-                        </Typography>
                       </Stack>
                     )}
                   </Paper>
