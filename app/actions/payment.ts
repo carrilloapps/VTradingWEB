@@ -329,11 +329,13 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
       reference: orderId,
       description: `VTrading Premium - ${request.months} ${request.months === 1 ? 'mes' : 'meses'}`,
       payment_methods: availablePaymentMethods,
-      // Bold requires HTTPS for callback_url and uses it for both webhook AND redirection
-      // If we are in development (http), we should NOT send callback_url to avoid 400 errors
-      ...((webhookUrl || `${baseUrl}/plan/success`).startsWith('https') && {
-        callback_url: webhookUrl || `${baseUrl}/plan/success`,
-      }),
+      // Bold requires HTTPS for callback_url (used for redirection)
+      // We allow it only if it's HTTPS or localhost to avoid 400 errors from Bold
+      ...(((webhookUrl || `${baseUrl}/plan/success`).startsWith('https') ||
+        baseUrl.includes('localhost') ||
+        baseUrl.includes('127.0.0.1'))
+        ? { callback_url: webhookUrl || `${baseUrl}/plan/success` }
+        : {}),
     };
 
     console.log('Bold API Request:', {
