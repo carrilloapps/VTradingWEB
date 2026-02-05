@@ -96,8 +96,8 @@ const PlanCard: React.FC<PlanCardProps> = ({
             position: 'absolute',
             top: -12,
             right: 20,
-            bgcolor: 'primary.main',
-            color: 'white',
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'primary.main',
+            color: (theme) => theme.palette.mode === 'dark' ? theme.palette.common.white : 'white',
             px: 2,
             py: 0.5,
             borderRadius: 2,
@@ -108,6 +108,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
             fontSize: '0.75rem',
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
+            boxShadow: (theme) => `0 2px 8px ${alpha(theme.palette.common.black, 0.2)}`,
           }}
         >
           <StarIcon sx={{ fontSize: '1rem' }} />
