@@ -174,6 +174,9 @@ export default function PagarContent() {
               {/* Step Label */}
               <Typography
                 variant="caption"
+                component="span"
+                role="status"
+                aria-label={`Paso actual: ${['Duración', 'Pago', 'Confirmar'][currentStep]}`}
                 sx={{
                   fontWeight: 700,
                   fontSize: { xs: '0.7rem', md: '0.75rem' },
@@ -185,7 +188,14 @@ export default function PagarContent() {
                 {['Duración', 'Pago', 'Confirmar'][currentStep]}
               </Typography>
               {/* Progress Bar */}
-              <Box sx={{ flex: 1, position: 'relative' }}>
+              <Box 
+                sx={{ flex: 1, position: 'relative' }}
+                role="progressbar"
+                aria-valuenow={currentStep + 1}
+                aria-valuemin={1}
+                aria-valuemax={3}
+                aria-label="Progreso del proceso de pago"
+              >
                 <Box
                   sx={{
                     height: 3,
@@ -377,19 +387,34 @@ export default function PagarContent() {
                         </Typography>
                       </Box>
                       <Box>
-                        <Typography variant="h6" fontWeight={700}>
+                        <Typography 
+                          variant="h6" 
+                          fontWeight={700}
+                          id="duration-selection-heading"
+                          component="h2"
+                        >
                           Elige la duración
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary"
+                          component="p"
+                        >
                           Ahorra más al elegir períodos más largos
                         </Typography>
                       </Box>
                     </Box>
 
-                    <FormControl component="fieldset" fullWidth>
+                    <FormControl 
+                      component="fieldset" 
+                      fullWidth
+                      aria-labelledby="duration-selection-heading"
+                    >
                       <RadioGroup
+                        aria-label="Selección de duración del plan premium"
                         value={selectedDuration}
                         onChange={(e) => setSelectedDuration(Number(e.target.value))}
+                        role="radiogroup"
                       >
                         <Grid container spacing={2}>
                           {planDurations.map((duration, index) => {
@@ -402,6 +427,16 @@ export default function PagarContent() {
                               <Grid size={{ xs: 12, sm: 6, md: 6, lg: 3 }} key={duration.months}>
                                 <Zoom in timeout={1200 + index * 100}>
                                   <Card
+                                    role="radio"
+                                    aria-checked={isSelected}
+                                    aria-label={`Plan de ${duration.label}, ${duration.discount > 0 ? `ahorra ${duration.discount}% ` : ''}$${total.toFixed(2)} total`}
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        setSelectedDuration(duration.months);
+                                      }
+                                    }}
                                     sx={{
                                       position: 'relative',
                                       cursor: 'pointer',
@@ -718,22 +753,47 @@ export default function PagarContent() {
                         </Typography>
                       </Box>
                       <Box>
-                        <Typography variant="h6" fontWeight={700}>
+                        <Typography 
+                          variant="h6" 
+                          fontWeight={700}
+                          id="payment-method-heading"
+                          component="h2"
+                        >
                           Selecciona cómo pagar
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary"
+                          component="p"
+                        >
                           Elige tu método de pago preferido
                         </Typography>
                       </Box>
                     </Box>
 
-                    <Grid container spacing={2}>
+                    <Grid 
+                      container 
+                      spacing={2}
+                      role="radiogroup"
+                      aria-labelledby="payment-method-heading"
+                      aria-label="Métodos de pago disponibles"
+                    >
                       {paymentMethods.filter((m) => !m.hidden).map((method, index) => {
                         const isSelected = selectedMethod === method.id;
                         return (
                           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={method.id}>
                             <Zoom in timeout={1400 + index * 100}>
                               <Card
+                                role="radio"
+                                aria-checked={isSelected}
+                                aria-label={`Método de pago ${method.name}, ${method.description}`}
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    setSelectedMethod(method.id);
+                                  }
+                                }}
                                 sx={{
                                   cursor: 'pointer',
                                   height: '100%',
@@ -872,7 +932,12 @@ export default function PagarContent() {
                     {/* Payment Form for Selected Method */}
                     {selectedMethod && planDetails && (
                       <Fade in timeout={600}>
-                        <Box sx={{ mt: 3 }}>
+                        <Box 
+                          sx={{ mt: 3 }}
+                          role="region"
+                          aria-label="Formulario de pago seleccionado"
+                          aria-live="polite"
+                        >
                           {selectedMethod === 'stripe' && (
                             <StripePaymentMethod
                               planDetails={planDetails}

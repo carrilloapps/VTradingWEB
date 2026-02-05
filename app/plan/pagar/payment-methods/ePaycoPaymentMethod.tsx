@@ -18,6 +18,9 @@ import {
   alpha,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { PaymentMethodComponentProps, CustomerInfo } from './types';
 import { createPaymentCheckout } from '@/app/actions/payment';
 
@@ -34,6 +37,7 @@ export default function EPaycoPaymentMethod({
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneValue, setPhoneValue] = useState<string | undefined>('');
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     email: '',
@@ -41,12 +45,40 @@ export default function EPaycoPaymentMethod({
     documentNumber: '',
   });
 
+  const formatDocumentNumber = (value: string): string => {
+    // Remover todo excepto letras y números
+    const cleaned = value.replace(/[^a-zA-Z0-9]/g, '');
+    
+    // Separar letra inicial (si existe) y números
+    const match = cleaned.match(/^([a-zA-Z])?([0-9]*)$/);
+    if (!match) return value;
+    
+    const [, letter, numbers] = match;
+    
+    // Formatear números con puntos de miles
+    const formatted = numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    // Retornar con formato apropiado
+    return letter ? `${letter.toUpperCase()}-${formatted}` : formatted;
+  };
+
   const handleInputChange =
     (field: keyof CustomerInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCustomerInfo((prev) => ({
-        ...prev,
-        [field]: event.target.value,
-      }));
+      const value = event.target.value;
+      
+      // Formatear automáticamente el documento
+      if (field === 'documentNumber') {
+        const formatted = formatDocumentNumber(value);
+        setCustomerInfo((prev) => ({
+          ...prev,
+          [field]: formatted,
+        }));
+      } else {
+        setCustomerInfo((prev) => ({
+          ...prev,
+          [field]: value,
+        }));
+      }
       setError(null);
     };
 
@@ -141,12 +173,20 @@ export default function EPaycoPaymentMethod({
           <TextField
             fullWidth
             required
+            id="epayco-customer-name"
+            name="name"
             label="Nombre completo"
             placeholder="Juan Pérez"
             value={customerInfo.name}
             onChange={handleInputChange('name')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="name"
+            inputProps={{
+              'aria-label': 'Nombre completo del cliente',
+              'aria-required': 'true',
+              minLength: 3,
+            }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Grid>
@@ -154,12 +194,18 @@ export default function EPaycoPaymentMethod({
         <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
+            id="epayco-document-number"
+            name="documentNumber"
             label="Número de documento"
-            placeholder="1234567890"
+            placeholder="Ej: 1.234.567 o V-1.234.567"
             value={customerInfo.documentNumber}
             onChange={handleInputChange('documentNumber')}
             disabled={isLoading}
             variant="outlined"
+            inputProps={{
+              'aria-label': 'Número de documento de identidad (opcional, se formateará automáticamente)',
+              minLength: 6,
+            }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Grid>
@@ -168,6 +214,8 @@ export default function EPaycoPaymentMethod({
           <TextField
             fullWidth
             required
+            id="epayco-email"
+            name="email"
             type="email"
             label="Correo electrónico"
             placeholder="tu@email.com"
@@ -175,22 +223,117 @@ export default function EPaycoPaymentMethod({
             onChange={handleInputChange('email')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="email"
+            inputProps={{
+              'aria-label': 'Correo electrónico de contacto',
+              'aria-required': 'true',
+            }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Grid>
 
         <Grid size={{ xs: 12 }}>
-          <TextField
-            fullWidth
-            required
-            label="Teléfono"
-            placeholder="+57 300 123 4567"
-            value={customerInfo.phone}
-            onChange={handleInputChange('phone')}
-            disabled={isLoading}
-            variant="outlined"
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-          />
+          <Box>
+            <Typography
+              component="label"
+              htmlFor="epayco-phone"
+              variant="body2"
+              sx={{
+                display: 'block',
+                mb: 0.5,
+                fontWeight: 500,
+                color: 'text.secondary',
+                fontSize: '0.875rem',
+              }}
+            >
+              Teléfono <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+            </Typography>
+            <Box
+              sx={{
+                '& .PhoneInput': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  border: `1px solid ${alpha(theme.palette.divider, 0.23)}`,
+                  borderRadius: '8px',
+                  padding: '14px 14px',
+                  backgroundColor: theme.palette.background.paper,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    borderColor: theme.palette.text.primary,
+                  },
+                  '&:focus-within': {
+                    borderColor: theme.palette.primary.main,
+                    borderWidth: '2px',
+                    padding: '13px 13px',
+                    boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
+                  },
+                },
+                '& .PhoneInputInput': {
+                  border: 'none',
+                  outline: 'none',
+                  flex: 1,
+                  fontSize: '1rem',
+                  backgroundColor: 'transparent',
+                  color: theme.palette.text.primary,
+                  fontFamily: theme.typography.fontFamily,
+                  '&::placeholder': {
+                    color: theme.palette.text.disabled,
+                  },
+                },
+                '& .PhoneInputCountry': {
+                  marginRight: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  position: 'relative',
+                },
+                '& .PhoneInputCountryIcon': {
+                  width: '32px',
+                  height: '24px',
+                  marginRight: '8px',
+                  borderRadius: '4px',
+                  boxShadow: `0 1px 3px ${alpha('#000', 0.15)}`,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                },
+                '& .PhoneInputCountrySelect': {
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                },
+                '& .PhoneInputCountrySelectArrow': {
+                  display: 'none',
+                },
+                '& .PhoneInputCountry::after': {
+                  content: '"▼"',
+                  fontSize: '10px',
+                  color: theme.palette.text.secondary,
+                  marginLeft: '4px',
+                  pointerEvents: 'none',
+                },
+              }}
+            >
+              <PhoneInput
+                id="epayco-phone"
+                placeholder="Ingresa tu número de teléfono"
+                value={phoneValue}
+                onChange={(value) => {
+                  setPhoneValue(value);
+                  setCustomerInfo((prev) => ({ ...prev, phone: value || '' }));
+                  setError(null);
+                }}
+                defaultCountry="CO"
+                disabled={isLoading}
+                international
+                countryCallingCodeEditable={false}
+                aria-label="Número de teléfono con código de país"
+                aria-required="true"
+              />
+            </Box>
+          </Box>
         </Grid>
       </Grid>
 
@@ -224,9 +367,17 @@ export default function EPaycoPaymentMethod({
           )}
         </Button>
 
-        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05) }}>
-          <Typography variant="caption" color="text.secondary" display="block" textAlign="center">
-            💳 Pago seguro disponible en toda Latinoamérica
+        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05), border: `1px solid ${alpha(theme.palette.info.main, 0.1)}` }}>
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            display="flex" 
+            alignItems="center" 
+            justifyContent="center"
+            textAlign="center"
+          >
+            <CreditCardIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            Pago seguro disponible en toda Latinoamérica
           </Typography>
         </Box>
       </Box>

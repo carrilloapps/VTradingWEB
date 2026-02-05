@@ -133,12 +133,20 @@ export default function PayPalPaymentMethod({
           <TextField
             fullWidth
             required
+            id="paypal-customer-name"
+            name="name"
             label="Nombre completo"
             placeholder="Juan Pérez"
             value={customerInfo.name}
             onChange={handleInputChange('name')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="name"
+            inputProps={{
+              'aria-label': 'Nombre completo del cliente',
+              'aria-required': 'true',
+              minLength: 3,
+            }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Grid>
@@ -147,6 +155,8 @@ export default function PayPalPaymentMethod({
           <TextField
             fullWidth
             required
+            id="paypal-email"
+            name="email"
             type="email"
             label="Correo electrónico"
             placeholder="tu@email.com"
@@ -154,6 +164,11 @@ export default function PayPalPaymentMethod({
             onChange={handleInputChange('email')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="email"
+            inputProps={{
+              'aria-label': 'Correo electrónico de contacto asociado a PayPal',
+              'aria-required': 'true',
+            }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Grid>
@@ -189,9 +204,17 @@ export default function PayPalPaymentMethod({
           )}
         </Button>
 
-        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05) }}>
-          <Typography variant="caption" color="text.secondary" display="block" textAlign="center">
-            🔒 Serás redirigido a PayPal para completar el pago de forma segura
+        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05), border: `1px solid ${alpha(theme.palette.info.main, 0.1)}` }}>
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            display="flex" 
+            alignItems="center" 
+            justifyContent="center"
+            textAlign="center"
+          >
+            <LockIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            Serás redirigido a PayPal para completar el pago de forma segura
           </Typography>
         </Box>
       </Box>

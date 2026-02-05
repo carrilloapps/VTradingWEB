@@ -20,6 +20,7 @@ import {
   Chip,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import { PaymentMethodComponentProps, CustomerInfo } from './types';
 import { createPaymentCheckout } from '@/app/actions/payment';
 import { CryptoCurrency } from '@/lib/vtrading-types';
@@ -203,12 +204,20 @@ export default function BinancePayPaymentMethod({
           <TextField
             fullWidth
             required
+            id="binance-customer-name"
+            name="name"
             label="Nombre completo"
             placeholder="Juan Pérez"
             value={customerInfo.name}
             onChange={handleInputChange('name')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="name"
+            inputProps={{
+              'aria-label': 'Nombre completo del cliente',
+              'aria-required': 'true',
+              minLength: 3,
+            }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Grid>
@@ -217,6 +226,8 @@ export default function BinancePayPaymentMethod({
           <TextField
             fullWidth
             required
+            id="binance-email"
+            name="email"
             type="email"
             label="Correo electrónico"
             placeholder="tu@email.com"
@@ -224,6 +235,11 @@ export default function BinancePayPaymentMethod({
             onChange={handleInputChange('email')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="email"
+            inputProps={{
+              'aria-label': 'Correo electrónico de contacto',
+              'aria-required': 'true',
+            }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Grid>
@@ -259,9 +275,17 @@ export default function BinancePayPaymentMethod({
           )}
         </Button>
 
-        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha('#F3BA2F', 0.1) }}>
-          <Typography variant="caption" color="text.secondary" display="block" textAlign="center">
-            ₿ Pago instantáneo y seguro con criptomonedas
+        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha('#F3BA2F', 0.1), border: `1px solid ${alpha('#F3BA2F', 0.2)}` }}>
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            display="flex" 
+            alignItems="center" 
+            justifyContent="center"
+            textAlign="center"
+          >
+            <CurrencyBitcoinIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            Pago instantáneo y seguro con criptomonedas
           </Typography>
         </Box>
       </Box>

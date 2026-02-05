@@ -18,6 +18,9 @@ import {
   alpha,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { PaymentMethodComponentProps, CustomerInfo } from './types';
 import { createPaymentCheckout } from '@/app/actions/payment';
 
@@ -34,6 +37,7 @@ export default function StripePaymentMethod({
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneValue, setPhoneValue] = useState<string | undefined>('');
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     email: '',
@@ -137,12 +141,20 @@ export default function StripePaymentMethod({
           <TextField
             fullWidth
             required
+            id="stripe-customer-name"
+            name="name"
             label="Nombre completo"
             placeholder="Juan Pérez"
             value={customerInfo.name}
             onChange={handleInputChange('name')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="name"
+            inputProps={{
+              'aria-label': 'Nombre completo del cliente',
+              'aria-required': 'true',
+              minLength: 3,
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
@@ -155,6 +167,8 @@ export default function StripePaymentMethod({
           <TextField
             fullWidth
             required
+            id="stripe-email"
+            name="email"
             type="email"
             label="Correo electrónico"
             placeholder="tu@email.com"
@@ -162,6 +176,11 @@ export default function StripePaymentMethod({
             onChange={handleInputChange('email')}
             disabled={isLoading}
             variant="outlined"
+            autoComplete="email"
+            inputProps={{
+              'aria-label': 'Correo electrónico de contacto',
+              'aria-required': 'true',
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
@@ -171,20 +190,106 @@ export default function StripePaymentMethod({
         </Grid>
 
         <Grid size={{ xs: 12 }}>
-          <TextField
-            fullWidth
-            label="Teléfono (opcional)"
-            placeholder="+57 300 123 4567"
-            value={customerInfo.phone}
-            onChange={handleInputChange('phone')}
-            disabled={isLoading}
-            variant="outlined"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-              },
-            }}
-          />
+          <Box>
+            <Typography
+              component="label"
+              htmlFor="stripe-phone"
+              variant="body2"
+              sx={{
+                display: 'block',
+                mb: 0.5,
+                fontWeight: 500,
+                color: 'text.secondary',
+                fontSize: '0.875rem',
+              }}
+            >
+              Teléfono (opcional)
+            </Typography>
+            <Box
+              sx={{
+                '& .PhoneInput': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  border: `1px solid ${alpha(theme.palette.divider, 0.23)}`,
+                  borderRadius: '8px',
+                  padding: '14px 14px',
+                  backgroundColor: theme.palette.background.paper,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    borderColor: theme.palette.text.primary,
+                  },
+                  '&:focus-within': {
+                    borderColor: theme.palette.primary.main,
+                    borderWidth: '2px',
+                    padding: '13px 13px',
+                    boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
+                  },
+                },
+                '& .PhoneInputInput': {
+                  border: 'none',
+                  outline: 'none',
+                  flex: 1,
+                  fontSize: '1rem',
+                  backgroundColor: 'transparent',
+                  color: theme.palette.text.primary,
+                  fontFamily: theme.typography.fontFamily,
+                  '&::placeholder': {
+                    color: theme.palette.text.disabled,
+                  },
+                },
+                '& .PhoneInputCountry': {
+                  marginRight: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  position: 'relative',
+                },
+                '& .PhoneInputCountryIcon': {
+                  width: '32px',
+                  height: '24px',
+                  marginRight: '8px',
+                  borderRadius: '4px',
+                  boxShadow: `0 1px 3px ${alpha('#000', 0.15)}`,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                },
+                '& .PhoneInputCountrySelect': {
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                },
+                '& .PhoneInputCountrySelectArrow': {
+                  display: 'none',
+                },
+                '& .PhoneInputCountry::after': {
+                  content: '"▼"',
+                  fontSize: '10px',
+                  color: theme.palette.text.secondary,
+                  marginLeft: '4px',
+                  pointerEvents: 'none',
+                },
+              }}
+            >
+              <PhoneInput
+                id="stripe-phone"
+                placeholder="Ingresa tu número de teléfono"
+                value={phoneValue}
+                onChange={(value) => {
+                  setPhoneValue(value);
+                  setCustomerInfo((prev) => ({ ...prev, phone: value || '' }));
+                  setError(null);
+                }}
+                defaultCountry="US"
+                disabled={isLoading}
+                international
+                countryCallingCodeEditable={false}
+                aria-label="Número de teléfono con código de país (opcional)"
+              />
+            </Box>
+          </Box>
         </Grid>
       </Grid>
 
@@ -232,13 +337,23 @@ export default function StripePaymentMethod({
             border: `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
           }}
         >
-          <Typography variant="caption" color="text.secondary" display="block" textAlign="center">
-            🔒 Pago procesado de forma segura por{' '}
-            <Box component="span" fontWeight={700} color="primary.main">
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            display="flex" 
+            alignItems="center" 
+            justifyContent="center" 
+            flexWrap="wrap"
+            textAlign="center"
+          >
+            <LockIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            Pago procesado de forma segura por{' '}
+            <Box component="span" fontWeight={700} color="primary.main" sx={{ ml: 0.5 }}>
               Stripe
             </Box>
-            <br />
-            Aceptamos Visa, Mastercard y American Express
+            <Box component="span" sx={{ width: '100%', display: 'block', mt: 0.5 }}>
+              Aceptamos Visa, Mastercard y American Express
+            </Box>
           </Typography>
         </Box>
       </Box>
