@@ -145,7 +145,24 @@ export default function CountryPhoneInput({
   const theme = useTheme();
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
+    // Remove all non-numeric characters
+    let value = e.target.value.replace(/[^0-9]/g, '');
+
+    // Remove country dial code if present at the beginning
+    const dialCode = selectedCountry.dial.replace(/[^0-9]/g, ''); // e.g., "57" from "+57"
+
+    // Check if the value starts with the dial code
+    if (value.startsWith(dialCode)) {
+      value = value.slice(dialCode.length);
+    }
+
+    // Handle special cases like Dominican Republic (+1-809)
+    // Extract all digits from dial code for these cases
+    const allDialDigits = selectedCountry.dial.replace(/\D/g, '');
+    if (allDialDigits !== dialCode && value.startsWith(allDialDigits)) {
+      value = value.slice(allDialDigits.length);
+    }
+
     onPhoneChange(value);
   };
 
@@ -377,11 +394,86 @@ export default function CountryPhoneInput({
             }}
             helperText={
               phoneNumber && (
-                <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <PhoneIcon sx={{ fontSize: 14 }} />
-                  <Typography variant="caption" component="span" color="text.secondary">
-                    {selectedCountry.dial} {phoneNumber}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    mt: 1,
+                    width: '100%',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    Número para confirmación del pago
                   </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      px: 2,
+                      py: 1.25,
+                      borderRadius: 2.5,
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                      backdropFilter: 'blur(8px)',
+                      transition: theme.transitions.create(['background-color', 'border-color'], {
+                        duration: theme.transitions.duration.short,
+                      }),
+                      '&:hover': {
+                        bgcolor: alpha(theme.palette.primary.main, 0.12),
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
+                      },
+                    }}
+                  >
+                    <PhoneIcon
+                      sx={{
+                        fontSize: 18,
+                        color: 'primary.main',
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      component="span"
+                      sx={{
+                        fontWeight: 600,
+                        color: 'primary.main',
+                        fontSize: '0.9rem',
+                        letterSpacing: '0.02em',
+                      }}
+                    >
+                      {selectedCountry.dial}
+                    </Typography>
+                    <Box
+                      component="span"
+                      sx={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: '50%',
+                        bgcolor: alpha(theme.palette.primary.main, 0.4),
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      component="span"
+                      sx={{
+                        fontWeight: 500,
+                        color: 'text.primary',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      {phoneNumber}
+                    </Typography>
+                  </Box>
                 </Box>
               )
             }
