@@ -12,16 +12,8 @@ import {
   Paper,
   Button,
   Fade,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Chip,
-  Stack,
-  Slide,
   Grow,
-  Collapse,
-  IconButton,
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -45,8 +37,6 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SecurityIcon from '@mui/icons-material/Security';
 import SpeedIcon from '@mui/icons-material/Speed';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CloseIcon from '@mui/icons-material/Close';
 
 interface PlanFeature {
   text: string;
@@ -375,7 +365,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
 
 export default function PlanContent() {
   const theme = useTheme();
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [_expandedFaq, _setExpandedFaq] = useState<number | null>(null);
 
   // Get price from environment variable
   const pricePerMonth = parseFloat(process.env.NEXT_PUBLIC_PREMIUM_PLAN_PRICE_USD || '1');

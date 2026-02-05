@@ -7,12 +7,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import {
-  parsePhoneNumber,
-  getExampleNumber,
-  AsYouType,
-  CountryCode,
-} from 'libphonenumber-js';
+import { parsePhoneNumber, getExampleNumber, AsYouType, CountryCode } from 'libphonenumber-js';
 import examples from 'libphonenumber-js/mobile/examples';
 import {
   Box,
@@ -146,7 +141,7 @@ export default function CountryPhoneInput({
   onPhoneChange,
   disabled = false,
   required = false,
-  placeholder = '300 123 4567',
+  placeholder: _placeholder = '300 123 4567',
   inputId = 'phone-input',
   label = 'Teléfono',
   countries = ALL_COUNTRIES,

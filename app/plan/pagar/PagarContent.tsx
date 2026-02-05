@@ -28,18 +28,6 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import SecurityIcon from '@mui/icons-material/Security';
 import StarIcon from '@mui/icons-material/Star';
 import LockIcon from '@mui/icons-material/Lock';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
-import FlashOnIcon from '@mui/icons-material/FlashOn';
-import ShowChartIcon from '@mui/icons-material/ShowChart';
-import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import TimelineIcon from '@mui/icons-material/Timeline';
-import ArticleIcon from '@mui/icons-material/Article';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import { PaymentMethod } from '@/lib/vtrading-types';
 import {
