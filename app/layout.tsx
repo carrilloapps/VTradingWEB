@@ -6,6 +6,8 @@ import { MarketProvider } from '@/context/MarketContext';
 import { getMarketDataAction } from '@/app/actions/market';
 import { logger } from '@/lib/logger';
 
+export const dynamic = 'force-dynamic';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
