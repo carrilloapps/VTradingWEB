@@ -6,7 +6,8 @@
 
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
+import { parsePhoneNumber } from 'libphonenumber-js';
 import {
   Box,
   TextField,
@@ -26,6 +27,8 @@ import {
 } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SearchIcon from '@mui/icons-material/Search';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 // Import flag SVGs
 import CO from 'country-flag-icons/react/3x2/CO';
@@ -165,6 +168,35 @@ export default function CountryPhoneInput({
 
     onPhoneChange(value);
   };
+
+  // Format and validate phone number
+  const phoneValidation = useMemo(() => {
+    if (!phoneNumber) return { isValid: false, formatted: '', international: '' };
+
+    try {
+      const fullNumber = `${selectedCountry.dial}${phoneNumber}`;
+      const parsed = parsePhoneNumber(
+        fullNumber,
+        selectedCountry.code as 'CO' | 'US' | 'MX' | 'AR' | 'CL' | 'PE' | 'EC' | 'VE' | string,
+      );
+
+      if (parsed) {
+        return {
+          isValid: parsed.isValid(),
+          formatted: parsed.formatNational(),
+          international: parsed.formatInternational(),
+        };
+      }
+    } catch (_error) {
+      // If parsing fails, return raw number
+    }
+
+    return {
+      isValid: false,
+      formatted: phoneNumber,
+      international: `${selectedCountry.dial} ${phoneNumber}`,
+    };
+  }, [phoneNumber, selectedCountry]);
 
   return (
     <Grid size={{ xs: 12 }}>
@@ -379,6 +411,7 @@ export default function CountryPhoneInput({
             disabled={disabled}
             variant="outlined"
             autoComplete="tel"
+            error={phoneNumber.length > 0 && !phoneValidation.isValid}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -410,10 +443,23 @@ export default function CountryPhoneInput({
                       fontWeight: 600,
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
-                      color: 'text.secondary',
+                      color: phoneValidation.isValid ? 'success.main' : 'warning.main',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
                     }}
                   >
-                    Número para confirmación del pago
+                    {phoneValidation.isValid ? (
+                      <>
+                        <CheckCircleIcon sx={{ fontSize: 12 }} />
+                        Número válido para confirmación del pago
+                      </>
+                    ) : (
+                      <>
+                        <ErrorOutlineIcon sx={{ fontSize: 12 }} />
+                        Verifica el formato del número
+                      </>
+                    )}
                   </Typography>
                   <Box
                     sx={{
@@ -423,22 +469,24 @@ export default function CountryPhoneInput({
                       px: 2,
                       py: 1.25,
                       borderRadius: 2.5,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                      bgcolor: phoneValidation.isValid
+                        ? alpha(theme.palette.success.main, 0.08)
+                        : alpha(theme.palette.warning.main, 0.08),
+                      border: `1px solid ${
+                        phoneValidation.isValid
+                          ? alpha(theme.palette.success.main, 0.3)
+                          : alpha(theme.palette.warning.main, 0.3)
+                      }`,
                       backdropFilter: 'blur(8px)',
                       transition: theme.transitions.create(['background-color', 'border-color'], {
                         duration: theme.transitions.duration.short,
                       }),
-                      '&:hover': {
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        borderColor: alpha(theme.palette.primary.main, 0.3),
-                      },
                     }}
                   >
                     <PhoneIcon
                       sx={{
                         fontSize: 18,
-                        color: 'primary.main',
+                        color: phoneValidation.isValid ? 'success.main' : 'warning.main',
                       }}
                     />
                     <Typography
@@ -446,7 +494,7 @@ export default function CountryPhoneInput({
                       component="span"
                       sx={{
                         fontWeight: 600,
-                        color: 'primary.main',
+                        color: phoneValidation.isValid ? 'success.main' : 'warning.main',
                         fontSize: '0.9rem',
                         letterSpacing: '0.02em',
                       }}
@@ -459,7 +507,9 @@ export default function CountryPhoneInput({
                         width: 4,
                         height: 4,
                         borderRadius: '50%',
-                        bgcolor: alpha(theme.palette.primary.main, 0.4),
+                        bgcolor: phoneValidation.isValid
+                          ? alpha(theme.palette.success.main, 0.5)
+                          : alpha(theme.palette.warning.main, 0.5),
                       }}
                     />
                     <Typography
@@ -471,7 +521,7 @@ export default function CountryPhoneInput({
                         fontSize: '0.9rem',
                       }}
                     >
-                      {phoneNumber}
+                      {phoneValidation.formatted || phoneNumber}
                     </Typography>
                   </Box>
                 </Box>
