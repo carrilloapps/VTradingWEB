@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import {
   Box,
   Container,
@@ -26,10 +27,6 @@ import {
 } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
-import PaymentIcon from '@mui/icons-material/Payment';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import SecurityIcon from '@mui/icons-material/Security';
 import StarIcon from '@mui/icons-material/Star';
@@ -43,41 +40,46 @@ const paymentMethods = [
     id: 'stripe' as PaymentMethod,
     name: 'Stripe',
     description: 'Tarjetas de crédito/débito',
-    icon: <CreditCardIcon />,
+    iconPath: '/assets/icons/stripe.svg',
     features: ['Visa', 'Mastercard', 'American Express'],
     color: '#635BFF',
+    iconBg: '#FFFFFF',
   },
   {
     id: 'paypal' as PaymentMethod,
     name: 'PayPal',
     description: 'Paga con PayPal o tarjeta',
-    icon: <PaymentIcon />,
+    iconPath: '/assets/icons/paypal.svg',
     features: ['PayPal', 'Tarjetas', 'Pago en 4'],
     color: '#0070BA',
+    iconBg: '#FFFFFF',
   },
   {
     id: 'bold' as PaymentMethod,
     name: 'Bold',
     description: 'Pagos Colombia (PSE, Nequi)',
-    icon: <AccountBalanceIcon />,
+    iconPath: '/assets/icons/bold.png',
     features: ['PSE', 'Nequi', 'Daviplata'],
     color: '#00D4FF',
+    iconBg: '#FFFFFF',
   },
   {
     id: 'epayco' as PaymentMethod,
     name: 'ePayco',
     description: 'Pagos Latinoamérica',
-    icon: <PaymentIcon />,
+    iconPath: '/assets/icons/epayco.png',
     features: ['Tarjetas', 'Efectivo', 'Transferencias'],
     color: '#0DC041',
+    iconBg: '#FFFFFF',
   },
   {
     id: 'binance' as PaymentMethod,
     name: 'Binance Pay',
     description: 'Paga con criptomonedas',
-    icon: <CurrencyBitcoinIcon />,
+    iconPath: '/assets/icons/binance.svg',
     features: ['USDT', 'USDC', 'BTC', 'ETH', 'BNB'],
     color: '#F3BA2F',
+    iconBg: '#F3BA2F',
   },
 ];
 
@@ -609,86 +611,160 @@ export default function PagarContent() {
                     </Box>
 
                     <Grid container spacing={2}>
-                      {paymentMethods.map((method, index) => (
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={method.id}>
-                          <Zoom in timeout={1400 + index * 100}>
-                            <Card
-                              sx={{
-                                cursor: 'pointer',
-                                border: `2px solid ${
-                                  selectedMethod === method.id
-                                    ? method.color
-                                    : alpha(theme.palette.divider, 0.3)
-                                }`,
-                                bgcolor:
-                                  selectedMethod === method.id
-                                    ? alpha(method.color, 0.05)
+                      {paymentMethods.map((method, index) => {
+                        const isSelected = selectedMethod === method.id;
+                        return (
+                          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={method.id}>
+                            <Zoom in timeout={1400 + index * 100}>
+                              <Card
+                                sx={{
+                                  cursor: 'pointer',
+                                  height: '100%',
+                                  border: `1px solid ${
+                                    isSelected
+                                      ? alpha(method.color, 0.4)
+                                      : alpha(theme.palette.divider, 0.15)
+                                  }`,
+                                  bgcolor: isSelected
+                                    ? alpha(method.color, 0.03)
                                     : 'transparent',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                '&:hover': {
-                                  borderColor: method.color,
-                                  transform: 'translateY(-4px)',
-                                  boxShadow: `0 12px 24px ${alpha(method.color, 0.15)}`,
-                                },
-                              }}
-                              onClick={() => setSelectedMethod(method.id)}
-                            >
-                              <CardContent sx={{ textAlign: 'center', p: 2.5 }}>
-                                <Box
-                                  sx={{
-                                    width: 56,
-                                    height: 56,
-                                    borderRadius: 3,
-                                    bgcolor: alpha(method.color, 0.1),
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    mx: 'auto',
-                                    mb: 2,
-                                    color: method.color,
-                                  }}
-                                >
-                                  {React.cloneElement(method.icon, { sx: { fontSize: 32 } })}
-                                </Box>
-                                <Typography variant="h6" fontWeight={700} gutterBottom>
-                                  {method.name}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ display: 'block', mb: 1.5 }}
-                                >
-                                  {method.description}
-                                </Typography>
-                                <Stack direction="row" spacing={0.5} justifyContent="center" flexWrap="wrap">
-                                  {method.features.slice(0, 3).map((feature) => (
-                                    <Chip
-                                      key={feature}
-                                      label={feature}
-                                      size="small"
-                                      sx={{
-                                        fontSize: '0.65rem',
-                                        height: 20,
-                                        bgcolor: alpha(method.color, 0.1),
-                                        color: method.color,
-                                        fontWeight: 600,
+                                  borderRadius: 3,
+                                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                  backdropFilter: 'blur(10px)',
+                                  position: 'relative',
+                                  overflow: 'visible',
+                                  '&:hover': {
+                                    borderColor: alpha(method.color, 0.5),
+                                    transform: 'translateY(-2px)',
+                                    bgcolor: alpha(method.color, 0.02),
+                                    boxShadow: `0 8px 20px ${alpha(method.color, 0.1)}`,
+                                  },
+                                }}
+                                onClick={() => setSelectedMethod(method.id)}
+                              >
+                                <CardContent sx={{ textAlign: 'center', p: { xs: 2.5, lg: 2 } }}>
+                                  <Box
+                                    sx={{
+                                      width: { xs: 48, lg: 44 },
+                                      height: { xs: 48, lg: 44 },
+                                      borderRadius: 2,
+                                      bgcolor: method.iconBg,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      mx: 'auto',
+                                      mb: 1.5,
+                                      position: 'relative',
+                                      transition: 'all 0.3s',
+                                    }}
+                                  >
+                                    <Image
+                                      src={method.iconPath}
+                                      alt={method.name}
+                                      width={32}
+                                      height={32}
+                                      style={{
+                                        objectFit: 'contain',
+                                        maxWidth: '80%',
+                                        maxHeight: '80%',
                                       }}
                                     />
-                                  ))}
-                                </Stack>
-                              </CardContent>
-                            </Card>
-                          </Zoom>
-                        </Grid>
-                      ))}
+                                  </Box>
+                                  <Typography 
+                                    variant="h6" 
+                                    fontWeight={700} 
+                                    gutterBottom
+                                    sx={{ 
+                                      fontSize: { xs: '1.1rem', lg: '1rem' },
+                                      mb: 0.5,
+                                    }}
+                                  >
+                                    {method.name}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ 
+                                      display: 'block', 
+                                      mb: 1.5,
+                                      fontSize: { xs: '0.75rem', lg: '0.7rem' },
+                                    }}
+                                  >
+                                    {method.description}
+                                  </Typography>
+                                  <Stack 
+                                    direction="row" 
+                                    spacing={0.5} 
+                                    justifyContent="center" 
+                                    flexWrap="wrap"
+                                    sx={{ gap: 0.5 }}
+                                  >
+                                    {method.features.slice(0, 3).map((feature) => (
+                                      <Chip
+                                        key={feature}
+                                        label={feature}
+                                        size="small"
+                                        sx={{
+                                          fontSize: { xs: '0.65rem', lg: '0.6rem' },
+                                          height: { xs: 22, lg: 20 },
+                                          bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                          color: theme.palette.text.secondary,
+                                          fontWeight: 600,
+                                          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                          '&:hover': {
+                                            bgcolor: alpha(theme.palette.primary.main, 0.12),
+                                          },
+                                        }}
+                                      />
+                                    ))}
+                                  </Stack>
+                                </CardContent>
+
+                                {/* Indicador de Selección */}
+                                {isSelected && (
+                                  <Box
+                                    sx={{
+                                      position: 'absolute',
+                                      top: 10,
+                                      right: 10,
+                                      width: 20,
+                                      height: 20,
+                                      borderRadius: '50%',
+                                      bgcolor: method.color,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      boxShadow: `0 2px 6px ${alpha(method.color, 0.35)}`,
+                                    }}
+                                  >
+                                    <Box
+                                      sx={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: '50%',
+                                        bgcolor: 'white',
+                                      }}
+                                    />
+                                  </Box>
+                                )}
+                              </Card>
+                            </Zoom>
+                          </Grid>
+                        );
+                      })}
                     </Grid>
 
                     {/* Binance Crypto Selector */}
                     {selectedMethod === 'binance' && (
                       <Fade in timeout={600}>
                         <Box sx={{ mt: 3 }}>
-                          <Divider sx={{ mb: 2 }} />
-                          <Typography variant="subtitle1" fontWeight={700} gutterBottom>
+                          <Divider sx={{ mb: 2.5, opacity: 0.6 }} />
+                          <Typography 
+                            variant="subtitle2" 
+                            fontWeight={700} 
+                            gutterBottom
+                            sx={{ mb: 2 }}
+                          >
                             Selecciona tu criptomoneda:
                           </Typography>
                           <FormControl component="fieldset" fullWidth>
@@ -704,32 +780,53 @@ export default function PagarContent() {
                                     <Card
                                       sx={{
                                         cursor: 'pointer',
-                                        border: `2px solid ${
+                                        border: `1px solid ${
                                           selectedCrypto === crypto.value
-                                            ? '#F3BA2F'
-                                            : alpha(theme.palette.divider, 0.3)
+                                            ? alpha('#F3BA2F', 0.4)
+                                            : alpha(theme.palette.divider, 0.15)
                                         }`,
                                         bgcolor:
                                           selectedCrypto === crypto.value
-                                            ? alpha('#F3BA2F', 0.05)
+                                            ? alpha('#F3BA2F', 0.03)
                                             : 'transparent',
+                                        borderRadius: 2,
                                         transition: 'all 0.2s',
                                         '&:hover': {
-                                          borderColor: '#F3BA2F',
+                                          borderColor: alpha('#F3BA2F', 0.5),
+                                          bgcolor: alpha('#F3BA2F', 0.02),
                                         },
                                       }}
                                       onClick={() => setSelectedCrypto(crypto.value)}
                                     >
-                                      <CardContent sx={{ p: 1.5, textAlign: 'center', '&:last-child': { pb: 1.5 } }}>
-                                        <Typography variant="body2" fontWeight={700}>
+                                      <CardContent 
+                                        sx={{ 
+                                          p: 1.5, 
+                                          textAlign: 'center', 
+                                          '&:last-child': { pb: 1.5 } 
+                                        }}
+                                      >
+                                        <Typography 
+                                          variant="body2" 
+                                          fontWeight={700}
+                                          sx={{ mb: crypto.stable ? 0.5 : 0 }}
+                                        >
                                           {crypto.value}
                                         </Typography>
                                         {crypto.stable && (
                                           <Chip
                                             label="Stable"
                                             size="small"
-                                            color="success"
-                                            sx={{ height: 18, fontSize: '0.6rem', mt: 0.5 }}
+                                            sx={{
+                                              height: 18,
+                                              fontSize: '0.6rem',
+                                              bgcolor: alpha(theme.palette.success.main, 0.12),
+                                              color: theme.palette.success.main,
+                                              fontWeight: 700,
+                                              border: `1px solid ${alpha(
+                                                theme.palette.success.main,
+                                                0.25
+                                              )}`,
+                                            }}
                                           />
                                         )}
                                       </CardContent>
@@ -837,15 +934,16 @@ export default function PagarContent() {
                             py: 1.8,
                             fontWeight: 700,
                             fontSize: '1rem',
-                            bgcolor: paymentMethods.find((m) => m.id === selectedMethod)?.color,
+                            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                             borderRadius: 2,
                             textTransform: 'none',
+                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                             '&:hover': {
-                              bgcolor: alpha(
-                                paymentMethods.find((m) => m.id === selectedMethod)?.color ||
-                                  theme.palette.primary.main,
-                                0.85
-                              ),
+                              background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
+                              boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+                            },
+                            '&:disabled': {
+                              background: theme.palette.action.disabledBackground,
                             },
                           }}
                         >

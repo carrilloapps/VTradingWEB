@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import {
   Box,
   Container,
@@ -30,8 +31,6 @@ import WidgetsIcon from '@mui/icons-material/Widgets';
 import ShareIcon from '@mui/icons-material/Share';
 import DevicesIcon from '@mui/icons-material/Devices';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -43,6 +42,17 @@ interface PlanFeature {
   icon: React.ElementType;
   highlight?: boolean;
 }
+
+// Payment method logos data
+const paymentMethods = [
+  { name: 'Stripe', iconPath: '/assets/icons/stripe.svg', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
+  { name: 'PayPal', iconPath: '/assets/icons/paypal.svg', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
+  { name: 'Bold', iconPath: '/assets/icons/bold.png', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
+  { name: 'ePayco', iconPath: '/assets/icons/epayco.png', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
+  { name: 'Binance Pay', iconPath: '/assets/icons/binance.svg', iconBg: '#E8E8E8', hoverBg: '#F3BA2F' },
+  { name: 'Mastercard', iconPath: '/assets/icons/mastercard.svg', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
+  { name: 'Visa', iconPath: '/assets/icons/visa.svg', iconBg: '#E8E8E8', hoverBg: '#FFFFFF' },
+];
 
 interface PlanCardProps {
   title: string;
@@ -377,31 +387,31 @@ export default function PlanContent() {
               sx={{
                 position: 'relative',
                 overflow: 'hidden',
-                py: 4,
+                py: 3,
                 '&::before, &::after': {
                   content: '""',
                   position: 'absolute',
                   top: 0,
                   bottom: 0,
-                  width: { xs: '80px', md: '150px' },
+                  width: { xs: '60px', md: '120px' },
                   zIndex: 2,
                   pointerEvents: 'none',
                 },
                 '&::before': {
                   left: 0,
-                  background: (theme) => `linear-gradient(to right, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.8)} 40%, transparent 100%)`,
+                  background: (theme) => `linear-gradient(to right, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.9)} 50%, transparent 100%)`,
                 },
                 '&::after': {
                   right: 0,
-                  background: (theme) => `linear-gradient(to left, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.8)} 40%, transparent 100%)`,
+                  background: (theme) => `linear-gradient(to left, ${theme.palette.background.default} 0%, ${alpha(theme.palette.background.default, 0.9)} 50%, transparent 100%)`,
                 },
               }}
             >
               <Box
                 sx={{
                   display: 'flex',
-                  gap: 4,
-                  animation: 'scroll 30s linear infinite',
+                  gap: 3,
+                  animation: 'scroll 25s linear infinite',
                   '&:hover': {
                     animationPlayState: 'paused',
                   },
@@ -415,83 +425,50 @@ export default function PlanContent() {
                   },
                 }}
               >
-                {/* Primera serie de métodos de pago */}
-                {[
-                  { name: 'Visa', icon: CreditCardIcon },
-                  { name: 'Mastercard', icon: CreditCardIcon },
-                  { name: 'Binance Pay', icon: AccountBalanceIcon },
-                  { name: 'PayPal', icon: AccountBalanceIcon },
-                  { name: 'Stripe', icon: CreditCardIcon },
-                  { name: 'Bold.co', icon: AccountBalanceIcon },
-                  { name: 'ePayco', icon: AccountBalanceIcon },
-                ]
-                  .concat([
-                    { name: 'Visa', icon: CreditCardIcon },
-                    { name: 'Mastercard', icon: CreditCardIcon },
-                    { name: 'Binance Pay', icon: AccountBalanceIcon },
-                    { name: 'PayPal', icon: AccountBalanceIcon },
-                    { name: 'Stripe', icon: CreditCardIcon },
-                    { name: 'Bold.co', icon: AccountBalanceIcon },
-                    { name: 'ePayco', icon: AccountBalanceIcon },
-                  ])
+                {/* Duplicamos el array para el efecto de loop infinito */}
+                {paymentMethods
+                  .concat(paymentMethods)
                   .map((method, index) => (
                     <Box
                       key={index}
                       sx={{
                         flex: '0 0 auto',
+                        width: { xs: '70px', md: '80px' },
+                        height: { xs: '70px', md: '80px' },
+                        borderRadius: 2.5,
+                        bgcolor: method.iconBg,
                         display: 'flex',
-                        flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 1.5,
-                        px: 3,
-                        py: 2.5,
-                        minWidth: { xs: '120px', md: '140px' },
-                        borderRadius: 4,
-                        bgcolor: alpha(theme.palette.background.paper, 0.6),
-                        border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                        backdropFilter: 'blur(10px)',
-                        transition: 'all 0.3s ease',
+                        justifyContent: 'center',
+                        border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.08)}`,
+                        '& img': {
+                          filter: 'grayscale(1)',
+                          transition: 'filter 0.3s ease',
+                        },
                         '&:hover': {
-                          transform: 'translateY(-8px) scale(1.05)',
-                          boxShadow: `0 12px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
+                          transform: 'translateY(-4px) scale(1.08)',
+                          boxShadow: `0 8px 20px ${alpha(theme.palette.common.black, 0.15)}`,
                           borderColor: alpha(theme.palette.primary.main, 0.3),
+                          bgcolor: method.hoverBg,
+                          '& img': {
+                            filter: 'grayscale(0)',
+                          },
                         },
                       }}
                     >
-                      <Box
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 2.5,
-                          bgcolor: alpha(theme.palette.primary.main, 0.08),
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            bgcolor: alpha(theme.palette.primary.main, 0.15),
-                          },
+                      <Image
+                        src={method.iconPath}
+                        alt={method.name}
+                        width={56}
+                        height={56}
+                        style={{
+                          objectFit: 'contain',
+                          maxWidth: '80%',
+                          maxHeight: '80%',
                         }}
-                      >
-                        <method.icon
-                          sx={{
-                            fontSize: '1.75rem',
-                            color: 'primary.main',
-                          }}
-                        />
-                      </Box>
-                      <Typography
-                        variant="body2"
-                        fontWeight="700"
-                        sx={{
-                          color: 'text.primary',
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                          letterSpacing: '-0.01em',
-                        }}
-                      >
-                        {method.name}
-                      </Typography>
+                      />
                     </Box>
                   ))}
               </Box>
