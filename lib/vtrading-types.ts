@@ -141,7 +141,7 @@ export interface CustomerInfo {
   name: string;
   email: string;
   phone?: string;
-  documentType?: 'CC' | 'NIT' | 'CE' | 'Passport';
+  documentType?: 'CC' | 'NIT' | 'CE' | 'Passport' | 'VEN';
   documentNumber?: string;
   address?: {
     line1: string;

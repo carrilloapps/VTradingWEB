@@ -14,6 +14,11 @@ import {
   Alert,
   CircularProgress,
   Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
   useTheme,
   alpha,
 } from '@mui/material';
@@ -47,6 +52,7 @@ export default function EPaycoPaymentMethod({
     name: '',
     email: '',
     phone: '',
+    documentType: 'CC',
     documentNumber: '',
   });
 
@@ -68,24 +74,27 @@ export default function EPaycoPaymentMethod({
   };
 
   const handleInputChange =
-    (field: keyof CustomerInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
+    (field: keyof CustomerInfo) =>
+      (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
+      ) => {
+        const value = event.target.value;
 
-      // Formatear automáticamente el documento
-      if (field === 'documentNumber') {
-        const formatted = formatDocumentNumber(value);
-        setCustomerInfo((prev) => ({
-          ...prev,
-          [field]: formatted,
-        }));
-      } else {
-        setCustomerInfo((prev) => ({
-          ...prev,
-          [field]: value,
-        }));
-      }
-      setError(null);
-    };
+        // Formatear automáticamente el documento
+        if (field === 'documentNumber') {
+          const formatted = formatDocumentNumber(value);
+          setCustomerInfo((prev) => ({
+            ...prev,
+            [field]: formatted,
+          }));
+        } else {
+          setCustomerInfo((prev) => ({
+            ...prev,
+            [field]: value,
+          }));
+        }
+        setError(null);
+      };
 
   const validateForm = (): boolean => {
     if (!customerInfo.name || customerInfo.name.length < 3) {
@@ -196,7 +205,32 @@ export default function EPaycoPaymentMethod({
           />
         </Grid>
 
-        <Grid size={{ xs: 12 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormControl fullWidth required>
+            <InputLabel id="epayco-document-type-label">Tipo de documento</InputLabel>
+            <Select
+              labelId="epayco-document-type-label"
+              id="epayco-document-type"
+              value={customerInfo.documentType}
+              onChange={handleInputChange('documentType')}
+              disabled={isLoading}
+              label="Tipo de documento"
+              inputProps={{
+                'aria-label': 'Tipo de documento de identificación',
+                'aria-required': 'true',
+              }}
+              sx={{ borderRadius: 2 }}
+            >
+              <MenuItem value="CC">Cédula de Ciudadanía</MenuItem>
+              <MenuItem value="CE">Cédula de Extranjería</MenuItem>
+              <MenuItem value="VEN">Cédula Venezolana</MenuItem>
+              <MenuItem value="NIT">NIT</MenuItem>
+              <MenuItem value="Passport">Pasaporte</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             id="epayco-document-number"

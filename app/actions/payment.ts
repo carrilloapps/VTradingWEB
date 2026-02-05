@@ -103,9 +103,8 @@ async function createStripeCheckout(request: PaymentRequest): Promise<PaymentRes
             currency: 'usd',
             product_data: {
               name: 'VTrading Premium',
-              description: `Suscripción por ${request.months} ${
-                request.months === 1 ? 'mes' : 'meses'
-              }`,
+              description: `Suscripción por ${request.months} ${request.months === 1 ? 'mes' : 'meses'
+                }`,
             },
             unit_amount: Math.round(request.totalAmount * 100), // Amount in cents
           },
@@ -208,9 +207,8 @@ async function createPaypalCheckout(request: PaymentRequest): Promise<PaymentRes
         purchase_units: [
           {
             reference_id: `VT${Date.now()}`,
-            description: `VTrading Premium - ${request.months} ${
-              request.months === 1 ? 'mes' : 'meses'
-            }`,
+            description: `VTrading Premium - ${request.months} ${request.months === 1 ? 'mes' : 'meses'
+              }`,
             amount: {
               currency_code: 'USD',
               value: request.totalAmount.toFixed(2),
@@ -325,6 +323,9 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
         total_amount: totalAmount,
         tip_amount: 0,
       },
+      // Map VEN to CC for Bold API
+      doc_type: request.customerInfo?.documentType === 'VEN' ? 'CC' : (request.customerInfo?.documentType || 'CC'),
+      doc_number: request.customerInfo?.documentNumber,
       reference: orderId,
       description: `VTrading Premium - ${request.months} ${request.months === 1 ? 'mes' : 'meses'}`,
       payment_methods: availablePaymentMethods,
@@ -459,7 +460,8 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
       email_billing: request.customerInfo?.email || 'test@test.com',
       name_billing: request.customerInfo?.name || 'Cliente',
       address_billing: 'Dirección',
-      type_doc_billing: 'CC',
+      type_doc_billing:
+        request.customerInfo?.documentType === 'VEN' ? 'CC' : (request.customerInfo?.documentType || 'CC'),
       mobilephone_billing: request.customerInfo?.phone || '3000000000',
       number_doc_billing: request.customerInfo?.documentNumber || '1000000000',
     };
