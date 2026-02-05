@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import SuccessContent from './SuccessContent';
+import { Box, CircularProgress } from '@mui/material';
 
 export const metadata: Metadata = {
   title: 'Pago Exitoso | VTrading',
@@ -8,5 +10,15 @@ export const metadata: Metadata = {
 };
 
 export default function SuccessPage() {
-  return <SuccessContent />;
+  return (
+    <Suspense
+      fallback={
+        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
+      }
+    >
+      <SuccessContent />
+    </Suspense>
+  );
 }
