@@ -16,4 +16,17 @@ Sentry.init({
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
   sendDefaultPii: false,
+
+  beforeBreadcrumb(breadcrumb) {
+    if (breadcrumb.category === 'http') {
+      const { data } = breadcrumb;
+      if (data && data.url) {
+        // Redact any auth or keys in server-side outbound requests
+        breadcrumb.data!.url = data.url.replace(/key=[^&]+/gi, 'key=[REDACTED]')
+          .replace(/api_key=[^&]+/gi, 'api_key=[REDACTED]')
+          .replace(/token=[^&]+/gi, 'token=[REDACTED]');
+      }
+    }
+    return breadcrumb;
+  },
 });

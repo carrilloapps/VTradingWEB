@@ -26,4 +26,16 @@ Sentry.init({
     // Enable sending user PII (Personally Identifiable Information)
     // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
     sendDefaultPii: false,
+
+    beforeBreadcrumb(breadcrumb) {
+        // Scrub sensitive headers from HTTP breadcrumbs
+        if (breadcrumb.category === 'fetch' || breadcrumb.category === 'xhr') {
+            const data = breadcrumb.data;
+            if (data && data.url) {
+                // Mask VTrading API key if it appears in URL (SSR safeguard)
+                breadcrumb.data!.url = data.url.replace(/X-API-Key=[^&]+/g, 'X-API-Key=[REDACTED]');
+            }
+        }
+        return breadcrumb;
+    },
 });
