@@ -241,7 +241,7 @@ export default function PagarContent() {
       {/* Hero Section mejorado */}
       <Box
         sx={{
-          pt: { xs: 24, md: 28 },
+          pt: { xs: 28, md: 32 },
           pb: 6,
           position: 'relative',
           overflow: 'hidden',

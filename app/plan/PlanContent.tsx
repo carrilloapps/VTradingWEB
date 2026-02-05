@@ -105,94 +105,110 @@ const PlanCard: React.FC<PlanCardProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       sx={{
-        p: { xs: 2.5, md: 3 },
+        p: { xs: 2, md: 2.5 },
         height: '100%',
-        borderRadius: 4,
+        borderRadius: 2,
         bgcolor: isPremium
           ? alpha(theme.palette.primary.main, 0.04)
           : alpha(theme.palette.background.paper, 0.6),
-        border: isPremium
-          ? `2px solid ${theme.palette.primary.main}`
-          : `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+        border: `1px solid ${alpha(isPremium ? theme.palette.primary.main : theme.palette.divider, 0.2)}`,
         position: 'relative',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        backdropFilter: 'blur(20px)',
-        overflow: 'hidden',
+        backdropFilter: 'blur(40px)',
+        overflow: 'visible',
         display: 'flex',
         flexDirection: 'column',
-        '&::before': isPremium
-          ? {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '3px',
-              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            }
-          : {},
+        boxShadow: isPremium
+          ? `0 8px 32px ${alpha(theme.palette.primary.main, 0.12)}`
+          : `0 4px 20px ${alpha(theme.palette.common.black, 0.06)}`,
         '&:hover': {
-          transform: 'translateY(-8px)',
+          transform: 'translateY(-12px) scale(1.02)',
           boxShadow: isPremium
-            ? `0 20px 40px ${alpha(theme.palette.primary.main, 0.25)}`
+            ? `0 24px 56px ${alpha(theme.palette.primary.main, 0.25)}`
             : `0 20px 40px ${alpha(theme.palette.common.black, 0.12)}`,
-          borderColor: isPremium ? theme.palette.primary.light : alpha(theme.palette.divider, 0.3),
+          borderColor: alpha(isPremium ? theme.palette.primary.main : theme.palette.primary.main, 0.4),
         },
       }}
     >
-      {/* Recommended badge compacto */}
+      {/* Recommended badge con glassmorphism */}
       {isPremium && (
         <Chip
           icon={<StarIcon sx={{ fontSize: '0.9rem' }} />}
-          label="Recomendado"
+          label="Popular"
           size="small"
           sx={{
             position: 'absolute',
-            top: 12,
-            right: 12,
-            bgcolor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'primary.main',
-            color: 'white',
+            top: -12,
+            right: 20,
+            bgcolor: theme.palette.primary.main,
+            backdropFilter: 'blur(10px)',
+            color: theme.palette.primary.contrastText,
             fontWeight: 700,
             fontSize: '0.7rem',
-            height: 24,
+            height: 28,
+            px: 1.5,
+            boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+            border: `1px solid ${alpha(theme.palette.background.paper, 0.1)}`,
+            borderRadius: 2,
+            zIndex: 2,
             '& .MuiChip-icon': {
-              color: 'white',
+              color: theme.palette.primary.contrastText,
             },
           }}
         />
       )}
 
-      {/* Header compacto */}
-      <Box sx={{ textAlign: 'center', mb: 2, pt: isPremium ? 1.5 : 0 }}>
+      {/* Header con gradiente de texto */}
+      <Box sx={{ textAlign: 'center', mb: 1.5, position: 'relative', zIndex: 1 }}>
         <Typography
           variant="h5"
           fontWeight="800"
           sx={{
-            mb: 1.5,
-            fontSize: { xs: '1.5rem', md: '1.65rem' },
-            color: isPremium ? 'primary.main' : 'text.primary',
+            mb: 1,
+            fontSize: { xs: '1.25rem', md: '1.5rem' },
+            background: isPremium
+              ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+              : theme.palette.text.primary,
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: isPremium ? 'transparent' : 'inherit',
             letterSpacing: '-0.02em',
           }}
         >
           {title}
         </Typography>
 
-        {/* Precio más compacto */}
-        <Box sx={{ mb: 1, display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 0.5 }}>
+        {/* Precio con efecto shimmer */}
+        <Box
+          sx={{
+            mb: 1,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'center',
+            gap: 0.5,
+            position: 'relative',
+          }}
+        >
           <Typography
             variant="h2"
             fontWeight="900"
             sx={{
-              fontSize: { xs: '2.25rem', md: '2.75rem' },
-              lineHeight: 1,
+              fontSize: { xs: '2rem', md: '2.5rem' },
+              lineHeight: 0.9,
               background: isPremium
-                ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+                ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main}, ${theme.palette.primary.light})`
                 : theme.palette.text.primary,
+              backgroundSize: isPremium ? '200% auto' : 'auto',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               transition: 'transform 0.3s',
-              transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+              transform: isHovered ? 'scale(1.08)' : 'scale(1)',
+              animation: isPremium && isHovered ? 'shimmer 2s linear infinite' : 'none',
+              '@keyframes shimmer': {
+                '0%': { backgroundPosition: '0% center' },
+                '100%': { backgroundPosition: '200% center' },
+              },
             }}
           >
             {price}
@@ -201,43 +217,48 @@ const PlanCard: React.FC<PlanCardProps> = ({
 
         <Typography
           variant="caption"
-          color="text.secondary"
           sx={{
             fontWeight: 600,
-            fontSize: '0.85rem',
+            fontSize: '0.75rem',
+            color: 'text.secondary',
+            px: 1.5,
+            py: 0.4,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.background.paper, 0.5),
+            display: 'inline-block',
           }}
         >
           {priceDescription}
         </Typography>
       </Box>
 
-      {/* Features en grid compacto de 2 columnas */}
+      {/* Features con iconos animados */}
       <Box
         sx={{
-          mb: 2,
+          mb: 1.5,
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: '1fr' },
-          gap: 1,
+          gridTemplateColumns: '1fr',
+          gap: 0.75,
           flex: 1,
         }}
       >
         {features.map((feature, index) => (
-          <Grow
-            key={index}
-            in
-            timeout={800 + index * 80}
-            style={{ transformOrigin: '0 0 0' }}
-          >
+          <Grow key={index} in timeout={800 + index * 80}>
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: 1.25,
-                p: 1,
+                gap: 1,
+                p: 0.75,
                 borderRadius: 2,
-                transition: 'all 0.2s',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                bgcolor: 'transparent',
+                border: `1px solid transparent`,
                 '&:hover': {
-                  bgcolor: alpha(theme.palette.primary.main, 0.03),
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: alpha(theme.palette.primary.main, 0.1),
+                  transform: 'translateX(4px)',
+                  boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.06)}`,
                 },
               }}
             >
@@ -247,19 +268,25 @@ const PlanCard: React.FC<PlanCardProps> = ({
                   height: 28,
                   minWidth: 28,
                   borderRadius: '50%',
-                  bgcolor: feature.highlight
-                    ? alpha(theme.palette.primary.main, 0.12)
-                    : alpha(theme.palette.success.main, 0.12),
+                  background: feature.highlight
+                    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)}, ${alpha(theme.palette.primary.light, 0.08)})`
+                    : `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.15)}, ${alpha(theme.palette.success.light, 0.08)})`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  mt: 0.2,
+                  position: 'relative',
+                  transition: 'transform 0.3s',
+                  '&:hover': {
+                    transform: 'rotate(10deg) scale(1.1)',
+                  },
                 }}
               >
                 <feature.icon
                   sx={{
-                    fontSize: '1.1rem',
+                    fontSize: '1rem',
                     color: feature.highlight ? 'primary.main' : 'success.main',
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 />
               </Box>
@@ -269,7 +296,8 @@ const PlanCard: React.FC<PlanCardProps> = ({
                   fontWeight: feature.highlight ? 600 : 500,
                   color: feature.highlight ? 'primary.main' : 'text.primary',
                   lineHeight: 1.5,
-                  fontSize: '0.875rem',
+                  fontSize: '0.8rem',
+                  pt: 0.25,
                 }}
               >
                 {feature.text}
@@ -279,7 +307,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
         ))}
       </Box>
 
-      {/* CTA Button compacto */}
+      {/* CTA Button con efectos avanzados */}
       {showStoreButtons ? (
         <Box sx={{ mt: 'auto' }}>
           <StoreButtons direction="column" fullWidth sx={{ gap: 1 }} />
@@ -291,27 +319,46 @@ const PlanCard: React.FC<PlanCardProps> = ({
           fullWidth
           onClick={ctaAction}
           sx={{
-            py: 1.5,
-            borderRadius: 2.5,
+            py: 1.25,
+            borderRadius: 2,
             fontWeight: 800,
-            fontSize: '0.95rem',
+            fontSize: '0.875rem',
             textTransform: 'none',
             letterSpacing: '0.02em',
             mt: 'auto',
+            position: 'relative',
+            overflow: 'hidden',
             ...(isPremium && {
               background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-              boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.35)}`,
+              boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.4)}`,
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.background.paper, 0.3)}, transparent)`,
+                transition: 'left 0.5s',
+              },
               '&:hover': {
                 background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.45)}`,
+                boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.5)}`,
                 transform: 'translateY(-2px)',
+                '&::before': {
+                  left: '100%',
+                },
               },
             }),
             ...(!isPremium && {
-              borderWidth: 2,
+              borderWidth: 1,
+              borderColor: alpha(theme.palette.primary.main, 0.3),
+              color: 'primary.main',
               '&:hover': {
-                borderWidth: 2,
-                bgcolor: alpha(theme.palette.primary.main, 0.05),
+                borderWidth: 1,
+                borderColor: alpha(theme.palette.primary.main, 0.5),
+                bgcolor: alpha(theme.palette.primary.main, 0.08),
+                transform: 'translateY(-2px)',
               },
             }),
           }}
@@ -426,7 +473,7 @@ export default function PlanContent() {
                     fontSize: '0.7rem',
                   }}
                 >
-                  Planes de inversión
+                  Planes de suscripción
                 </Typography>
               </Box>
 
@@ -441,7 +488,7 @@ export default function PlanContent() {
                   lineHeight: 1.05,
                 }}
               >
-                Invierte{' '}
+                Monitorea{' '}
                 <Box
                   component="span"
                   sx={{
@@ -470,7 +517,7 @@ export default function PlanContent() {
                   fontSize: { xs: '1rem', md: '1.15rem' },
                 }}
               >
-                Información financiera profesional desde ${pricePerMonth}/mes. Sin contratos, sin
+                Monitoreo financiero profesional desde ${pricePerMonth}/mes. Sin contratos, sin
                 comisiones ocultas. Cancela cuando quieras.
               </Typography>
             </Box>
