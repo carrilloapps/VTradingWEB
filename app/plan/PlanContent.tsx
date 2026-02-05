@@ -209,6 +209,9 @@ const PlanCard: React.FC<PlanCardProps> = ({
 export default function PlanContent() {
   const theme = useTheme();
 
+  // Get price from environment variable
+  const pricePerMonth = parseFloat(process.env.NEXT_PUBLIC_PREMIUM_PLAN_PRICE_USD || '1');
+
   const freePlanFeatures: PlanFeature[] = [
     {
       text: 'Acceso completo a la aplicación móvil',
@@ -267,8 +270,8 @@ export default function PlanContent() {
   ];
 
   const handlePremiumPlanAction = () => {
-    // Acción para plan premium (por ejemplo, redirigir a checkout o abrir modal de pago)
-    console.log('Plan Premium seleccionado');
+    // Redirigir a la página de pago
+    window.location.href = '/plan/pagar';
   };
 
   return (
@@ -355,7 +358,7 @@ export default function PlanContent() {
             <Grid size={{ xs: 12, md: 6, lg: 5 }}>
               <PlanCard
                 title="Plan Premium"
-                price="$ 1"
+                price={`$ ${pricePerMonth.toFixed(2)}`}
                 priceDescription="Por mes"
                 features={premiumPlanFeatures}
                 isPremium

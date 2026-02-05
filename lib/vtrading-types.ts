@@ -123,3 +123,52 @@ export interface NotificationRequest {
 export interface ApiError {
   error: string;
 }
+
+// Payment System Types
+export type PaymentMethod = 'stripe' | 'bold' | 'epayco' | 'binance' | 'paypal';
+export type CryptoCurrency = 'USDT' | 'USDC' | 'BTC' | 'ETH' | 'BNB' | 'BUSD';
+
+export interface PaymentPlan {
+  months: number;
+  pricePerMonth: number;
+  totalPrice: number;
+  discount?: number;
+}
+
+export interface PaymentRequest {
+  method: PaymentMethod;
+  months: number;
+  totalAmount: number;
+  currency: 'USD';
+  userId?: string;
+  email?: string;
+  cryptoCurrency?: CryptoCurrency; // For Binance Pay
+}
+
+export interface PaymentResponse {
+  success: boolean;
+  checkoutUrl?: string;
+  orderId?: string;
+  error?: string;
+}
+
+export interface StripeCheckoutRequest extends PaymentRequest {
+  method: 'stripe';
+}
+
+export interface BoldCheckoutRequest extends PaymentRequest {
+  method: 'bold';
+}
+
+export interface EpaycoCheckoutRequest extends PaymentRequest {
+  method: 'epayco';
+}
+
+export interface BinanceCheckoutRequest extends PaymentRequest {
+  method: 'binance';
+  cryptoCurrency: CryptoCurrency;
+}
+
+export interface PaypalCheckoutRequest extends PaymentRequest {
+  method: 'paypal';
+}

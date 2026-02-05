@@ -8,6 +8,15 @@ Este directorio contiene las **Server Actions** de Next.js (`'use server'`). Son
     *   `getMarketDataAction`: Obtiene datos agregados (tasas, cripto, bancos).
     *   Normaliza respuestas de la API para que el frontend las consuma fácilmente.
 
+*   **`payment.ts`:** Acciones relacionadas con procesamiento de pagos.
+    *   `createPaymentCheckout`: Crea sesión de checkout según método de pago elegido.
+    *   `verifyPaymentStatus` Verifica el estado de un pago (usado en webhooks).
+    *   Soporta múltiples gateways: Stripe, Bold.co, ePayco, Binance Pay.
+    *   Maneja redirecciones a páginas de pago externas.
+
+*   **`notifications.ts`:** Acciones relacionadas con notificaciones push.
+    *   Gestiona subscripciones y envío de notificaciones FCM.
+
 ## Cuándo usar Server Actions
 1.  **Mutaciones:** Enviar formularios, POST requests.
 2.  **Ocultar Lógica:** Cuando se necesita procesar datos sensibles o claves de API que no deben llegar al cliente (aunque `vtrading-api` ya maneja esto, las acciones añaden una capa extra de abstracción).
