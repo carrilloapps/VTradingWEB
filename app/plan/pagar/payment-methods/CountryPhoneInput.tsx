@@ -7,7 +7,13 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { parsePhoneNumber } from 'libphonenumber-js';
+import {
+  parsePhoneNumber,
+  getExampleNumber,
+  AsYouType,
+  CountryCode,
+} from 'libphonenumber-js';
+import examples from 'libphonenumber-js/mobile/examples';
 import {
   Box,
   TextField,
@@ -147,6 +153,54 @@ export default function CountryPhoneInput({
 }: CountryPhoneInputProps) {
   const theme = useTheme();
 
+  // Get dynamic placeholder based on selected country
+  const dynamicPlaceholder = useMemo(() => {
+    try {
+      const exampleNumber = getExampleNumber(selectedCountry.code as CountryCode, examples);
+      if (exampleNumber) {
+        return exampleNumber.formatNational();
+      }
+    } catch (_error) {
+      // Fallback to country-specific examples
+    }
+
+    // Fallback placeholders for common countries
+    const placeholders: Record<string, string> = {
+      VE: '0414 123 4567',
+      CO: '300 123 4567',
+      PE: '987 654 321',
+      EC: '99 123 4567',
+      CL: '9 1234 5678',
+      BR: '11 91234 5678',
+      US: '(201) 555-0123',
+      AR: '11 1234-5678',
+      ES: '612 34 56 78',
+      MX: '55 1234 5678',
+      PA: '6123-4567',
+      DO: '809 234 5678',
+      CR: '8312 3456',
+      UY: '094 123 456',
+      DE: '1512 3456789',
+      AU: '0412 345 678',
+      BO: '71234567',
+      CA: '(204) 234-5678',
+      CN: '131 2345 6789',
+      SV: '7012 3456',
+      FR: '06 12 34 56 78',
+      GT: '5123 4567',
+      HN: '9123 4567',
+      IN: '081234 56789',
+      IT: '312 345 6789',
+      JP: '090-1234-5678',
+      NI: '8123 4567',
+      PY: '0981 123456',
+      PT: '912 345 678',
+      GB: '07400 123456',
+    };
+
+    return placeholders[selectedCountry.code] || '123 456 789';
+  }, [selectedCountry.code]);
+
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Remove all non-numeric characters
     let value = e.target.value.replace(/[^0-9]/g, '');
@@ -166,6 +220,20 @@ export default function CountryPhoneInput({
       value = value.slice(allDialDigits.length);
     }
 
+    // Format as user types using AsYouType
+    if (value) {
+      try {
+        const formatter = new AsYouType(selectedCountry.code as CountryCode);
+        const formatted = formatter.input(value);
+        // Extract just the national number part (without country code)
+        const nationalNumber = formatted.replace(selectedCountry.dial, '').trim();
+        onPhoneChange(nationalNumber);
+        return;
+      } catch (_error) {
+        // Fallback to unformatted
+      }
+    }
+
     onPhoneChange(value);
   };
 
@@ -175,10 +243,7 @@ export default function CountryPhoneInput({
 
     try {
       const fullNumber = `${selectedCountry.dial}${phoneNumber}`;
-      const parsed = parsePhoneNumber(
-        fullNumber,
-        selectedCountry.code as 'CO' | 'US' | 'MX' | 'AR' | 'CL' | 'PE' | 'EC' | 'VE' | string,
-      );
+      const parsed = parsePhoneNumber(fullNumber, selectedCountry.code as CountryCode);
 
       if (parsed) {
         return {
@@ -405,7 +470,7 @@ export default function CountryPhoneInput({
             id={inputId}
             name="phone"
             type="tel"
-            placeholder={placeholder}
+            placeholder={dynamicPlaceholder}
             value={phoneNumber}
             onChange={handlePhoneChange}
             disabled={disabled}
