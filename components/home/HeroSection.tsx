@@ -33,19 +33,27 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
       }}
     >
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 8, xl: 10 }, width: '100%' }}>
-        <Grid container spacing={6} alignItems="center">
-          {/* Visual Phone Mockup - Moved to Left */}
+        <Grid container spacing={6} alignItems="center" justifyContent="center">
+          {/* Visual Phone Mockup - Responsive visibility and ordering */}
           <Grid
             size={{ xs: 12, lg: 'auto' }}
-            sx={{ display: { xs: 'none', lg: 'flex' }, justifyContent: 'flex-start' }}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              order: { xs: 2, lg: 1 } // Stay left on desktop, move down on mobile
+            }}
           >
             <PhoneMockup marketData={marketData} loading={loading} />
           </Grid>
 
-          {/* Text Content - Moved to Right */}
+          {/* Text Content - Responsive ordering */}
           <Grid
             size={{ xs: 12, lg: 'grow' }}
-            sx={{ textAlign: { xs: 'center', lg: 'left' }, minWidth: 0 }}
+            sx={{
+              textAlign: { xs: 'center', lg: 'left' },
+              minWidth: 0,
+              order: { xs: 1, lg: 2 } // Stay right on desktop, move up on mobile
+            }}
           >
             {' '}
             {/* minWidth 0 for flex items to shrink properly if needed */}
