@@ -275,12 +275,20 @@ export default function BinancePayPaymentMethod({
           )}
         </Button>
 
-        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha('#F3BA2F', 0.1), border: `1px solid ${alpha('#F3BA2F', 0.2)}` }}>
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
-            display="flex" 
-            alignItems="center" 
+        <Box
+          sx={{
+            mt: 2,
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: alpha('#F3BA2F', 0.1),
+            border: `1px solid ${alpha('#F3BA2F', 0.2)}`,
+          }}
+        >
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="flex"
+            alignItems="center"
             justifyContent="center"
             textAlign="center"
           >

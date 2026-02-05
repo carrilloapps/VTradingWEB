@@ -126,7 +126,10 @@ const PlanCard: React.FC<PlanCardProps> = ({
           boxShadow: isPremium
             ? `0 24px 56px ${alpha(theme.palette.primary.main, 0.25)}`
             : `0 20px 40px ${alpha(theme.palette.common.black, 0.12)}`,
-          borderColor: alpha(isPremium ? theme.palette.primary.main : theme.palette.primary.main, 0.4),
+          borderColor: alpha(
+            isPremium ? theme.palette.primary.main : theme.palette.primary.main,
+            0.4
+          ),
         },
       }}
     >
@@ -500,8 +503,7 @@ export default function PlanContent() {
                 >
                   mejor
                 </Box>
-                ,{' '}
-                <br />
+                , <br />
                 paga solo lo que necesites
               </Typography>
 

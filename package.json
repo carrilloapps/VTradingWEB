@@ -23,6 +23,7 @@
     "@mui/material-nextjs": "~7.3.7",
     "@paypal/paypal-server-sdk": "^2.2.0",
     "@types/md5": "~2.3.6",
+    "country-flag-icons": "^1.6.12",
     "epayco-sdk-node": "^1.4.4",
     "firebase": "~12.9.0",
     "firebase-admin": "~13.6.1",

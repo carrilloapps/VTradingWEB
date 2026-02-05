@@ -19,10 +19,14 @@ import {
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
-import PhoneInput from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
 import { PaymentMethodComponentProps, CustomerInfo } from './types';
 import { createPaymentCheckout } from '@/app/actions/payment';
+import CountryPhoneInput, { ALL_COUNTRIES, Country } from './CountryPhoneInput';
+
+// Lista de países de Latinoamérica
+const LATAM_COUNTRIES = ALL_COUNTRIES.filter((c) =>
+  ['CO', 'MX', 'AR', 'CL', 'PE', 'EC', 'VE', 'BR', 'PA', 'CR', 'UY'].includes(c.code)
+);
 
 /**
  * ePayco Payment Form Component
@@ -37,7 +41,8 @@ export default function EPaycoPaymentMethod({
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [phoneValue, setPhoneValue] = useState<string | undefined>('');
+  const [selectedCountry, setSelectedCountry] = useState<Country>(LATAM_COUNTRIES[0]); // Colombia por defecto
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     email: '',
@@ -48,16 +53,16 @@ export default function EPaycoPaymentMethod({
   const formatDocumentNumber = (value: string): string => {
     // Remover todo excepto letras y números
     const cleaned = value.replace(/[^a-zA-Z0-9]/g, '');
-    
+
     // Separar letra inicial (si existe) y números
     const match = cleaned.match(/^([a-zA-Z])?([0-9]*)$/);
     if (!match) return value;
-    
+
     const [, letter, numbers] = match;
-    
+
     // Formatear números con puntos de miles
     const formatted = numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
     // Retornar con formato apropiado
     return letter ? `${letter.toUpperCase()}-${formatted}` : formatted;
   };
@@ -65,7 +70,7 @@ export default function EPaycoPaymentMethod({
   const handleInputChange =
     (field: keyof CustomerInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
-      
+
       // Formatear automáticamente el documento
       if (field === 'documentNumber') {
         const formatted = formatDocumentNumber(value);
@@ -203,7 +208,8 @@ export default function EPaycoPaymentMethod({
             disabled={isLoading}
             variant="outlined"
             inputProps={{
-              'aria-label': 'Número de documento de identidad (opcional, se formateará automáticamente)',
+              'aria-label':
+                'Número de documento de identidad (opcional, se formateará automáticamente)',
               minLength: 6,
             }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
@@ -232,123 +238,26 @@ export default function EPaycoPaymentMethod({
           />
         </Grid>
 
-        <Grid size={{ xs: 12 }}>
-          <Box>
-            <Typography
-              component="label"
-              htmlFor="epayco-phone"
-              variant="body2"
-              sx={{
-                display: 'block',
-                mb: 0.5,
-                fontWeight: 500,
-                color: 'text.secondary',
-                fontSize: '0.875rem',
-              }}
-            >
-              Teléfono <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-            </Typography>
-            <Box
-              sx={{
-                '& .PhoneInput': {
-                  display: 'flex',
-                  alignItems: 'center',
-                  border: `1px solid ${alpha(theme.palette.divider, 0.23)}`,
-                  borderRadius: '8px',
-                  padding: '14px 14px',
-                  backgroundColor: theme.palette.background.paper,
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    borderColor: theme.palette.text.primary,
-                  },
-                  '&:focus-within': {
-                    borderColor: theme.palette.primary.main,
-                    borderWidth: '2px',
-                    padding: '13px 13px',
-                    boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
-                  },
-                },
-                '& .PhoneInputInput': {
-                  border: 'none',
-                  outline: 'none',
-                  flex: 1,
-                  fontSize: '1rem',
-                  backgroundColor: 'transparent',
-                  color: theme.palette.text.primary,
-                  fontFamily: theme.typography.fontFamily,
-                  '&::placeholder': {
-                    color: theme.palette.text.disabled,
-                  },
-                },
-                '& .PhoneInputCountry': {
-                  marginRight: '12px',
-                  paddingRight: '8px',
-                  borderRight: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  minWidth: '60px',
-                  '&:hover': {
-                    '& .PhoneInputCountryIcon': {
-                      transform: 'scale(1.05)',
-                    },
-                  },
-                },
-                '& .PhoneInputCountryIcon': {
-                  width: '24px',
-                  height: '18px',
-                  borderRadius: '2px',
-                  boxShadow: `0 1px 3px ${alpha('#000', 0.12)}`,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                  transition: 'transform 0.2s ease',
-                },
-                '& .PhoneInputCountrySelect': {
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  width: '100%',
-                  height: '100%',
-                  opacity: 0,
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                },
-                '& .PhoneInputCountrySelectArrow': {
-                  display: 'block',
-                  width: '0',
-                  height: '0',
-                  marginLeft: '6px',
-                  borderLeft: '4px solid transparent',
-                  borderRight: '4px solid transparent',
-                  borderTop: `5px solid ${theme.palette.text.secondary}`,
-                  opacity: 0.7,
-                  transition: 'opacity 0.2s ease',
-                },
-                '& .PhoneInputCountry:hover .PhoneInputCountrySelectArrow': {
-                  opacity: 1,
-                  borderTopColor: theme.palette.text.primary,
-                },
-              }}
-            >
-              <PhoneInput
-                id="epayco-phone"
-                placeholder="Ingresa tu número de teléfono"
-                value={phoneValue}
-                onChange={(value) => {
-                  setPhoneValue(value);
-                  setCustomerInfo((prev) => ({ ...prev, phone: value || '' }));
-                  setError(null);
-                }}
-                defaultCountry="CO"
-                disabled={isLoading}
-                international
-                countryCallingCodeEditable={false}
-                aria-label="Número de teléfono con código de país"
-                aria-required="true"
-              />
-            </Box>
-          </Box>
-        </Grid>
+        <CountryPhoneInput
+          selectedCountry={selectedCountry}
+          onCountryChange={(country) => {
+            setSelectedCountry(country);
+            const fullPhone = phoneNumber ? `${country.dial}${phoneNumber}` : '';
+            setCustomerInfo((prev) => ({ ...prev, phone: fullPhone }));
+          }}
+          phoneNumber={phoneNumber}
+          onPhoneChange={(value) => {
+            setPhoneNumber(value);
+            const fullPhone = value ? `${selectedCountry.dial}${value}` : '';
+            setCustomerInfo((prev) => ({ ...prev, phone: fullPhone }));
+            setError(null);
+          }}
+          disabled={isLoading}
+          required
+          inputId="epayco-phone"
+          placeholder="300 123 4567"
+          countries={LATAM_COUNTRIES}
+        />
       </Grid>
 
       <Box sx={{ mt: 3 }}>
@@ -381,12 +290,20 @@ export default function EPaycoPaymentMethod({
           )}
         </Button>
 
-        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05), border: `1px solid ${alpha(theme.palette.info.main, 0.1)}` }}>
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
-            display="flex" 
-            alignItems="center" 
+        <Box
+          sx={{
+            mt: 2,
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.info.main, 0.05),
+            border: `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+          }}
+        >
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="flex"
+            alignItems="center"
             justifyContent="center"
             textAlign="center"
           >

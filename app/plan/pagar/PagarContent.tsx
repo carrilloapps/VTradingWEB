@@ -156,7 +156,9 @@ export default function PagarContent() {
   };
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pt: { xs: '106px', md: '132px' } }}>
+    <Box
+      sx={{ bgcolor: 'background.default', minHeight: '100vh', pt: { xs: '106px', md: '132px' } }}
+    >
       <Navbar />
 
       {/* Progress Indicator - Minimalista */}
@@ -169,102 +171,102 @@ export default function PagarContent() {
           boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.03)}`,
         }}
       >
-          <Container maxWidth="lg">
-            <Box sx={{ py: 1.5, display: 'flex', alignItems: 'center', gap: 2 }}>
-              {/* Step Label */}
-              <Typography
-                variant="caption"
-                component="span"
-                role="status"
-                aria-label={`Paso actual: ${['Duración', 'Pago', 'Confirmar'][currentStep]}`}
+        <Container maxWidth="lg">
+          <Box sx={{ py: 1.5, display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Step Label */}
+            <Typography
+              variant="caption"
+              component="span"
+              role="status"
+              aria-label={`Paso actual: ${['Duración', 'Pago', 'Confirmar'][currentStep]}`}
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: '0.7rem', md: '0.75rem' },
+                color: 'text.primary',
+                minWidth: { xs: '70px', md: '100px' },
+                textAlign: 'left',
+              }}
+            >
+              {['Duración', 'Pago', 'Confirmar'][currentStep]}
+            </Typography>
+            {/* Progress Bar */}
+            <Box
+              sx={{ flex: 1, position: 'relative' }}
+              role="progressbar"
+              aria-valuenow={currentStep + 1}
+              aria-valuemin={1}
+              aria-valuemax={3}
+              aria-label="Progreso del proceso de pago"
+            >
+              <Box
                 sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: '0.7rem', md: '0.75rem' },
-                  color: 'text.primary',
-                  minWidth: { xs: '70px', md: '100px' },
-                  textAlign: 'left',
+                  height: 3,
+                  bgcolor: alpha(theme.palette.divider, 0.1),
+                  borderRadius: 2,
+                  overflow: 'hidden',
                 }}
-              >
-                {['Duración', 'Pago', 'Confirmar'][currentStep]}
-              </Typography>
-              {/* Progress Bar */}
-              <Box 
-                sx={{ flex: 1, position: 'relative' }}
-                role="progressbar"
-                aria-valuenow={currentStep + 1}
-                aria-valuemin={1}
-                aria-valuemax={3}
-                aria-label="Progreso del proceso de pago"
               >
                 <Box
                   sx={{
-                    height: 3,
-                    bgcolor: alpha(theme.palette.divider, 0.1),
+                    height: '100%',
+                    width: `${((currentStep + 1) / 3) * 100}%`,
+                    bgcolor: theme.palette.primary.main,
+                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     borderRadius: 2,
-                    overflow: 'hidden',
                   }}
-                >
+                />
+              </Box>
+              {/* Dots */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  right: 0,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  transform: 'translateY(-50%)',
+                  px: 0.5,
+                }}
+              >
+                {[0, 1, 2].map((index) => (
                   <Box
+                    key={index}
                     sx={{
-                      height: '100%',
-                      width: `${((currentStep + 1) / 3) * 100}%`,
-                      bgcolor: theme.palette.primary.main,
-                      transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                      borderRadius: 2,
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor:
+                        index <= currentStep
+                          ? theme.palette.primary.main
+                          : alpha(theme.palette.divider, 0.3),
+                      transition: 'all 0.3s',
+                      border: `2px solid ${theme.palette.background.paper}`,
+                      boxShadow:
+                        index === currentStep
+                          ? `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`
+                          : 'none',
                     }}
                   />
-                </Box>
-                {/* Dots */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: 0,
-                    right: 0,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    transform: 'translateY(-50%)',
-                    px: 0.5,
-                  }}
-                >
-                  {[0, 1, 2].map((index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        bgcolor:
-                          index <= currentStep
-                            ? theme.palette.primary.main
-                            : alpha(theme.palette.divider, 0.3),
-                        transition: 'all 0.3s',
-                        border: `2px solid ${theme.palette.background.paper}`,
-                        boxShadow:
-                          index === currentStep
-                            ? `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`
-                            : 'none',
-                      }}
-                    />
-                  ))}
-                </Box>
+                ))}
               </Box>
-              {/* Step Counter */}
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  color: 'text.secondary',
-                  fontFamily: 'monospace',
-                  minWidth: 'fit-content',
-                }}
-              >
-                {currentStep + 1}/3
-              </Typography>
             </Box>
-          </Container>
-        </Box>
+            {/* Step Counter */}
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                color: 'text.secondary',
+                fontFamily: 'monospace',
+                minWidth: 'fit-content',
+              }}
+            >
+              {currentStep + 1}/3
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
 
       {/* Hero Section mejorado */}
       <Box
@@ -387,26 +389,22 @@ export default function PagarContent() {
                         </Typography>
                       </Box>
                       <Box>
-                        <Typography 
-                          variant="h6" 
+                        <Typography
+                          variant="h6"
                           fontWeight={700}
                           id="duration-selection-heading"
                           component="h2"
                         >
                           Elige la duración
                         </Typography>
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary"
-                          component="p"
-                        >
+                        <Typography variant="caption" color="text.secondary" component="p">
                           Ahorra más al elegir períodos más largos
                         </Typography>
                       </Box>
                     </Box>
 
-                    <FormControl 
-                      component="fieldset" 
+                    <FormControl
+                      component="fieldset"
                       fullWidth
                       aria-labelledby="duration-selection-heading"
                     >
@@ -753,186 +751,184 @@ export default function PagarContent() {
                         </Typography>
                       </Box>
                       <Box>
-                        <Typography 
-                          variant="h6" 
+                        <Typography
+                          variant="h6"
                           fontWeight={700}
                           id="payment-method-heading"
                           component="h2"
                         >
                           Selecciona cómo pagar
                         </Typography>
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary"
-                          component="p"
-                        >
+                        <Typography variant="caption" color="text.secondary" component="p">
                           Elige tu método de pago preferido
                         </Typography>
                       </Box>
                     </Box>
 
-                    <Grid 
-                      container 
+                    <Grid
+                      container
                       spacing={2}
                       role="radiogroup"
                       aria-labelledby="payment-method-heading"
                       aria-label="Métodos de pago disponibles"
                     >
-                      {paymentMethods.filter((m) => !m.hidden).map((method, index) => {
-                        const isSelected = selectedMethod === method.id;
-                        return (
-                          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={method.id}>
-                            <Zoom in timeout={1400 + index * 100}>
-                              <Card
-                                role="radio"
-                                aria-checked={isSelected}
-                                aria-label={`Método de pago ${method.name}, ${method.description}`}
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    setSelectedMethod(method.id);
-                                  }
-                                }}
-                                sx={{
-                                  cursor: 'pointer',
-                                  height: '100%',
-                                  border: `1px solid ${
-                                    isSelected
-                                      ? alpha(method.color, 0.4)
-                                      : alpha(theme.palette.divider, 0.15)
-                                  }`,
-                                  bgcolor: isSelected ? alpha(method.color, 0.03) : 'transparent',
-                                  borderRadius: 3,
-                                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                  backdropFilter: 'blur(10px)',
-                                  position: 'relative',
-                                  overflow: 'visible',
-                                  '&:hover': {
-                                    borderColor: alpha(method.color, 0.5),
-                                    transform: 'translateY(-2px)',
-                                    bgcolor: alpha(method.color, 0.02),
-                                    boxShadow: `0 8px 20px ${alpha(method.color, 0.1)}`,
-                                  },
-                                }}
-                                onClick={() => setSelectedMethod(method.id)}
-                              >
-                                <CardContent sx={{ textAlign: 'center', p: { xs: 2.5, lg: 2 } }}>
-                                  <Box
-                                    sx={{
-                                      width: { xs: 48, lg: 44 },
-                                      height: { xs: 48, lg: 44 },
-                                      borderRadius: 2,
-                                      bgcolor: method.iconBg,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      mx: 'auto',
-                                      mb: 1.5,
-                                      position: 'relative',
-                                      transition: 'all 0.3s',
-                                    }}
-                                  >
-                                    <Image
-                                      src={method.iconPath}
-                                      alt={method.name}
-                                      width={32}
-                                      height={32}
-                                      style={{
-                                        objectFit: 'contain',
-                                        maxWidth: '80%',
-                                        maxHeight: '80%',
-                                      }}
-                                    />
-                                  </Box>
-                                  <Typography
-                                    variant="h6"
-                                    fontWeight={700}
-                                    gutterBottom
-                                    sx={{
-                                      fontSize: { xs: '1.1rem', lg: '1rem' },
-                                      mb: 0.5,
-                                    }}
-                                  >
-                                    {method.name}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{
-                                      display: 'block',
-                                      mb: 1.5,
-                                      fontSize: { xs: '0.75rem', lg: '0.7rem' },
-                                    }}
-                                  >
-                                    {method.description}
-                                  </Typography>
-                                  <Stack
-                                    direction="row"
-                                    spacing={0.5}
-                                    justifyContent="center"
-                                    flexWrap="wrap"
-                                    sx={{ gap: 0.5 }}
-                                  >
-                                    {method.features.slice(0, 3).map((feature) => (
-                                      <Chip
-                                        key={feature}
-                                        label={feature}
-                                        size="small"
-                                        sx={{
-                                          fontSize: { xs: '0.65rem', lg: '0.6rem' },
-                                          height: { xs: 22, lg: 20 },
-                                          bgcolor: alpha(theme.palette.primary.main, 0.08),
-                                          color: theme.palette.text.secondary,
-                                          fontWeight: 600,
-                                          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                                          '&:hover': {
-                                            bgcolor: alpha(theme.palette.primary.main, 0.12),
-                                          },
-                                        }}
-                                      />
-                                    ))}
-                                  </Stack>
-                                </CardContent>
-
-                                {/* Indicador de Selección */}
-                                {isSelected && (
-                                  <Box
-                                    sx={{
-                                      position: 'absolute',
-                                      top: 10,
-                                      right: 10,
-                                      width: 20,
-                                      height: 20,
-                                      borderRadius: '50%',
-                                      bgcolor: method.color,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      boxShadow: `0 2px 6px ${alpha(method.color, 0.35)}`,
-                                    }}
-                                  >
+                      {paymentMethods
+                        .filter((m) => !m.hidden)
+                        .map((method, index) => {
+                          const isSelected = selectedMethod === method.id;
+                          return (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={method.id}>
+                              <Zoom in timeout={1400 + index * 100}>
+                                <Card
+                                  role="radio"
+                                  aria-checked={isSelected}
+                                  aria-label={`Método de pago ${method.name}, ${method.description}`}
+                                  tabIndex={0}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault();
+                                      setSelectedMethod(method.id);
+                                    }
+                                  }}
+                                  sx={{
+                                    cursor: 'pointer',
+                                    height: '100%',
+                                    border: `1px solid ${
+                                      isSelected
+                                        ? alpha(method.color, 0.4)
+                                        : alpha(theme.palette.divider, 0.15)
+                                    }`,
+                                    bgcolor: isSelected ? alpha(method.color, 0.03) : 'transparent',
+                                    borderRadius: 3,
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    backdropFilter: 'blur(10px)',
+                                    position: 'relative',
+                                    overflow: 'visible',
+                                    '&:hover': {
+                                      borderColor: alpha(method.color, 0.5),
+                                      transform: 'translateY(-2px)',
+                                      bgcolor: alpha(method.color, 0.02),
+                                      boxShadow: `0 8px 20px ${alpha(method.color, 0.1)}`,
+                                    },
+                                  }}
+                                  onClick={() => setSelectedMethod(method.id)}
+                                >
+                                  <CardContent sx={{ textAlign: 'center', p: { xs: 2.5, lg: 2 } }}>
                                     <Box
                                       sx={{
-                                        width: 8,
-                                        height: 8,
-                                        borderRadius: '50%',
-                                        bgcolor: 'white',
+                                        width: { xs: 48, lg: 44 },
+                                        height: { xs: 48, lg: 44 },
+                                        borderRadius: 2,
+                                        bgcolor: method.iconBg,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        mx: 'auto',
+                                        mb: 1.5,
+                                        position: 'relative',
+                                        transition: 'all 0.3s',
                                       }}
-                                    />
-                                  </Box>
-                                )}
-                              </Card>
-                            </Zoom>
-                          </Grid>
-                        );
-                      })}
+                                    >
+                                      <Image
+                                        src={method.iconPath}
+                                        alt={method.name}
+                                        width={32}
+                                        height={32}
+                                        style={{
+                                          objectFit: 'contain',
+                                          maxWidth: '80%',
+                                          maxHeight: '80%',
+                                        }}
+                                      />
+                                    </Box>
+                                    <Typography
+                                      variant="h6"
+                                      fontWeight={700}
+                                      gutterBottom
+                                      sx={{
+                                        fontSize: { xs: '1.1rem', lg: '1rem' },
+                                        mb: 0.5,
+                                      }}
+                                    >
+                                      {method.name}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{
+                                        display: 'block',
+                                        mb: 1.5,
+                                        fontSize: { xs: '0.75rem', lg: '0.7rem' },
+                                      }}
+                                    >
+                                      {method.description}
+                                    </Typography>
+                                    <Stack
+                                      direction="row"
+                                      spacing={0.5}
+                                      justifyContent="center"
+                                      flexWrap="wrap"
+                                      sx={{ gap: 0.5 }}
+                                    >
+                                      {method.features.slice(0, 3).map((feature) => (
+                                        <Chip
+                                          key={feature}
+                                          label={feature}
+                                          size="small"
+                                          sx={{
+                                            fontSize: { xs: '0.65rem', lg: '0.6rem' },
+                                            height: { xs: 22, lg: 20 },
+                                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                            color: theme.palette.text.secondary,
+                                            fontWeight: 600,
+                                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                            '&:hover': {
+                                              bgcolor: alpha(theme.palette.primary.main, 0.12),
+                                            },
+                                          }}
+                                        />
+                                      ))}
+                                    </Stack>
+                                  </CardContent>
+
+                                  {/* Indicador de Selección */}
+                                  {isSelected && (
+                                    <Box
+                                      sx={{
+                                        position: 'absolute',
+                                        top: 10,
+                                        right: 10,
+                                        width: 20,
+                                        height: 20,
+                                        borderRadius: '50%',
+                                        bgcolor: method.color,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        boxShadow: `0 2px 6px ${alpha(method.color, 0.35)}`,
+                                      }}
+                                    >
+                                      <Box
+                                        sx={{
+                                          width: 8,
+                                          height: 8,
+                                          borderRadius: '50%',
+                                          bgcolor: 'white',
+                                        }}
+                                      />
+                                    </Box>
+                                  )}
+                                </Card>
+                              </Zoom>
+                            </Grid>
+                          );
+                        })}
                     </Grid>
 
                     {/* Payment Form for Selected Method */}
                     {selectedMethod && planDetails && (
                       <Fade in timeout={600}>
-                        <Box 
+                        <Box
                           sx={{ mt: 3 }}
                           role="region"
                           aria-label="Formulario de pago seleccionado"
@@ -1108,22 +1104,12 @@ export default function PagarContent() {
                               }}
                             >
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <LocalOfferIcon
-                                  sx={{ fontSize: 16, color: 'success.main' }}
-                                />
-                                <Typography
-                                  variant="body2"
-                                  color="success.main"
-                                  fontWeight={700}
-                                >
+                                <LocalOfferIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                <Typography variant="body2" color="success.main" fontWeight={700}>
                                   Descuento ({planDetails.discount}%)
                                 </Typography>
                               </Box>
-                              <Typography
-                                variant="body2"
-                                color="success.main"
-                                fontWeight={800}
-                              >
+                              <Typography variant="body2" color="success.main" fontWeight={800}>
                                 -${planDetails.discountAmount.toFixed(2)}
                               </Typography>
                             </Box>

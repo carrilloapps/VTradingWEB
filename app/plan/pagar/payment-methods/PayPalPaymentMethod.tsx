@@ -204,12 +204,20 @@ export default function PayPalPaymentMethod({
           )}
         </Button>
 
-        <Box sx={{ mt: 2, p: 1.5, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05), border: `1px solid ${alpha(theme.palette.info.main, 0.1)}` }}>
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
-            display="flex" 
-            alignItems="center" 
+        <Box
+          sx={{
+            mt: 2,
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.info.main, 0.05),
+            border: `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+          }}
+        >
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="flex"
+            alignItems="center"
             justifyContent="center"
             textAlign="center"
           >
