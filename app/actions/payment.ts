@@ -104,8 +104,9 @@ async function createStripeCheckout(request: PaymentRequest): Promise<PaymentRes
             currency: 'usd',
             product_data: {
               name: 'VTrading Premium',
-              description: `Suscripción por ${request.months} ${request.months === 1 ? 'mes' : 'meses'
-                }`,
+              description: `Suscripción por ${request.months} ${
+                request.months === 1 ? 'mes' : 'meses'
+              }`,
             },
             unit_amount: Math.round(request.totalAmount * 100), // Amount in cents
           },
@@ -208,8 +209,9 @@ async function createPaypalCheckout(request: PaymentRequest): Promise<PaymentRes
         purchase_units: [
           {
             reference_id: `VT${Date.now()}`,
-            description: `VTrading Premium - ${request.months} ${request.months === 1 ? 'mes' : 'meses'
-              }`,
+            description: `VTrading Premium - ${request.months} ${
+              request.months === 1 ? 'mes' : 'meses'
+            }`,
             amount: {
               currency_code: 'USD',
               value: request.totalAmount.toFixed(2),
@@ -325,16 +327,19 @@ async function createBoldCheckout(request: PaymentRequest): Promise<PaymentRespo
         tip_amount: 0,
       },
       // Map VEN to CC for Bold API
-      doc_type: request.customerInfo?.documentType === 'VEN' ? 'CC' : (request.customerInfo?.documentType || 'CC'),
+      doc_type:
+        request.customerInfo?.documentType === 'VEN'
+          ? 'CC'
+          : request.customerInfo?.documentType || 'CC',
       doc_number: request.customerInfo?.documentNumber,
       reference: orderId,
       description: `VTrading Premium - ${request.months} ${request.months === 1 ? 'mes' : 'meses'}`,
       payment_methods: availablePaymentMethods,
       // Bold requires HTTPS for callback_url (used for redirection)
       // We allow it only if it's HTTPS or localhost to avoid 400 errors from Bold
-      ...(((webhookUrl || `${baseUrl}/plan/success`).startsWith('https') ||
-        baseUrl.includes('localhost') ||
-        baseUrl.includes('127.0.0.1'))
+      ...((webhookUrl || `${baseUrl}/plan/success`).startsWith('https') ||
+      baseUrl.includes('localhost') ||
+      baseUrl.includes('127.0.0.1')
         ? { callback_url: webhookUrl || `${baseUrl}/plan/success` }
         : {}),
     };
@@ -464,7 +469,9 @@ async function createEpaycoCheckout(request: PaymentRequest): Promise<PaymentRes
       name_billing: request.customerInfo?.name || 'Cliente',
       address_billing: 'Dirección',
       type_doc_billing:
-        request.customerInfo?.documentType === 'VEN' ? 'CC' : (request.customerInfo?.documentType || 'CC'),
+        request.customerInfo?.documentType === 'VEN'
+          ? 'CC'
+          : request.customerInfo?.documentType || 'CC',
       mobilephone_billing: request.customerInfo?.phone || '3000000000',
       number_doc_billing: request.customerInfo?.documentNumber || '1000000000',
     };
@@ -640,11 +647,15 @@ async function createBinanceCheckout(request: PaymentRequest): Promise<PaymentRe
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error('Binance Pay API error', new Error(`Binance Pay API error: ${response.status}`), {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-      });
+      logger.error(
+        'Binance Pay API error',
+        new Error(`Binance Pay API error: ${response.status}`),
+        {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText,
+        }
+      );
       throw new Error(
         `Binance Pay API error: ${response.status} ${response.statusText} - ${errorText}`
       );

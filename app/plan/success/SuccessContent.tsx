@@ -60,7 +60,8 @@ export default function SuccessContent() {
   const binanceStatus = searchParams.get('status'); // Binance / General status
 
   // Final display ID (can be session_id, reference, etc.)
-  const transactionId = sessionId || epaycoRef || boldRef || paypalToken || searchParams.get('prepayId');
+  const transactionId =
+    sessionId || epaycoRef || boldRef || paypalToken || searchParams.get('prepayId');
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -72,7 +73,11 @@ export default function SuccessContent() {
         const explicitStatus = searchParams.get('status')?.toLowerCase();
 
         // 1. Check for cancellation (common across many)
-        if (explicitStatus === 'cancel' || explicitStatus === 'cancelled' || boldSuccess === 'false') {
+        if (
+          explicitStatus === 'cancel' ||
+          explicitStatus === 'cancelled' ||
+          boldSuccess === 'false'
+        ) {
           setStatus('cancelled');
           return;
         }
@@ -85,7 +90,13 @@ export default function SuccessContent() {
         }
 
         // 3. Check for specific provider parameters
-        if (sessionId || paypalToken || boldSuccess === 'true' || explicitStatus === 'success' || binanceStatus === 'SUCCESS') {
+        if (
+          sessionId ||
+          paypalToken ||
+          boldSuccess === 'true' ||
+          explicitStatus === 'success' ||
+          binanceStatus === 'SUCCESS'
+        ) {
           setStatus('success');
           return;
         }
@@ -205,11 +216,15 @@ export default function SuccessContent() {
                           ? alpha(theme.palette.background.paper, 0.6)
                           : alpha(theme.palette.background.paper, 0.9),
                       backdropFilter: 'blur(20px)',
-                      border: `1px solid ${status === 'success' ? alpha(theme.palette.success.main, 0.3) :
-                        status === 'failed' ? alpha(theme.palette.error.main, 0.3) :
-                          status === 'cancelled' ? alpha(theme.palette.warning.main, 0.3) :
-                            alpha(theme.palette.info.main, 0.3)
-                        }`,
+                      border: `1px solid ${
+                        status === 'success'
+                          ? alpha(theme.palette.success.main, 0.3)
+                          : status === 'failed'
+                            ? alpha(theme.palette.error.main, 0.3)
+                            : status === 'cancelled'
+                              ? alpha(theme.palette.warning.main, 0.3)
+                              : alpha(theme.palette.info.main, 0.3)
+                      }`,
                       borderRadius: 3,
                       position: 'relative',
                       overflow: 'hidden',
@@ -220,11 +235,15 @@ export default function SuccessContent() {
                         left: 0,
                         right: 0,
                         height: '4px',
-                        background: `linear-gradient(90deg, ${status === 'success' ? theme.palette.success.main :
-                          status === 'failed' ? theme.palette.error.main :
-                            status === 'cancelled' ? theme.palette.warning.main :
-                              theme.palette.info.main
-                          }, ${theme.palette.primary.main})`,
+                        background: `linear-gradient(90deg, ${
+                          status === 'success'
+                            ? theme.palette.success.main
+                            : status === 'failed'
+                              ? theme.palette.error.main
+                              : status === 'cancelled'
+                                ? theme.palette.warning.main
+                                : theme.palette.info.main
+                        }, ${theme.palette.primary.main})`,
                       },
                     }}
                   >
@@ -235,14 +254,23 @@ export default function SuccessContent() {
                           width: { xs: 100, md: 120, lg: 140 },
                           height: { xs: 100, md: 120, lg: 140 },
                           borderRadius: '50%',
-                          background: (theme) => `linear-gradient(135deg, ${status === 'success' ? alpha(theme.palette.success.main, 0.2) :
-                            status === 'failed' ? alpha(theme.palette.error.main, 0.2) :
-                              status === 'cancelled' ? alpha(theme.palette.warning.main, 0.2) :
-                                alpha(theme.palette.info.main, 0.2)
-                            } 0%, ${status === 'success' ? alpha(theme.palette.success.light, 0.1) :
-                              status === 'failed' ? alpha(theme.palette.error.light, 0.1) :
-                                status === 'cancelled' ? alpha(theme.palette.warning.light, 0.1) :
-                                  alpha(theme.palette.info.light, 0.1)
+                          background: (theme) =>
+                            `linear-gradient(135deg, ${
+                              status === 'success'
+                                ? alpha(theme.palette.success.main, 0.2)
+                                : status === 'failed'
+                                  ? alpha(theme.palette.error.main, 0.2)
+                                  : status === 'cancelled'
+                                    ? alpha(theme.palette.warning.main, 0.2)
+                                    : alpha(theme.palette.info.main, 0.2)
+                            } 0%, ${
+                              status === 'success'
+                                ? alpha(theme.palette.success.light, 0.1)
+                                : status === 'failed'
+                                  ? alpha(theme.palette.error.light, 0.1)
+                                  : status === 'cancelled'
+                                    ? alpha(theme.palette.warning.light, 0.1)
+                                    : alpha(theme.palette.info.light, 0.1)
                             } 100%)`,
                           display: 'flex',
                           alignItems: 'center',
@@ -253,10 +281,15 @@ export default function SuccessContent() {
                             position: 'absolute',
                             inset: -8,
                             borderRadius: '50%',
-                            background: (theme) => `linear-gradient(135deg, ${status === 'success' ? alpha(theme.palette.success.main, 0.1) :
-                              status === 'failed' ? alpha(theme.palette.error.main, 0.1) :
-                                status === 'cancelled' ? alpha(theme.palette.warning.main, 0.1) :
-                                  alpha(theme.palette.info.main, 0.1)
+                            background: (theme) =>
+                              `linear-gradient(135deg, ${
+                                status === 'success'
+                                  ? alpha(theme.palette.success.main, 0.1)
+                                  : status === 'failed'
+                                    ? alpha(theme.palette.error.main, 0.1)
+                                    : status === 'cancelled'
+                                      ? alpha(theme.palette.warning.main, 0.1)
+                                      : alpha(theme.palette.info.main, 0.1)
                               }, transparent)`,
                             animation: 'pulse 2s ease-in-out infinite',
                           },
@@ -266,10 +299,26 @@ export default function SuccessContent() {
                           },
                         }}
                       >
-                        {status === 'success' && <CheckCircleIcon sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'success.main' }} />}
-                        {status === 'failed' && <ErrorIcon sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'error.main' }} />}
-                        {status === 'cancelled' && <CancelIcon sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'warning.main' }} />}
-                        {status === 'pending' && <AccessTimeIcon sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'info.main' }} />}
+                        {status === 'success' && (
+                          <CheckCircleIcon
+                            sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'success.main' }}
+                          />
+                        )}
+                        {status === 'failed' && (
+                          <ErrorIcon
+                            sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'error.main' }}
+                          />
+                        )}
+                        {status === 'cancelled' && (
+                          <CancelIcon
+                            sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'warning.main' }}
+                          />
+                        )}
+                        {status === 'pending' && (
+                          <AccessTimeIcon
+                            sx={{ fontSize: { xs: 60, md: 75, lg: 90 }, color: 'info.main' }}
+                          />
+                        )}
                       </Box>
 
                       {/* Status Title */}
@@ -278,14 +327,23 @@ export default function SuccessContent() {
                           variant="h4"
                           fontWeight={800}
                           sx={{
-                            background: (theme) => `linear-gradient(135deg, ${status === 'success' ? theme.palette.success.main :
-                              status === 'failed' ? theme.palette.error.main :
-                                status === 'cancelled' ? theme.palette.warning.main :
-                                  theme.palette.info.main
-                              } 0%, ${status === 'success' ? theme.palette.success.dark :
-                                status === 'failed' ? theme.palette.error.dark :
-                                  status === 'cancelled' ? theme.palette.warning.dark :
-                                    theme.palette.info.dark
+                            background: (theme) =>
+                              `linear-gradient(135deg, ${
+                                status === 'success'
+                                  ? theme.palette.success.main
+                                  : status === 'failed'
+                                    ? theme.palette.error.main
+                                    : status === 'cancelled'
+                                      ? theme.palette.warning.main
+                                      : theme.palette.info.main
+                              } 0%, ${
+                                status === 'success'
+                                  ? theme.palette.success.dark
+                                  : status === 'failed'
+                                    ? theme.palette.error.dark
+                                    : status === 'cancelled'
+                                      ? theme.palette.warning.dark
+                                      : theme.palette.info.dark
                               } 100%)`,
                             backgroundClip: 'text',
                             WebkitBackgroundClip: 'text',
@@ -305,9 +363,12 @@ export default function SuccessContent() {
                           fontWeight={500}
                           sx={{ maxWidth: 300, mx: 'auto' }}
                         >
-                          {status === 'success' && 'Tu suscripción a VTrading Premium ha sido activada'}
-                          {status === 'failed' && (errorMessage || 'Hubo un error al procesar tu transacción')}
-                          {status === 'cancelled' && 'La operación fue cancelada. No se ha realizado ningún cargo.'}
+                          {status === 'success' &&
+                            'Tu suscripción a VTrading Premium ha sido activada'}
+                          {status === 'failed' &&
+                            (errorMessage || 'Hubo un error al procesar tu transacción')}
+                          {status === 'cancelled' &&
+                            'La operación fue cancelada. No se ha realizado ningún cargo.'}
                           {status === 'pending' && 'Estamos esperando la confirmación de tu pago.'}
                         </Typography>
                       </Box>
@@ -315,22 +376,33 @@ export default function SuccessContent() {
                       {/* Status Badge */}
                       <Chip
                         icon={
-                          status === 'success' ? <StarIcon /> :
-                            status === 'failed' ? <ErrorIcon /> :
-                              status === 'cancelled' ? <WarningIcon /> :
-                                <AccessTimeIcon />
+                          status === 'success' ? (
+                            <StarIcon />
+                          ) : status === 'failed' ? (
+                            <ErrorIcon />
+                          ) : status === 'cancelled' ? (
+                            <WarningIcon />
+                          ) : (
+                            <AccessTimeIcon />
+                          )
                         }
                         label={
-                          status === 'success' ? 'PREMIUM ACTIVO' :
-                            status === 'failed' ? 'ERROR EN PAGO' :
-                              status === 'cancelled' ? 'CANCELADO' :
-                                'PROCESANDO'
+                          status === 'success'
+                            ? 'PREMIUM ACTIVO'
+                            : status === 'failed'
+                              ? 'ERROR EN PAGO'
+                              : status === 'cancelled'
+                                ? 'CANCELADO'
+                                : 'PROCESANDO'
                         }
                         color={
-                          status === 'success' ? 'success' :
-                            status === 'failed' ? 'error' :
-                              status === 'cancelled' ? 'warning' :
-                                'info'
+                          status === 'success'
+                            ? 'success'
+                            : status === 'failed'
+                              ? 'error'
+                              : status === 'cancelled'
+                                ? 'warning'
+                                : 'info'
                         }
                         sx={{
                           fontWeight: 700,
@@ -377,10 +449,13 @@ export default function SuccessContent() {
                               <AccessTimeIcon sx={{ fontSize: 32, color: 'info.main' }} />
                             )}
                             <Typography variant="h6" fontWeight={700}>
-                              {status === 'success' ? '¿Qué sigue?' :
-                                status === 'failed' ? 'Detalles del error' :
-                                  status === 'cancelled' ? 'Información adicional' :
-                                    'Información del proceso'}
+                              {status === 'success'
+                                ? '¿Qué sigue?'
+                                : status === 'failed'
+                                  ? 'Detalles del error'
+                                  : status === 'cancelled'
+                                    ? 'Información adicional'
+                                    : 'Información del proceso'}
                             </Typography>
                           </Box>
 
@@ -390,9 +465,14 @@ export default function SuccessContent() {
                             <Grid container spacing={1}>
                               {[
                                 {
-                                  icon: <CheckCircleIcon sx={{ fontSize: 20, color: 'success.main' }} />,
+                                  icon: (
+                                    <CheckCircleIcon sx={{ fontSize: 20, color: 'success.main' }} />
+                                  ),
                                   color: theme.palette.success.main,
-                                  text: status === 'success' ? 'Tu cuenta Premium está activa inmediatamente' : 'Tu cuenta será activada al confirmar el pago',
+                                  text:
+                                    status === 'success'
+                                      ? 'Tu cuenta Premium está activa inmediatamente'
+                                      : 'Tu cuenta será activada al confirmar el pago',
                                 },
                                 {
                                   icon: <EmailIcon sx={{ fontSize: 20, color: 'primary.main' }} />,
@@ -400,12 +480,18 @@ export default function SuccessContent() {
                                   text: 'Recibirás un email de confirmación',
                                 },
                                 {
-                                  icon: <PhoneIphoneIcon sx={{ fontSize: 20, color: 'info.main' }} />,
+                                  icon: (
+                                    <PhoneIphoneIcon sx={{ fontSize: 20, color: 'info.main' }} />
+                                  ),
                                   color: theme.palette.info.main,
                                   text: 'Descarga la app para disfrutar todas las funciones',
                                 },
                                 {
-                                  icon: <CardGiftcardIcon sx={{ fontSize: 20, color: 'warning.main' }} />,
+                                  icon: (
+                                    <CardGiftcardIcon
+                                      sx={{ fontSize: 20, color: 'warning.main' }}
+                                    />
+                                  ),
                                   color: theme.palette.warning.main,
                                   text: 'Si referiste a alguien, tu mes gratis se aplicará automáticamente',
                                 },
@@ -413,13 +499,27 @@ export default function SuccessContent() {
                                 <Grid size={{ xs: 12, md: 6 }} key={index}>
                                   <ListItem sx={{ px: 0, py: 1 }}>
                                     <ListItemIcon sx={{ minWidth: 40 }}>
-                                      <Box sx={{ width: 32, height: 32, borderRadius: '50%', bgcolor: alpha(item.color as string, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                      <Box
+                                        sx={{
+                                          width: 32,
+                                          height: 32,
+                                          borderRadius: '50%',
+                                          bgcolor: alpha(item.color as string, 0.1),
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                        }}
+                                      >
                                         {item.icon}
                                       </Box>
                                     </ListItemIcon>
                                     <ListItemText
                                       primary={item.text}
-                                      primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.3 }}
+                                      primaryTypographyProps={{
+                                        fontWeight: 600,
+                                        fontSize: '0.9rem',
+                                        lineHeight: 1.3,
+                                      }}
                                     />
                                   </ListItem>
                                 </Grid>
@@ -428,19 +528,23 @@ export default function SuccessContent() {
                           ) : status === 'failed' ? (
                             <Stack spacing={2}>
                               <Alert severity="error" sx={{ borderRadius: 2 }}>
-                                {errorMessage || 'La transacción no pudo completarse. Por favor verifica los datos e intenta nuevamente.'}
+                                {errorMessage ||
+                                  'La transacción no pudo completarse. Por favor verifica los datos e intenta nuevamente.'}
                               </Alert>
                               <Typography variant="body2" color="text.secondary">
-                                Si el cargo se realizó en tu banco pero no ves tu cuenta activa, por favor contacta a nuestro equipo de soporte con tu ID de transacción.
+                                Si el cargo se realizó en tu banco pero no ves tu cuenta activa, por
+                                favor contacta a nuestro equipo de soporte con tu ID de transacción.
                               </Typography>
                             </Stack>
                           ) : (
                             <Stack spacing={2}>
                               <Alert severity="warning" variant="outlined" sx={{ borderRadius: 2 }}>
-                                No se ha realizado ningún cargo a tu cuenta. Puedes intentar realizar el pago nuevamente usando el mismo u otro método de pago.
+                                No se ha realizado ningún cargo a tu cuenta. Puedes intentar
+                                realizar el pago nuevamente usando el mismo u otro método de pago.
                               </Alert>
                               <Typography variant="body2" color="text.secondary">
-                                Si cambiaste de opinión, puedes volver a ver nuestros planes para encontrar el que mejor se adapte a tus necesidades.
+                                Si cambiaste de opinión, puedes volver a ver nuestros planes para
+                                encontrar el que mejor se adapte a tus necesidades.
                               </Typography>
                             </Stack>
                           )}

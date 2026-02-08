@@ -158,10 +158,11 @@ export default function BinancePayPaymentMethod({
                 sx={{
                   cursor: 'pointer',
                   p: 1.5,
-                  border: `1px solid ${selectedCrypto === crypto.value
+                  border: `1px solid ${
+                    selectedCrypto === crypto.value
                       ? alpha('#F3BA2F', 0.4)
                       : alpha(theme.palette.divider, 0.15)
-                    }`,
+                  }`,
                   bgcolor: selectedCrypto === crypto.value ? alpha('#F3BA2F', 0.05) : 'transparent',
                   transition: 'all 0.3s',
                   '&:hover': {

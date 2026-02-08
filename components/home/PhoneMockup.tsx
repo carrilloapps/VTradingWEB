@@ -69,19 +69,22 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
     const rate = item.rate;
     const change = item.change;
 
-    const avgPrice = typeof rate === 'number' ? rate : rate.average || ((rate.buy || 0) + (rate.sell || 0)) / 2;
+    const avgPrice =
+      typeof rate === 'number' ? rate : rate.average || ((rate.buy || 0) + (rate.sell || 0)) / 2;
 
     let avgChange = 0;
     if (typeof change === 'number') {
       avgChange = change;
     } else if (change) {
       const changeObj = change as RateChange;
-      avgChange = changeObj.average?.percent !== undefined
-        ? changeObj.average.percent
-        : ((changeObj.buy?.percent || 0) + (changeObj.sell?.percent || 0)) / 2;
+      avgChange =
+        changeObj.average?.percent !== undefined
+          ? changeObj.average.percent
+          : ((changeObj.buy?.percent || 0) + (changeObj.sell?.percent || 0)) / 2;
     }
 
-    let trend = typeof change === 'object' && change ? (change as RateChange).average?.direction : undefined;
+    let trend =
+      typeof change === 'object' && change ? (change as RateChange).average?.direction : undefined;
     if (!trend) {
       if (avgChange > 0) trend = 'up';
       else if (avgChange < 0) trend = 'down';
@@ -97,46 +100,63 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
 
   const bcvData = bcvRate
     ? {
-      general: getGeneralData(bcvRate),
-      buy: {
-        price: fmt((bcvRate.rate as RateValue)?.buy),
-        change: fmtPct((bcvRate.change as RateChange)?.buy?.percent ?? 0),
-        trend: ((bcvRate.change as RateChange)?.buy?.direction || 'stable') as 'up' | 'down' | 'stable',
-      },
-      sell: {
-        price: fmt((bcvRate.rate as RateValue)?.sell),
-        change: fmtPct((bcvRate.change as RateChange)?.sell?.percent ?? 0),
-        trend: ((bcvRate.change as RateChange)?.sell?.direction || 'stable') as 'up' | 'down' | 'stable',
-      },
-    }
+        general: getGeneralData(bcvRate),
+        buy: {
+          price: fmt((bcvRate.rate as RateValue)?.buy),
+          change: fmtPct((bcvRate.change as RateChange)?.buy?.percent ?? 0),
+          trend: ((bcvRate.change as RateChange)?.buy?.direction || 'stable') as
+            | 'up'
+            | 'down'
+            | 'stable',
+        },
+        sell: {
+          price: fmt((bcvRate.rate as RateValue)?.sell),
+          change: fmtPct((bcvRate.change as RateChange)?.sell?.percent ?? 0),
+          trend: ((bcvRate.change as RateChange)?.sell?.direction || 'stable') as
+            | 'up'
+            | 'down'
+            | 'stable',
+        },
+      }
     : {
-      general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-      buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-      sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-    };
+        general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+        buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+        sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      };
 
   const cryptoList = (Array.isArray(marketData?.crypto) ? marketData.crypto : []) || [];
-  const firstCrypto = cryptoList.find((c: CurrencyRate) => c.rate && ((c.rate as RateValue).average || (c.rate as RateValue).buy || (c.rate as RateValue).sell)) || (cryptoList.length > 0 ? cryptoList[0] : null);
+  const firstCrypto =
+    cryptoList.find(
+      (c: CurrencyRate) =>
+        c.rate &&
+        ((c.rate as RateValue).average || (c.rate as RateValue).buy || (c.rate as RateValue).sell)
+    ) || (cryptoList.length > 0 ? cryptoList[0] : null);
 
   const cryptoData = firstCrypto
     ? {
-      general: getGeneralData(firstCrypto),
-      buy: {
-        price: fmt((firstCrypto.rate as RateValue)?.buy),
-        change: fmtPct((firstCrypto.change as RateChange)?.buy?.percent ?? 0),
-        trend: ((firstCrypto.change as RateChange)?.buy?.direction || 'stable') as 'up' | 'down' | 'stable',
-      },
-      sell: {
-        price: fmt((firstCrypto.rate as RateValue)?.sell),
-        change: fmtPct((firstCrypto.change as RateChange)?.sell?.percent ?? 0),
-        trend: ((firstCrypto.change as RateChange)?.sell?.direction || 'stable') as 'up' | 'down' | 'stable',
-      },
-    }
+        general: getGeneralData(firstCrypto),
+        buy: {
+          price: fmt((firstCrypto.rate as RateValue)?.buy),
+          change: fmtPct((firstCrypto.change as RateChange)?.buy?.percent ?? 0),
+          trend: ((firstCrypto.change as RateChange)?.buy?.direction || 'stable') as
+            | 'up'
+            | 'down'
+            | 'stable',
+        },
+        sell: {
+          price: fmt((firstCrypto.rate as RateValue)?.sell),
+          change: fmtPct((firstCrypto.change as RateChange)?.sell?.percent ?? 0),
+          trend: ((firstCrypto.change as RateChange)?.sell?.direction || 'stable') as
+            | 'up'
+            | 'down'
+            | 'stable',
+        },
+      }
     : {
-      general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-      buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-      sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
-    };
+        general: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+        buy: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+        sell: { price: '0,00', change: '0.00%', trend: 'stable' as const },
+      };
 
   const bvcQuotes = Array.isArray(marketData?.bvc) ? marketData.bvc : [];
   const stockItems = bvcQuotes.slice(0, 3).map((quote: BVCQuote) => {
@@ -239,8 +259,34 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
           }}
         >
           {/* Physical Buttons */}
-          <Box sx={{ position: 'absolute', right: -3, top: 100, width: 4, height: 40, bgcolor: isDark ? '#4A504D' : '#C0C9C2', borderTopRightRadius: 2, borderBottomRightRadius: 2, zIndex: 1, boxShadow: '-1px 0 2px rgba(0,0,0,0.2)' }} />
-          <Box sx={{ position: 'absolute', right: -3, top: 150, width: 4, height: 70, bgcolor: isDark ? '#4A504D' : '#C0C9C2', borderTopRightRadius: 2, borderBottomRightRadius: 2, zIndex: 1, boxShadow: '-1px 0 2px rgba(0,0,0,0.2)' }} />
+          <Box
+            sx={{
+              position: 'absolute',
+              right: -3,
+              top: 100,
+              width: 4,
+              height: 40,
+              bgcolor: isDark ? '#4A504D' : '#C0C9C2',
+              borderTopRightRadius: 2,
+              borderBottomRightRadius: 2,
+              zIndex: 1,
+              boxShadow: '-1px 0 2px rgba(0,0,0,0.2)',
+            }}
+          />
+          <Box
+            sx={{
+              position: 'absolute',
+              right: -3,
+              top: 150,
+              width: 4,
+              height: 70,
+              bgcolor: isDark ? '#4A504D' : '#C0C9C2',
+              borderTopRightRadius: 2,
+              borderBottomRightRadius: 2,
+              zIndex: 1,
+              boxShadow: '-1px 0 2px rgba(0,0,0,0.2)',
+            }}
+          />
 
           <Paper
             elevation={24}
@@ -272,10 +318,24 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
                 color: isDark ? '#fff' : '#191C1A',
               }}
             >
-              <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.85rem', letterSpacing: '0.02em' }}>
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 600, fontSize: '0.85rem', letterSpacing: '0.02em' }}
+              >
                 {currentTime}
               </Typography>
-              <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', width: 12, height: 12, bgcolor: '#101010', borderRadius: '50%', boxShadow: 'inset 0 0 4px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)' }} />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 12,
+                  height: 12,
+                  bgcolor: '#101010',
+                  borderRadius: '50%',
+                  boxShadow: 'inset 0 0 4px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)',
+                }}
+              />
               <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
                 <SignalCellularAltIcon sx={{ fontSize: 16 }} />
                 <WifiIcon sx={{ fontSize: 16 }} />
@@ -292,27 +352,68 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
                 height: '100%',
                 overflowY: 'auto',
                 '&::-webkit-scrollbar': { display: 'none' },
-                maskImage: 'linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)',
+                maskImage:
+                  'linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)',
               }}
             >
               {loading && (
-                <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(mockColors.bg, 0.8), zIndex: 10 }}>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: alpha(mockColors.bg, 0.8),
+                    zIndex: 10,
+                  }}
+                >
                   <CircularProgress size={24} color="primary" />
                 </Box>
               )}
 
               {/* Header */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, pt: 1 }}>
-                <Box sx={{ border: `1px solid ${statusColor}`, borderRadius: 5, px: 1, py: 0.3, bgcolor: statusBg }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 2,
+                  pt: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    border: `1px solid ${statusColor}`,
+                    borderRadius: 5,
+                    px: 1,
+                    py: 0.3,
+                    bgcolor: statusBg,
+                  }}
+                >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                     <FiberManualRecordIcon sx={{ fontSize: 8, color: statusColor }} />
-                    <Typography variant="caption" sx={{ color: statusColor, fontWeight: 700, fontSize: '0.6rem', letterSpacing: '0.05em' }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: statusColor,
+                        fontWeight: 700,
+                        fontSize: '0.6rem',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
                       MERCADO {state}
                     </Typography>
                   </Box>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="caption" sx={{ color: mockColors.textSecondary, fontSize: '0.65rem' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: mockColors.textSecondary, fontSize: '0.65rem' }}
+                  >
                     Actualizado: {displayTime}
                   </Typography>
                   <RefreshIcon sx={{ color: mockColors.textSecondary, fontSize: 14 }} />
@@ -324,18 +425,62 @@ const PhoneMockup = ({ marketData, loading }: PhoneMockupProps) => {
                 <RateCard title="USD/VES • BCV" icon={<AttachMoneyIcon />} data={bcvData} />
               </Box>
               <Box sx={{ mb: 3 }}>
-                <RateCard title={firstCrypto ? `${firstCrypto.currency} • ${firstCrypto.source}` : 'Tether • P2P'} icon={<ShowChartIcon />} data={cryptoData} />
+                <RateCard
+                  title={
+                    firstCrypto ? `${firstCrypto.currency} • ${firstCrypto.source}` : 'Tether • P2P'
+                  }
+                  icon={<ShowChartIcon />}
+                  data={cryptoData}
+                />
               </Box>
               <StockListCard items={stockItems} />
             </Box>
 
             {/* Home Indicator */}
-            <Box sx={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', width: 108, height: 4, bgcolor: isDark ? '#ffffff' : '#191C1A', borderRadius: 4, opacity: 0.4, zIndex: 20, pointerEvents: 'none' }} />
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 12,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 108,
+                height: 4,
+                bgcolor: isDark ? '#ffffff' : '#191C1A',
+                borderRadius: 4,
+                opacity: 0.4,
+                zIndex: 20,
+                pointerEvents: 'none',
+              }}
+            />
           </Paper>
 
           {/* Blobs */}
-          <Box sx={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, bgcolor: alpha(mockColors.primary, 0.2), borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
-          <Box sx={{ position: 'absolute', bottom: -40, left: -40, width: 200, height: 200, bgcolor: alpha(mockColors.trendUp, 0.1), borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
+          <Box
+            sx={{
+              position: 'absolute',
+              top: -40,
+              right: -40,
+              width: 200,
+              height: 200,
+              bgcolor: alpha(mockColors.primary, 0.2),
+              borderRadius: '50%',
+              filter: 'blur(60px)',
+              zIndex: 1,
+            }}
+          />
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: -40,
+              left: -40,
+              width: 200,
+              height: 200,
+              bgcolor: alpha(mockColors.trendUp, 0.1),
+              borderRadius: '50%',
+              filter: 'blur(60px)',
+              zIndex: 1,
+            }}
+          />
         </Box>
       </Box>
     </Grow>

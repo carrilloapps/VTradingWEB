@@ -40,7 +40,7 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
             sx={{
               display: 'flex',
               justifyContent: 'center',
-              order: { xs: 2, lg: 1 } // Stay left on desktop, move down on mobile
+              order: { xs: 2, lg: 1 }, // Stay left on desktop, move down on mobile
             }}
           >
             <PhoneMockup marketData={marketData} loading={loading} />
@@ -52,7 +52,7 @@ const HeroSection = ({ marketData, loading, onDownload }: HeroSectionProps) => {
             sx={{
               textAlign: { xs: 'center', lg: 'left' },
               minWidth: 0,
-              order: { xs: 1, lg: 2 } // Stay right on desktop, move up on mobile
+              order: { xs: 1, lg: 2 }, // Stay right on desktop, move up on mobile
             }}
           >
             {' '}

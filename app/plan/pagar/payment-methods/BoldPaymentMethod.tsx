@@ -72,26 +72,26 @@ export default function BoldPaymentMethod({
 
   const handleInputChange =
     (field: keyof CustomerInfo) =>
-      (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
-      ) => {
-        const value = event.target.value;
+    (
+      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
+    ) => {
+      const value = event.target.value;
 
-        // Formatear automáticamente el documento
-        if (field === 'documentNumber') {
-          const formatted = formatDocumentNumber(value);
-          setCustomerInfo((prev) => ({
-            ...prev,
-            [field]: formatted,
-          }));
-        } else {
-          setCustomerInfo((prev) => ({
-            ...prev,
-            [field]: value,
-          }));
-        }
-        setError(null);
-      };
+      // Formatear automáticamente el documento
+      if (field === 'documentNumber') {
+        const formatted = formatDocumentNumber(value);
+        setCustomerInfo((prev) => ({
+          ...prev,
+          [field]: formatted,
+        }));
+      } else {
+        setCustomerInfo((prev) => ({
+          ...prev,
+          [field]: value,
+        }));
+      }
+      setError(null);
+    };
 
   const validateForm = (): boolean => {
     if (!customerInfo.name || customerInfo.name.length < 3) {

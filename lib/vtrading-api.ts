@@ -38,7 +38,11 @@ async function fetchVTrading<T>(endpoint: string, options: RequestInit = {}): Pr
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error(`VTrading API Error: ${response.status} ${response.statusText}`, new Error(errorText), { endpoint });
+      logger.error(
+        `VTrading API Error: ${response.status} ${response.statusText}`,
+        new Error(errorText),
+        { endpoint }
+      );
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
@@ -164,9 +168,9 @@ export async function fetchMarketData(bvcPage = 1, bvcLimit = 30) {
     // Use the request timestamp as the lastUpdate time
     status: rates?.status
       ? {
-        ...rates.status,
-        lastUpdate: requestTimestamp,
-      }
+          ...rates.status,
+          lastUpdate: requestTimestamp,
+        }
       : null,
   };
 }

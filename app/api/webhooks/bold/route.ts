@@ -81,7 +81,10 @@ export async function POST(request: NextRequest) {
             transactionId,
           });
         } catch (error) {
-          logger.error('Error updating user premium status in Bold webhook', error, { userId, orderId });
+          logger.error('Error updating user premium status in Bold webhook', error, {
+            userId,
+            orderId,
+          });
           // Don't return error - payment was successful even if DB update failed
         }
       }
